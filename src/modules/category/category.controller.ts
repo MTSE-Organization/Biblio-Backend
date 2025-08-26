@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryForm } from './form/create-category.form';
+import { JwtAuthGuard } from '../auth/guards';
 
 @Controller('category')
 export class CategoryController {
@@ -11,6 +12,7 @@ export class CategoryController {
     return await this.categoryService.create(form);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('list')
   async list() {
     return await this.categoryService.findAll();
