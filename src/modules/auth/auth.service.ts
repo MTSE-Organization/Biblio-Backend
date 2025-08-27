@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AccountService } from '../account/account.service';
-import { RegisterForm } from './form/register.form';
+import { RegisterForm } from './forms/register.form';
 import { BadRequestException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { JwtService } from '@nestjs/jwt';
@@ -11,7 +11,7 @@ import {
   ActiveAccountForm,
   ChangePasswordForm,
   ForgotPasswordForm,
-} from './form';
+} from './forms';
 
 @Injectable()
 export class AuthService {
