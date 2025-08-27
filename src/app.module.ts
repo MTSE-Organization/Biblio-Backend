@@ -14,6 +14,10 @@ import { CategoryModule } from './modules/category/category.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { StartTimingMiddleware } from './common/middlewares/start-timing.middleware';
 import { JwtModule } from '@nestjs/jwt';
+import { OtpModule } from './modules/otp/otp.module';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -32,11 +36,24 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       global: true,
     }),
+    CacheModule.registerAsync({
+      useFactory: () => ({
+        stores: [createKeyv('redis://localhost:6379')],
+      }),
+      isGlobal: true,
+    }),
     AuthModule,
     AccountModule,
     GroupModule,
     CategoryModule,
     PermissionModule,
+    OtpModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
   ],
 })
 export class AppModule implements NestModule {
