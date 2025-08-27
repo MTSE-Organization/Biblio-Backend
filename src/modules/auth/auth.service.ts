@@ -1,16 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AccountService } from '../account/account.service';
 import { RegisterForm } from './form/register.form';
-import { BadRequestException, NotFoundException } from '@/common/exceptions';
+import { BadRequestException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { LoginForm } from './form/login.form';
 import { JwtService } from '@nestjs/jwt';
+import { OtpService } from '../otp/otp.service';
+import { MailService } from '../mail/mail.service';
+import { Constant } from '@/constants/constant';
+import {
+  ActiveAccountForm,
+  ChangePasswordForm,
+  ForgotPasswordForm,
+} from './form';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
+    private readonly otpService: OtpService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(form: RegisterForm) {
@@ -21,12 +30,77 @@ export class AuthService {
         ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED,
       );
     }
+    if (form.password !== form.confirmPassword) {
+      throw new BadRequestException(
+        'Password and Confirm Password do not match',
+        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH,
+      );
+    }
     await this.accountService.createUser(form);
-    return { message: 'Register successfully' };
+
+    // otp
+    const otp = this.otpService.generateOtp();
+    await this.otpService.storeOtp(form.email, otp);
+
+    // send email
+    void this.mailService.sendActivationMail(form.email, otp);
+
+    return {
+      message: 'Register successfully',
+    };
+  }
+
+  async verifyOtp(form: ActiveAccountForm) {
+    const isVerified = await this.otpService.verifyOtp(form.email, form.otp);
+    if (!isVerified) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+    // OTP valid - proceed to activate the user account or mark as verified
+    await this.accountService.activateUser(form.email);
+    return { message: 'OTP verified successfully' };
   }
 
   async login({ id, kind }) {
     const token = await this.jwtService.signAsync({ id, kind });
     return { message: 'Login successfully', token };
+  }
+
+  async forgotPassword(form: ForgotPasswordForm) {
+    const account = await this.accountService.findByEmailAndStatus(
+      form.email,
+      Constant.STATUS_ACTIVE,
+    );
+    if (!account) {
+      throw new NotFoundException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+      );
+    }
+
+    // otp
+    const otp = this.otpService.generateOtp();
+    await this.otpService.storeOtp(form.email, otp);
+
+    // send email
+    void this.mailService.sendActivationMail(form.email, otp);
+
+    return {
+      message: 'Send OTP successfully',
+    };
+  }
+
+  async changePassword(form: ChangePasswordForm) {
+    const isVerified = await this.otpService.verifyOtp(form.email, form.otp);
+    if (!isVerified) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+    if (form.password !== form.confirmPassword) {
+      throw new BadRequestException(
+        'Password and Confirm Password do not match',
+        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH,
+      );
+    }
+    await this.accountService.changePassword(form.email, form.password);
+    return { message: 'Change password successfully' };
   }
 }

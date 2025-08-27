@@ -4,6 +4,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import bcrypt from 'node_modules/bcryptjs';
 import { RegisterForm } from '../auth/form/register.form';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
+import { ErrorCode } from '@/constants/error-code.constant';
 
 @Injectable()
 export class AccountService {
@@ -19,9 +21,20 @@ export class AccountService {
     return await this.accountRepository.findOne({ where: { email } });
   }
 
+  async findByEmailAndStatus(
+    email: string,
+    status: number,
+  ): Promise<Account | null> {
+    return await this.accountRepository.findOne({ where: { email, status } });
+  }
+
   async createUser(data: RegisterForm): Promise<Account> {
     data.password = this.hashPassword(data.password);
-    const account = { ...data, kind: Constant.ACCOUNT_KIND_USER };
+    const account = {
+      ...data,
+      kind: Constant.ACCOUNT_KIND_USER,
+      status: Constant.STATUS_PENDING,
+    };
     return await this.accountRepository.create(account);
   }
 
@@ -34,10 +47,40 @@ export class AccountService {
   }
 
   async validateUser(email: string, password: string) {
-    const account = await this.findByEmail(email);
+    const account = await this.findByEmailAndStatus(
+      email,
+      Constant.STATUS_ACTIVE,
+    );
     if (account && this.checkPassword(password, account.password)) {
       return { id: account.id, kind: account.kind };
     }
     throw new UnauthorizedException();
+  }
+
+  async activateUser(email: string) {
+    const account = await this.findByEmail(email);
+    if (!account) {
+      throw new NotFoundException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+      );
+    }
+    account.status = Constant.STATUS_ACTIVE;
+    await account.save();
+  }
+
+  async changePassword(email: string, password: string) {
+    const account = await this.findByEmailAndStatus(
+      email,
+      Constant.STATUS_ACTIVE,
+    );
+    if (!account) {
+      throw new NotFoundException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+      );
+    }
+    account.password = this.hashPassword(password);
+    await account.save();
   }
 }
