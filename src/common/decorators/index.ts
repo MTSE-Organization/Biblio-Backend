@@ -2,6 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -44,6 +45,21 @@ export const BooleanDecorator = (name: string, required: boolean = false) => {
       description: `${name} field`,
     }),
     IsBoolean({ message: `${name} must be a boolean` }),
+    ...(required
+      ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
+      : [IsOptional()]),
+  );
+};
+
+export const EmailDecorator = (name: string, required: boolean = false) => {
+  return applyDecorators(
+    ApiProperty({
+      required,
+      type: String,
+      description: `${name} (email) field`,
+      example: 'example@gmail.com',
+    }),
+    IsEmail({}, { message: `${name} must be a valid email` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
       : [IsOptional()]),

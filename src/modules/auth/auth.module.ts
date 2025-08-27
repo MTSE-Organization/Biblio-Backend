@@ -5,6 +5,7 @@ import { AccountModule } from '../account/account.module';
 import { JwtStrategy, LocalStrategy } from './stratigies';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
 import { OtpModule } from '../otp/otp.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -15,7 +16,7 @@ import { OtpModule } from '../otp/otp.module';
     JwtStrategy,
     JwtAuthGuard,
   ],
-  imports: [AccountModule, OtpModule],
+  imports: [AccountModule, OtpModule, MailModule],
   exports: [JwtAuthGuard],
 })
 export class AuthModule {}
