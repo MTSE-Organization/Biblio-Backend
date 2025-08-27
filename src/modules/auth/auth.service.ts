@@ -5,6 +5,7 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from '../otp/otp.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async register(form: RegisterForm) {
@@ -29,8 +31,21 @@ export class AuthService {
     await this.otpService.storeOtp(form.email, otp);
 
     // send email
+    await this.mailerService
+      .sendMail({
+        to: form.email,
+        subject: 'Activate account',
+        text: 'Welcome to Biblio',
+        template: 'register',
+        context: {
+          name: 'Test',
+          otp: otp,
+        },
+      })
+      .then((info) => console.log('Mail sent:', info))
+      .catch((err) => console.error('Mail error:', err));
+
     return {
-      data: { email: form.email, otp: otp },
       message: 'Register successfully',
     };
   }
