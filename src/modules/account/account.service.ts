@@ -3,9 +3,10 @@ import { Account } from '@/models';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import bcrypt from 'node_modules/bcryptjs';
-import { RegisterForm } from '../auth/form/register.form';
+import { RegisterForm } from '../auth/forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
+import { UpdateProfileFForm } from './forms';
 
 @Injectable()
 export class AccountService {
@@ -13,7 +14,33 @@ export class AccountService {
     @InjectModel(Account) private readonly accountRepository: typeof Account,
   ) {}
 
-  async findAll() {
+  async findById(id: number): Promise<Account> {
+    const account: Account | null = await this.accountRepository.findByPk(id);
+    console.log({ id, account });
+
+    if (!account) {
+      throw new NotFoundException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+      );
+    }
+    return account;
+  }
+
+  async findByIdAndStatus(id: number, status: number): Promise<Account> {
+    const account: Account | null = await this.accountRepository.findOne({
+      where: { id, status },
+    });
+    if (!account) {
+      throw new NotFoundException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+      );
+    }
+    return account;
+  }
+
+  async findAll(): Promise<Account[]> {
     return await this.accountRepository.findAll();
   }
 
@@ -82,5 +109,42 @@ export class AccountService {
     }
     account.password = this.hashPassword(password);
     await account.save();
+  }
+
+  async updateProfile(id: number, data: UpdateProfileFForm) {
+    const account = await this.findByIdAndStatus(id, Constant.STATUS_ACTIVE);
+    if (data.email !== account.email) {
+      const existingAccount = await this.findByEmail(data.email);
+      if (existingAccount) {
+        throw new BadRequestException(
+          'Account error email existed',
+          ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED,
+        );
+      }
+      account.email = data.email;
+    }
+    if (
+      data.phone !== null &&
+      (account.phone === null || data.phone !== account.phone)
+    ) {
+      if (await this.existsBy('phone', data.phone)) {
+        throw new BadRequestException(
+          'Account error phone existed',
+          ErrorCode.ACCOUNT_ERROR_PHONE_EXISTED,
+        );
+      }
+      account.phone = data.phone;
+    }
+    account.fullName = data.fullName;
+    account.avatarPath = data.avatarPath;
+    await account.save();
+    return { message: 'Profile updated successfully' };
+  }
+
+  async existsBy(field: keyof Account, value: any): Promise<boolean> {
+    const count = await this.accountRepository.count({
+      where: { [field]: value },
+    });
+    return count > 0;
   }
 }
