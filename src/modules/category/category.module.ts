@@ -4,10 +4,11 @@ import { CategoryController } from './category.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Category } from '@/models';
 import { CategoryMapper } from '@/common/mappers/category.mapper';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   controllers: [CategoryController],
   providers: [CategoryService, CategoryMapper],
-  imports: [SequelizeModule.forFeature([Category])],
+  imports: [SequelizeModule.forFeature([Category]), AuthModule],
 })
 export class CategoryModule {}
