@@ -1,9 +1,12 @@
-import { StringDecorator } from '@/common/decorators';
+import { EmailDecorator, StringDecorator } from '@/common/decorators';
 
 export class RegisterForm {
-  @StringDecorator('email', true)
+  @EmailDecorator('email', true)
   email: string;
 
   @StringDecorator('password', true)
   password: string;
+
+  @StringDecorator('confirmPassword', true)
+  confirmPassword: string;
 }

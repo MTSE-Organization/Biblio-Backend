@@ -1,9 +1,9 @@
 import { EmailDecorator, StringDecorator } from '@/common/decorators';
 
-export class LoginForm {
+export class ActiveAccountForm {
   @EmailDecorator('email', true)
   email: string;
 
-  @StringDecorator('password', true)
-  password: string;
+  @StringDecorator('otp', true)
+  otp: string;
 }

@@ -20,6 +20,7 @@ import { createKeyv } from '@keyv/redis';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     CategoryModule,
     PermissionModule,
     OtpModule,
+    MailModule,
   ],
 })
 export class AppModule implements NestModule {
