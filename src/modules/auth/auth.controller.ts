@@ -6,7 +6,7 @@ import {
   ChangePasswordForm,
   ForgotPasswordForm,
   RegisterForm,
-} from './form';
+} from './forms';
 
 @Controller('auth')
 export class AuthController {

@@ -20,4 +20,20 @@ export class MailService {
       .then((info) => console.log('Mail sent:', info))
       .catch((err) => console.error('Mail error:', err));
   }
+
+  async sendForgotPasswordMail(email: string, otp: string): Promise<void> {
+    return this.mailerService
+      .sendMail({
+        to: email,
+        subject: 'Forgot Password',
+        text: 'Welcome to Biblio',
+        template: 'forgot-password',
+        context: {
+          name: 'Test',
+          otp: otp,
+        },
+      })
+      .then((info) => console.log('Mail sent:', info))
+      .catch((err) => console.error('Mail error:', err));
+  }
 }

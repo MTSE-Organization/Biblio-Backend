@@ -50,8 +50,8 @@ export class AllExceptionFilter implements ExceptionFilter {
       message = 'An error just happened in system';
     }
     this.logger.error(exception);
-    const errorResponse: ApiResponse<any> = {
-      false: false,
+    const res: ApiResponse<any> = {
+      result: false,
       code,
       message,
       ...(error && { error }),
@@ -62,6 +62,6 @@ export class AllExceptionFilter implements ExceptionFilter {
       path: request.url,
       takenTime,
     };
-    response.status(status).json(errorResponse);
+    response.status(status).json(res);
   }
 }

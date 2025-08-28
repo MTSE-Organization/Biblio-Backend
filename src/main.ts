@@ -45,6 +45,8 @@ async function bootstrap() {
   const port = configService.get<string>('PORT') || 3000;
   logger.log(`Server running on port: ${port}`);
   logger.log(`Swagger running at: http://localhost:${port}/api/v1/docs`);
+
+  app.enableCors();
   await app.listen(port);
 }
 bootstrap().catch((err) => {
