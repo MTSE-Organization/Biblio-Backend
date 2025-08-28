@@ -1,4 +1,4 @@
-import { ROLE_KEY } from '@/common/decorators';
+import { PCODE_KEY } from '@/common/decorators';
 import {
   CanActivate,
   ExecutionContext,
@@ -14,9 +14,9 @@ export class AuthorizationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     try {
       const request = context.switchToHttp().getRequest();
-      const role = this.reflector.get<string>(ROLE_KEY, context.getHandler());
+      const pcode = this.reflector.get<string>(PCODE_KEY, context.getHandler());
       const authorities = request.user?.authorities || [];
-      if (role && !authorities.includes(role)) {
+      if (pcode && !authorities.includes(pcode)) {
         throw new UnauthorizedException('You do not have permission');
       }
     } catch (error) {
