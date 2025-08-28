@@ -2,6 +2,8 @@ import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { JwtAuthGuard } from '../auth/guards';
 import { UpdateProfileFForm } from './forms';
+import { AccountDto } from './dtos';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('account')
 export class AccountController {
@@ -14,9 +16,11 @@ export class AccountController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async profile(@Req() req: any) {
-    const { userId } = req.user;
-    return await this.accountService.findById(userId);
+  async profile(@Req() req: any): Promise<AccountDto> {
+    const account = await this.accountService.findById(req.user.userId);
+    return plainToInstance(AccountDto, account, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

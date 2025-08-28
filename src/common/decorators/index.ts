@@ -9,6 +9,8 @@ import {
   IsString,
 } from 'class-validator';
 
+export * from './pcode.decorator';
+
 export const StringDecorator = (name: string, required: boolean = false) => {
   return applyDecorators(
     ApiProperty({

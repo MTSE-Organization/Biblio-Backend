@@ -7,6 +7,7 @@ import { RegisterForm } from '../auth/forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateProfileFForm } from './forms';
+import { UserDetailsDto } from '../auth/dtos';
 
 @Injectable()
 export class AccountService {
@@ -16,7 +17,6 @@ export class AccountService {
 
   async findById(id: number): Promise<Account> {
     const account: Account | null = await this.accountRepository.findByPk(id);
-    console.log({ id, account });
 
     if (!account) {
       throw new NotFoundException(
@@ -73,13 +73,19 @@ export class AccountService {
     return bcrypt.compareSync(password, hash);
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<UserDetailsDto> {
     const account = await this.findByEmailAndStatus(
       email,
       Constant.STATUS_ACTIVE,
     );
     if (account && this.checkPassword(password, account.password)) {
-      return { id: account.id, kind: account.kind };
+      const user = new UserDetailsDto(
+        account.id,
+        account.kind,
+        ['CAT_V', 'CAT_L'],
+        account.isSuperAdmin,
+      );
+      return user;
     }
     throw new UnauthorizedException();
   }
