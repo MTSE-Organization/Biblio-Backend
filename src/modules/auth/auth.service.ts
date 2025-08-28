@@ -82,7 +82,7 @@ export class AuthService {
     await this.otpService.storeOtp(form.email, otp);
 
     // send email
-    void this.mailService.sendActivationMail(form.email, otp);
+    void this.mailService.sendForgotPasswordMail(form.email, otp);
 
     return {
       message: 'Send OTP successfully',
