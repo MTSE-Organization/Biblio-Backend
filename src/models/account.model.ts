@@ -29,7 +29,7 @@ export class Account extends Auditable {
   declare phone?: string | null;
 
   @Column({ allowNull: false, type: DataType.INTEGER })
-  declare kind?: number | null;
+  declare kind: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   declare isSuperAdmin: boolean;
