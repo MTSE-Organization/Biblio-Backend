@@ -2,6 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { UserDetailsDto } from '../dtos';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,11 +20,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (!userId) {
         throw new UnauthorizedException('Invalid token payload');
       }
-      const user = {
-        userId: userId,
-        roles: payload.roles || [],
-        kind: payload.kind,
-      };
+      const user = new UserDetailsDto(
+        userId,
+        payload.kind,
+        payload.authorities,
+        payload.isSuperAdmin,
+      );
       return user;
     } catch (error) {
       console.error(`JWT validation failed: ${error.message}`, error.stack);

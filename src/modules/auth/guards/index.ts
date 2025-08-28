@@ -1,2 +1,3 @@
-export * from './local-auth.guard';
-export * from './jwt.guard';
+export * from './local-auth.guard'; // verify user credentials
+export * from './jwt.guard'; // authentication
+export * from './authorization.guard'; // authorization

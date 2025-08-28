@@ -12,6 +12,7 @@ import {
   ChangePasswordForm,
   ForgotPasswordForm,
 } from './forms';
+import { UserDetailsDto } from './dtos';
 
 @Injectable()
 export class AuthService {
@@ -60,8 +61,9 @@ export class AuthService {
     return { message: 'OTP verified successfully' };
   }
 
-  async login({ id, kind }) {
-    const token = await this.jwtService.signAsync({ id, kind });
+  async login(user: UserDetailsDto) {
+    const payload = { ...user };
+    const token = await this.jwtService.signAsync(payload);
     return { message: 'Login successfully', token };
   }
 
