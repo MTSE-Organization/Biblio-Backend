@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AccountService } from '../account/account.service';
 import { RegisterForm } from './forms/register.form';
-import { BadRequestException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from '../otp/otp.service';
@@ -92,7 +92,10 @@ export class AuthService {
   async changePassword(form: ChangePasswordForm) {
     const isVerified = await this.otpService.verifyOtp(form.email, form.otp);
     if (!isVerified) {
-      throw new BadRequestException('Invalid or expired OTP');
+      throw new BadRequestException(
+        'Invalid or expired OTP',
+        ErrorCode.AUTH_ERROR_OTP_INVALID_OR_EXPIRED,
+      );
     }
     if (form.password !== form.confirmPassword) {
       throw new BadRequestException(
