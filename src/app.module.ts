@@ -1,3 +1,4 @@
+//#region import
 import {
   MiddlewareConsumer,
   Module,
@@ -21,6 +22,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { jwtConfig } from './config';
 import { cacheConfig } from './config/cache.config';
 import { mailConfig } from './config/mail.config';
+//#endregion
 
 @Module({
   imports: [
