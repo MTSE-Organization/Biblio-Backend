@@ -74,3 +74,17 @@ export const EmailDecorator = (name: string, required: boolean = false) => {
       : [IsOptional()]),
   );
 };
+
+export const BigIntDecorator = (name: string, required: boolean = false) => {
+  return applyDecorators(
+    ApiProperty({
+      required: required,
+      type: BigInt,
+      description: `${name} field`,
+    }),
+    Transform(({ value }) => BigInt(value)),
+    ...(required
+      ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
+      : [IsOptional()]),
+  );
+};
