@@ -9,7 +9,7 @@ export interface ApiResponse<T> {
 }
 
 export interface ResponseListDto<T> {
-  data: T;
+  content: T;
   totalElements: number;
   totalPages: number;
 }

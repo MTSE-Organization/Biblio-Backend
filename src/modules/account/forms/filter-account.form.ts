@@ -4,7 +4,7 @@ import {
   StringDecorator,
 } from '@/common/decorators';
 import { PaginationForm } from '@/common/forms';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { Op } from 'sequelize';
 
 export class FilterAccountForm extends PaginationForm {
@@ -21,11 +21,11 @@ export class FilterAccountForm extends PaginationForm {
   @NumberDecorator('kind')
   kind: number;
 
-  @Type(() => Boolean)
   @BooleanDecorator('isSuperAdmin')
   isSuperAdmin: boolean;
 
   getFilter(): Record<string, any> {
+    console.log(this.isSuperAdmin);
     const where: Record<string, any> = {};
     if (this.email) where.email = { [Op.like]: `%${this.email}%` };
     if (this.fullName) where.fullName = { [Op.like]: `%${this.fullName}%` };

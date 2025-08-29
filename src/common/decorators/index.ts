@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEmail,
@@ -45,6 +46,12 @@ export const BooleanDecorator = (name: string, required: boolean = false) => {
       required: required,
       type: Boolean,
       description: `${name} field`,
+    }),
+    Transform(({ value }) => {
+      if (typeof value === 'boolean') return value;
+      if (value === 'true' || value === '1' || value === 1) return true;
+      if (value === 'false' || value === '0' || value === 0) return false;
+      return value as boolean;
     }),
     IsBoolean({ message: `${name} must be a boolean` }),
     ...(required

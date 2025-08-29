@@ -59,7 +59,7 @@ export class AccountService {
     });
 
     const response: ResponseListDto<AccountDto[]> = {
-      data: plainToInstance(AccountDto, rows, {
+      content: plainToInstance(AccountDto, rows, {
         excludeExtraneousValues: true,
       }),
       totalElements: count,
