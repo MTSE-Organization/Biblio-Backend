@@ -7,10 +7,10 @@ import { Auditable } from './auditable.model';
 })
 export class Permission extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
-  name: string;
+  declare name: string;
 
   @Column({ allowNull: false, type: DataType.STRING })
-  description: string;
+  declare description: string;
 
   @Column({
     allowNull: false,
@@ -18,8 +18,8 @@ export class Permission extends Auditable {
     type: DataType.STRING,
     field: 'p_code',
   })
-  pCode: string;
+  declare pCode: string;
 
   @Column({ allowNull: false, type: DataType.STRING })
-  nameGroup: string;
+  declare nameGroup: string;
 }

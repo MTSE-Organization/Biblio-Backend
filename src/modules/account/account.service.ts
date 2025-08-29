@@ -8,6 +8,10 @@ import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateProfileFForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
+import { FilterAccountForm } from './forms/filter-account.form';
+import { ResponseListDto } from '@/common/interfaces';
+import { AccountDto } from './dtos';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AccountService {
@@ -40,8 +44,28 @@ export class AccountService {
     return account;
   }
 
-  async findAll(): Promise<Account[]> {
-    return await this.accountRepository.findAll();
+  async findAll(
+    query: FilterAccountForm,
+  ): Promise<ResponseListDto<AccountDto[]>> {
+    const { page, size } = query;
+    const skip = page * size;
+
+    const filter = query.getFilter();
+
+    const { rows, count } = await this.accountRepository.findAndCountAll({
+      limit: size,
+      offset: skip,
+      where: filter,
+    });
+
+    const response: ResponseListDto<AccountDto[]> = {
+      content: plainToInstance(AccountDto, rows, {
+        excludeExtraneousValues: true,
+      }),
+      totalElements: count,
+      totalPages: Math.ceil(count / size),
+    };
+    return response;
   }
 
   async findByEmail(email: string): Promise<Account | null> {
