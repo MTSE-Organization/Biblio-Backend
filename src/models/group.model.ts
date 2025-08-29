@@ -14,10 +14,10 @@ export class Group extends Auditable {
   @Column({ type: DataType.STRING })
   description: string;
 
-  @Column({ type: DataType.INTEGER })
+  @Column({ type: DataType.INTEGER, allowNull: false })
   kind: number;
 
-  @Column({ type: DataType.BOOLEAN })
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isSystemRole: boolean;
 
   @BelongsToMany(() => Permission, () => GroupPermission)

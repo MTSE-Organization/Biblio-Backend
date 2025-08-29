@@ -9,7 +9,7 @@ export class Category extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
   name: string;
 
-  @Column({ allowNull: false, unique: true, type: DataType.STRING })
+  @Column({ allowNull: false, type: DataType.STRING })
   slug: string;
 
   @Column({ type: DataType.TEXT })

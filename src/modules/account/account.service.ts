@@ -2,12 +2,12 @@ import { Constant } from '@/constants/constant';
 import { Account } from '@/models';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import bcrypt from 'node_modules/bcryptjs';
 import { RegisterForm } from '../auth/forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateProfileFForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AccountService {
