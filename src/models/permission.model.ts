@@ -9,9 +9,17 @@ export class Permission extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
   name: string;
 
-  @Column({ type: DataType.STRING })
+  @Column({ allowNull: false, type: DataType.STRING })
   description: string;
 
-  @Column({ type: DataType.STRING, field: 'p_code' })
+  @Column({
+    allowNull: false,
+    unique: true,
+    type: DataType.STRING,
+    field: 'p_code',
+  })
   pCode: string;
+
+  @Column({ allowNull: false, type: DataType.STRING })
+  nameGroup: string;
 }

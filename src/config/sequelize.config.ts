@@ -18,8 +18,13 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
     host: configService.get<string>('DB_HOST', 'localhost'),
     port: configService.get<number>('DB_PORT'),
     dialect: configService.get<Dialect>('DB_DIALECT'),
-    synchronize: true,
+    synchronize: false,
     autoLoadModels: true,
     models: [Category, Group, Permission, GroupPermission, Account],
+    define: {
+      underscored: true,
+      createdAt: 'created_date',
+      updatedAt: 'modified_date',
+    },
   }),
 };

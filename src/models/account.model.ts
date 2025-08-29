@@ -31,19 +31,16 @@ export class Account extends Auditable {
   @Column({ allowNull: false, type: DataType.INTEGER })
   declare kind: number;
 
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
   declare isSuperAdmin: boolean;
 
   @ForeignKey(() => Group)
-  @Column({ type: DataType.BIGINT, field: 'group_id' })
+  @Column({ type: DataType.BIGINT })
   declare groupId: number;
 
   @BelongsTo(() => Group)
   group: Group;
-
-  getWithoutPassword() {
-    const { password, ...rest } = this.get({ plain: true });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return rest;
-  }
 }
