@@ -7,3 +7,9 @@ export interface ApiResponse<T> {
   path?: string;
   takenTime?: string;
 }
+
+export interface ResponseListDto<T> {
+  data: T;
+  totalElements: number;
+  totalPages: number;
+}

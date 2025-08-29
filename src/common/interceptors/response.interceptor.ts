@@ -39,7 +39,7 @@ export class TransformInterceptor<T>
     const endTime = Date.now();
     const takenTime = `${endTime - startTime}ms`;
     const url: string = request.url;
-  
+
     return next.handle().pipe(
       map((data: any) => {
         if (
@@ -55,10 +55,6 @@ export class TransformInterceptor<T>
           message = data.message as string;
           const { message: _, ...rest } = data;
           data = Object.keys(rest).length > 0 ? rest : undefined;
-        }
-
-        if (data && typeof data === 'object' && 'data' in data) {
-          data = data.data as T;
         }
 
         if (Object.keys(data || {}).length == 0) {
