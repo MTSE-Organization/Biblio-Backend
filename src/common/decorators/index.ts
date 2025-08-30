@@ -2,12 +2,17 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  Validate,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 
 export * from './pcode.decorator';
@@ -86,5 +91,48 @@ export const BigIntDecorator = (name: string, required: boolean = false) => {
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
       : [IsOptional()]),
+  );
+};
+
+@ValidatorConstraint({ name: 'isBigIntArray', async: false })
+class IsBigIntArray implements ValidatorConstraintInterface {
+  validate(value: any, _args: ValidationArguments) {
+    if (value === null || value === undefined) return true; // optional
+    if (!Array.isArray(value)) return false;
+    try {
+      return value.every((v) => {
+        if (v === null || v === undefined) return false;
+        BigInt(v); // convert để test
+        return true;
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  defaultMessage(_args: ValidationArguments) {
+    return 'All elements must be valid integers';
+  }
+}
+
+export const BigIntArrayDecorator = (name: string, required = false) => {
+  return applyDecorators(
+    ApiProperty({
+      required,
+      type: [String],
+      description: `${name} field`,
+    }),
+    Transform(({ value }: { value: any }) => {
+      if (!value) return value as unknown;
+      const arr = Array.isArray(value) ? value : [value];
+      return arr.map((v) => BigInt(v));
+    }),
+    IsArray({ message: `${name} must be an array` }),
+    ...(required
+      ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
+      : [IsOptional()]),
+    Validate(IsBigIntArray, {
+      message: `Each element of ${name} must be a valid integer`,
+    }),
   );
 };

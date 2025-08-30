@@ -9,17 +9,17 @@ import { Auditable } from './auditable.model';
 })
 export class Group extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
-  name: string;
+  declare name: string;
 
   @Column({ type: DataType.STRING })
-  description: string;
+  declare description: string;
 
   @Column({ type: DataType.INTEGER, allowNull: false })
-  kind: number;
+  declare kind: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  isSystemRole: boolean;
+  declare isSystemRole: boolean;
 
   @BelongsToMany(() => Permission, () => GroupPermission)
-  permissions: Permission[];
+  declare permissions: Permission[];
 }

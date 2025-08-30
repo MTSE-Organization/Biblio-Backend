@@ -1,26 +1,31 @@
 import { Constant } from '@/constants/constant';
-import { Account } from '@/models';
+import { Account, Group, Permission } from '@/models';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterForm } from '../auth/forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { UpdateProfileFForm } from './forms';
+import { FilterAccountForm, UpdateProfileFForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
-import { FilterAccountForm } from './forms/filter-account.form';
-import { ResponseListDto } from '@/common/interfaces';
-import { AccountDto } from './dtos';
-import { plainToInstance } from 'class-transformer';
+import { GroupService } from '../group/group.service';
 
 @Injectable()
 export class AccountService {
   constructor(
     @InjectModel(Account) private readonly accountRepository: typeof Account,
+    private readonly groupService: GroupService,
   ) {}
 
   async findById(id: number): Promise<Account> {
-    const account: Account | null = await this.accountRepository.findByPk(id);
+    const account: Account | null = await this.accountRepository.findByPk(id, {
+      include: [
+        {
+          model: Group,
+          include: [{ model: Permission, through: { attributes: [] } }],
+        },
+      ],
+    });
 
     if (!account) {
       throw new NotFoundException(
@@ -44,28 +49,22 @@ export class AccountService {
     return account;
   }
 
-  async findAll(
+  async list(
     query: FilterAccountForm,
-  ): Promise<ResponseListDto<AccountDto[]>> {
+  ): Promise<{ accounts: Account[]; count: number }> {
     const { page, size } = query;
     const skip = page * size;
 
     const filter = query.getFilter();
 
     const { rows, count } = await this.accountRepository.findAndCountAll({
+      include: [Group],
       limit: size,
       offset: skip,
       where: filter,
     });
 
-    const response: ResponseListDto<AccountDto[]> = {
-      content: plainToInstance(AccountDto, rows, {
-        excludeExtraneousValues: true,
-      }),
-      totalElements: count,
-      totalPages: Math.ceil(count / size),
-    };
-    return response;
+    return { accounts: rows, count };
   }
 
   async findByEmail(email: string): Promise<Account | null> {
@@ -76,17 +75,28 @@ export class AccountService {
     email: string,
     status: number,
   ): Promise<Account | null> {
-    return await this.accountRepository.findOne({ where: { email, status } });
+    return await this.accountRepository.findOne({
+      where: { email, status },
+      include: [
+        {
+          model: Group,
+          include: [{ model: Permission, through: { attributes: [] } }],
+        },
+      ],
+    });
   }
 
-  async createUser(data: RegisterForm): Promise<Account> {
-    data.password = this.hashPassword(data.password);
-    const account = {
-      ...data,
+  async createUser(form: RegisterForm): Promise<Account> {
+    form.password = this.hashPassword(form.password);
+    const data = {
+      ...form,
       kind: Constant.ACCOUNT_KIND_USER,
       status: Constant.STATUS_PENDING,
     };
-    return await this.accountRepository.create(account);
+    const group = await this.groupService.findByName(Constant.GROUP_NAME_USER);
+    const account = await this.accountRepository.create(data);
+    await account.$set('group', group);
+    return account;
   }
 
   hashPassword(password: string): string {
@@ -103,10 +113,15 @@ export class AccountService {
       Constant.STATUS_ACTIVE,
     );
     if (account && this.checkPassword(password, account.password)) {
+      const authorities = account.group?.permissions?.map((p) => p.pCode) ?? [];
+      console.log(account.group);
+      console.log(account.group?.permissions);
+      console.log(authorities);
+
       const user = new UserDetailsDto(
         account.id,
         account.kind,
-        ['CAT_V', 'CAT_L'],
+        authorities,
         account.isSuperAdmin,
       );
       return user;

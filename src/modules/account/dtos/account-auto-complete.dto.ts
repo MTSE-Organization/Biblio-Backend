@@ -1,7 +1,7 @@
 import { GroupAutoCompleteDto } from '@/modules/group/dtos/group-auto-complete.dto';
 import { Expose, Type } from 'class-transformer';
 
-export class AccountDto {
+export class AccountAutoCompleteDto {
   @Expose()
   id: number;
 
@@ -26,12 +26,6 @@ export class AccountDto {
   @Expose()
   @Type(() => GroupAutoCompleteDto)
   group: GroupAutoCompleteDto;
-
-  @Expose()
-  createdDate: Date;
-
-  @Expose()
-  modifiedDate: Date;
 
   @Expose()
   status: number;

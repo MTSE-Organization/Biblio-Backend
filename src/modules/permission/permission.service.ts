@@ -87,6 +87,13 @@ export class PermissionService {
     return permission;
   }
 
+  async findByIds(ids: bigint[]): Promise<Permission[]> {
+    const permissions = await this.permissionRepository.findAll({
+      where: { id: ids },
+    });
+    return permissions;
+  }
+
   async existsBy(field: keyof Permission, value: any): Promise<boolean> {
     const count = await this.permissionRepository.count({
       where: { [field]: value },

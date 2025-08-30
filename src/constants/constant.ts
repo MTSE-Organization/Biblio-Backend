@@ -9,4 +9,7 @@ export const Constant = {
   STATUS_ACTIVE: 1,
   STATUS_LOCK: -1,
   STATUS_DELETED: -2,
+
+  // Group
+  GROUP_NAME_USER: 'Role User',
 } as const;
