@@ -42,5 +42,5 @@ export class Account extends Auditable {
   declare groupId: number;
 
   @BelongsTo(() => Group)
-  group: Group;
+  declare group: Group;
 }

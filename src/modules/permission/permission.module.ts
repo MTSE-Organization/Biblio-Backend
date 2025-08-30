@@ -8,5 +8,6 @@ import { Permission } from '@/models';
   controllers: [PermissionController],
   providers: [PermissionService],
   imports: [SequelizeModule.forFeature([Permission])],
+  exports: [PermissionService],
 })
 export class PermissionModule {}

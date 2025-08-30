@@ -25,7 +25,6 @@ export class FilterAccountForm extends PaginationForm {
   isSuperAdmin: boolean;
 
   getFilter(): Record<string, any> {
-    console.log(this.isSuperAdmin);
     const where: Record<string, any> = {};
     if (this.email) where.email = { [Op.like]: `%${this.email}%` };
     if (this.fullName) where.fullName = { [Op.like]: `%${this.fullName}%` };

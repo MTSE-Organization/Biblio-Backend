@@ -9,26 +9,33 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { JwtAuthGuard } from '../auth/guards';
-import { UpdateProfileFForm } from './forms';
+import { FilterAccountForm, UpdateProfileFForm } from './forms';
 import { AccountDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
-import { FilterAccountForm } from './forms/filter-account.form';
+import { ResponseListDto } from '@/common/interfaces';
+import { MapperUtil } from '@/utils';
+import { AccountProfileDto } from './dtos/account-profile.dto';
 
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   @Get('list')
-  async list(@Query() query: FilterAccountForm) {
-    const res = await this.accountService.findAll(query);
-    return res;
+  async list(@Query() form: FilterAccountForm) {
+    const { accounts, count } = await this.accountService.list(form);
+    const response: ResponseListDto<AccountDto[]> = {
+      content: MapperUtil.toDtoList(accounts, AccountDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size),
+    };
+    return response;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async profile(@Req() req: any): Promise<AccountDto> {
-    const account = await this.accountService.findById(req.user.userId);
-    return plainToInstance(AccountDto, account, {
+  async profile(@Req() req: any): Promise<AccountProfileDto> {
+    const account = await this.accountService.findById(req.user.id);
+    return plainToInstance(AccountProfileDto, account, {
       excludeExtraneousValues: true,
     });
   }
