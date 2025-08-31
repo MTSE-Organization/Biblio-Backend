@@ -7,14 +7,17 @@ import { Auditable } from './auditable.model';
 })
 export class Category extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
-  name: string;
+  declare name: string;
 
   @Column({ allowNull: false, type: DataType.STRING })
-  slug: string;
+  declare slug: string;
 
   @Column({ type: DataType.TEXT })
-  description: string;
+  declare description: string;
+
+  @Column({ type: DataType.STRING })
+  declare imageUrl: string;
 
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
-  ordering: number;
+  declare ordering: number;
 }
