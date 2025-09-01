@@ -19,9 +19,8 @@ import { OtpModule } from './modules/otp/otp.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './modules/mail/mail.module';
-import { jwtConfig } from './config';
-import { cacheConfig } from './config/cache.config';
-import { mailConfig } from './config/mail.config';
+import { cacheConfig, jwtConfig, mailConfig } from './config';
+import { FileModule } from './modules/file/file.module';
 //#endregion
 
 @Module({
@@ -38,6 +37,7 @@ import { mailConfig } from './config/mail.config';
     PermissionModule,
     OtpModule,
     MailModule,
+    FileModule,
   ],
 })
 export class AppModule implements NestModule {
