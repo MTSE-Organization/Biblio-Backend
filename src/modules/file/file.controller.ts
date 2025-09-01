@@ -13,24 +13,29 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import path from 'path';
 import * as fs from 'fs';
 import { NotFoundException } from '@/common/exceptions';
+import { FileRenameInterceptor } from '@/common/interceptors/file.interceptor';
 
 @Controller('file')
 export class FileController {
   constructor(private readonly configService: ConfigService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file'), new FileRenameInterceptor())
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
-      filename: file.filename,
+      filePath: `/${file.destination.replace('\\', '/')}/${file.filename}`,
     };
   }
 
-  @Get('download/:fileName')
-  downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
+  @Get('download/:folder/:fileName')
+  downloadFile(
+    @Param('folder') folder: string,
+    @Param('fileName') fileName: string,
+    @Res() res: Response,
+  ) {
     const uploadDir =
       this.configService.get<string>('UPLOAD_DIR') || './uploads';
-    const filePath = path.join(uploadDir, fileName);
+    const filePath = path.join(uploadDir, `/${folder}/${fileName}`);
 
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException(`File ${fileName} not found`);
