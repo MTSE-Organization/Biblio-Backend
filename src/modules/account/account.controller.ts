@@ -43,7 +43,7 @@ export class AccountController {
   @UseGuards(JwtAuthGuard)
   @Put('update-profile')
   async updateProfile(@Req() req: any, @Body() form: UpdateProfileFForm) {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     return await this.accountService.updateProfile(userId, form);
   }
 }
