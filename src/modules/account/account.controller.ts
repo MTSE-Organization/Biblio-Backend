@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { JwtAuthGuard } from '../auth/guards';
-import { FilterAccountForm, UpdateProfileFForm } from './forms';
+import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { AccountDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { ResponseListDto } from '@/common/interfaces';
@@ -42,7 +42,7 @@ export class AccountController {
 
   @UseGuards(JwtAuthGuard)
   @Put('update-profile')
-  async updateProfile(@Req() req: any, @Body() form: UpdateProfileFForm) {
+  async updateProfile(@Req() req: any, @Body() form: UpdateProfileForm) {
     const { id: userId } = req.user;
     return await this.accountService.updateProfile(userId, form);
   }

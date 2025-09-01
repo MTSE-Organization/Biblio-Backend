@@ -1,6 +1,6 @@
 import { EmailDecorator, StringDecorator } from '@/common/decorators';
 
-export class UpdateProfileFForm {
+export class UpdateProfileForm {
   @EmailDecorator('email', true)
   email: string;
 
