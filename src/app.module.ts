@@ -21,6 +21,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './modules/mail/mail.module';
 import { cacheConfig, jwtConfig, mailConfig } from './config';
 import { FileModule } from './modules/file/file.module';
+import { ProductImageModule } from './modules/product-image/product-image.module';
+import { ProductModule } from './modules/product/product.module';
 //#endregion
 
 @Module({
@@ -38,6 +40,8 @@ import { FileModule } from './modules/file/file.module';
     OtpModule,
     MailModule,
     FileModule,
+    ProductImageModule,
+    ProductModule,
   ],
 })
 export class AppModule implements NestModule {

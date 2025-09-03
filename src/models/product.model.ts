@@ -3,35 +3,55 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Table,
 } from 'sequelize-typescript';
 import { Category } from './category.model';
 import { Auditable } from './auditable.model';
+import { ProductImage } from './product-image.model';
 
 @Table
 export class Product extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
-  name: string;
-
-  @Column({ allowNull: false, unique: true, type: DataType.STRING })
-  slug: string;
-
-  @Column({ allowNull: false, type: DataType.TEXT })
-  description: string;
-
-  @Column({ allowNull: false, type: DataType.FLOAT })
-  price: number;
+  declare name: string;
 
   @Column({ allowNull: false, type: DataType.STRING })
-  imageUrl: string;
+  declare slug: string;
+
+  @Column({ allowNull: false, type: DataType.TEXT })
+  declare description: string;
+
+  @Column({ allowNull: false, type: DataType.FLOAT })
+  declare price: number;
+
+  @Column({ allowNull: false, type: DataType.DATE })
+  declare releaseDate: Date;
+
+  @Column({ type: DataType.FLOAT })
+  declare length: number;
+
+  @Column({ type: DataType.FLOAT })
+  declare width: number;
+
+  @Column({ type: DataType.FLOAT })
+  declare height: number;
+
+  @Column({ type: DataType.NUMBER })
+  declare ageRating: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  isFeatured: boolean;
+  declare isFeatured: boolean;
+
+  @Column({ type: DataType.NUMBER, defaultValue: 0 })
+  declare quantity: number;
 
   @ForeignKey(() => Category)
-  @Column({ allowNull: false, type: DataType.INTEGER })
-  categoryId: number;
+  @Column({ allowNull: false, type: DataType.BIGINT })
+  declare categoryId: number;
 
   @BelongsTo(() => Category)
-  category: Category;
+  declare category: Category;
+
+  @HasMany(() => ProductImage)
+  declare images: ProductImage[];
 }
