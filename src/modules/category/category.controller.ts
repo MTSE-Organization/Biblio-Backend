@@ -17,6 +17,7 @@ import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
 import { PCode } from '@/common/decorators';
 import { CategoryDto } from './dtos/category.dto';
 import { MapperUtil } from '@/utils';
+import { UpdateOrderingForm } from './form/update-ordering.form';
 
 @Controller('category')
 export class CategoryController {
@@ -29,7 +30,7 @@ export class CategoryController {
     return await this.categoryService.create(form);
   }
 
-  // @PCode('CAT_L')
+  @PCode('CAT_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterCategoryForm) {
@@ -37,11 +38,11 @@ export class CategoryController {
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / (form.size || 10)),
     };
   }
 
-  // @PCode('CAT_V')
+  @PCode('CAT_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
@@ -49,7 +50,7 @@ export class CategoryController {
     return MapperUtil.toDto(category, CategoryDto);
   }
 
-  // @PCode('CAT_U')
+  @PCode('CAT_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateCategoryForm) {
@@ -57,10 +58,24 @@ export class CategoryController {
     return await this.categoryService.update(form);
   }
 
-  // @PCode('CAT_D')
+  @PCode('CAT_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
     return await this.categoryService.delete(id);
+  }
+  @PCode('CAT_AUTO')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('autocomplete')
+  async autocomplete(@Query('q') keyword: string) {
+    const categories = await this.categoryService.autocomplete(keyword);
+    return MapperUtil.toDtoList(categories, CategoryDto);
+  }
+
+  @PCode('CAT_U_ORDER')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('update-ordering')
+  async updateOrdering(@Body() form: UpdateOrderingForm[]) {
+    return await this.categoryService.updateOrdering(form);
   }
 }

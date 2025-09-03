@@ -6,6 +6,9 @@ import { ErrorCode } from '@/constants/error-code.constant';
 import { CreateCategoryForm } from './form/create-category.form';
 import { UpdateCategoryForm } from './form/update-category.form';
 import { FilterCategoryForm } from './form/filter-category.form';
+import slugify from 'slugify';
+import { Op } from 'sequelize';
+import { UpdateOrderingForm } from './form/update-ordering.form';
 
 @Injectable()
 export class CategoryService {
@@ -22,18 +25,27 @@ export class CategoryService {
       );
     }
 
-    if (await this.existsBy('slug', form.slug)) {
-      throw new BadRequestException(
-        'Category slug already exists',
-        ErrorCode.CATEGORY_ERROR_SLUG_EXISTED,
-      );
+    const baseSlug = slugify(form.name, { lower: true, strict: true });
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+
+    while (await this.existsBy('slug', uniqueSlug)) {
+      uniqueSlug = `${baseSlug}-${counter++}`;
     }
+
+    const maxOrderingCategory = await this.categoryRepository.findOne({
+      order: [['ordering', 'DESC']],
+    });
+    const nextOrdering =
+      maxOrderingCategory?.ordering != null
+        ? maxOrderingCategory.ordering + 1
+        : 0;
 
     const category = await this.categoryRepository.create({
       name: form.name,
-      slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
+      slug: uniqueSlug,
       description: form.description || '',
-      ordering: form.ordering ?? 0,
+      ordering: nextOrdering,
       imageUrl: '',
     });
 
@@ -60,10 +72,7 @@ export class CategoryService {
       data.slug !== category.slug &&
       (await this.existsBy('slug', data.slug))
     ) {
-      throw new BadRequestException(
-        'Category slug already exists',
-        ErrorCode.CATEGORY_ERROR_SLUG_EXISTED,
-      );
+      throw new BadRequestException('Category slug already exists');
     }
 
     if (data.name && !data.slug) {
@@ -85,15 +94,17 @@ export class CategoryService {
   async findAll(
     query?: FilterCategoryForm,
   ): Promise<{ categories: Category[]; count: number }> {
-    if (!query) {
-      const categories = await this.categoryRepository.findAll();
-      return { categories, count: categories.length };
-    }
-
-    const { page = 0, size = 10 } = query;
+    const { page = 0, size = 10, name } = query || {};
     const skip = page * size;
 
+    const whereClause: any = {};
+
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
+
     const { rows, count } = await this.categoryRepository.findAndCountAll({
+      where: whereClause,
       limit: size,
       offset: skip,
       order: [['ordering', 'ASC']],
@@ -118,5 +129,55 @@ export class CategoryService {
       where: { [field]: value },
     });
     return count > 0;
+  }
+
+  async autocomplete(keyword: string): Promise<Category[]> {
+    return await this.categoryRepository.findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${keyword}%`,
+        },
+      },
+      limit: 10,
+      order: [['ordering', 'ASC']],
+    });
+  }
+
+  async updateOrdering(
+    forms: UpdateOrderingForm[],
+  ): Promise<{ message: string }> {
+    if (!forms || forms.length === 0) {
+      throw new BadRequestException(
+        'Input list cannot be empty',
+        ErrorCode.CATEGORY_ERROR_INVALID_REQUEST,
+      );
+    }
+
+    const ids = forms.map((f) => f.id);
+    const categories = await this.categoryRepository.findAll({
+      where: { id: ids },
+    });
+
+    if (categories.length !== ids.length) {
+      throw new NotFoundException(
+        'One or more categories not found',
+        ErrorCode.CATEGORY_ERROR_NOT_FOUND,
+      );
+    }
+
+    const orderingMap = new Map<number, number>();
+    for (const form of forms) {
+      orderingMap.set(Number(form.id), form.ordering);
+    }
+
+    for (const category of categories) {
+      const newOrdering = orderingMap.get(Number(category.id));
+      if (newOrdering !== undefined) {
+        category.ordering = newOrdering;
+        await category.save();
+      }
+    }
+
+    return { message: 'Update ordering category success' };
   }
 }
