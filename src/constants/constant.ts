@@ -13,3 +13,8 @@ export const Constant = {
   // Group
   GROUP_NAME_USER: 'Role User',
 } as const;
+
+export const fileFolders = {
+  ['1']: 'systems',
+  ['2']: 'avatars',
+};

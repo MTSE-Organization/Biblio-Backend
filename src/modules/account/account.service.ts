@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { RegisterForm } from '../auth/forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { FilterAccountForm, UpdateProfileFForm } from './forms';
+import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
@@ -156,7 +156,7 @@ export class AccountService {
     await account.save();
   }
 
-  async updateProfile(id: number, data: UpdateProfileFForm) {
+  async updateProfile(id: number, data: UpdateProfileForm) {
     const account = await this.findByIdAndStatus(id, Constant.STATUS_ACTIVE);
     if (data.email !== account.email) {
       const existingAccount = await this.findByEmail(data.email);
