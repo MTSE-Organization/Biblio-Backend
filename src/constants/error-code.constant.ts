@@ -21,4 +21,7 @@ export const ErrorCode = {
   // Group
   GROUP_ERROR_NOT_FOUND: 'ERROR-GROUP-0000',
   GROUP_ERROR_NAME_EXISTS: 'ERROR-GROUP-0001',
+
+  // Category
+  CATEGORY_ERROR_SLUG_EXISTED: 'ERROR_CATEGORY_0000',
 } as const;
