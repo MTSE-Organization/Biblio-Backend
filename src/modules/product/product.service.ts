@@ -72,4 +72,29 @@ export class ProductService {
     await product.destroy();
     return { message: 'Delete product successfully' };
   }
+
+  async findLatest(limit: number = 8) {
+    return this.productRepository.findAll({
+      limit,
+      order: [['createdDate', 'DESC']],
+      include: [{ model: Category }],
+    });
+  }
+
+  async findBestSeller(limit: number = 6) {
+    return this.productRepository.findAll({
+      where: { isFeatured: true },
+      limit,
+      order: [['quantity', 'DESC']],
+      include: [{ model: Category }],
+    });
+  }
+
+  async findTopDiscount(limit: number = 4) {
+    return this.productRepository.findAll({
+      limit,
+      order: [['price', 'DESC']],
+      include: [{ model: Category }],
+    });
+  }
 }
