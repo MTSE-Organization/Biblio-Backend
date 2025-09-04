@@ -57,4 +57,28 @@ export class ProductController {
   async delete(@Param('id') id: bigint) {
     return await this.productService.delete(id);
   }
+
+  @Get('latest')
+  async getLatest() {
+    return MapperUtil.toDtoList(
+      await this.productService.findLatest(),
+      ProductDto,
+    );
+  }
+
+  @Get('best-seller')
+  async getBestSeller() {
+    return MapperUtil.toDtoList(
+      await this.productService.findBestSeller(),
+      ProductDto,
+    );
+  }
+
+  @Get('top-discount')
+  async getTopDiscount() {
+    return MapperUtil.toDtoList(
+      await this.productService.findTopDiscount(),
+      ProductDto,
+    );
+  }
 }
