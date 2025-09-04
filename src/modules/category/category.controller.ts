@@ -18,12 +18,14 @@ import { PCode } from '@/common/decorators';
 import { CategoryDto } from './dtos/category.dto';
 import { MapperUtil } from '@/utils';
 import { UpdateOrderingForm } from './form/update-ordering.form';
+import { CategoryAutoCompleteDto } from './dtos/category-auto-complete.dto';
+import { ResponseListDto } from '@/common/interfaces';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  // @PCode('CAT_C')
+  @PCode('CAT_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateCategoryForm) {
@@ -64,15 +66,21 @@ export class CategoryController {
   async delete(@Param('id') id: bigint) {
     return await this.categoryService.delete(id);
   }
-  @PCode('CAT_AUTO')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Get('autocomplete')
-  async autocomplete(@Query('q') keyword: string) {
-    const categories = await this.categoryService.autocomplete(keyword);
-    return MapperUtil.toDtoList(categories, CategoryDto);
+
+  @UseGuards(JwtAuthGuard)
+  @Get('auto-complete')
+  async autocomplete(@Query() form: FilterCategoryForm) {
+    const categories = await this.categoryService.autocomplete(form);
+    const count = categories.length;
+    const response: ResponseListDto<CategoryAutoCompleteDto[]> = {
+      content: MapperUtil.toDtoList(categories, CategoryAutoCompleteDto),
+      totalElements: count,
+      totalPages: 1,
+    };
+    return response;
   }
 
-  @PCode('CAT_U_ORDER')
+  @PCode('CAT_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {

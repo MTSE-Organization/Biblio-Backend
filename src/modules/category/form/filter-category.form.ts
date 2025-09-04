@@ -1,12 +1,7 @@
-import { StringDecorator, NumberDecorator } from '@/common/decorators';
+import { StringDecorator } from '@/common/decorators';
+import { PaginationForm } from '@/common/forms';
 
-export class FilterCategoryForm {
-  @NumberDecorator('page', false)
-  page?: number;
-
-  @NumberDecorator('size', false)
-  size?: number;
-
-  @StringDecorator('name', false)
+export class FilterCategoryForm extends PaginationForm {
+  @StringDecorator('name')
   name?: string;
 }

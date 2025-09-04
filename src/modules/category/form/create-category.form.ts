@@ -12,4 +12,7 @@ export class CreateCategoryForm {
 
   @NumberDecorator('status', false)
   status?: number;
+
+  @StringDecorator('imageUrl', false)
+  imageUrl?: string;
 }

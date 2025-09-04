@@ -25,17 +25,12 @@ export class CategoryService {
       );
     }
 
-    const baseSlug = slugify(form.name, { lower: true, strict: true });
-    let uniqueSlug = baseSlug;
-    let counter = 1;
-
-    while (await this.existsBy('slug', uniqueSlug)) {
-      uniqueSlug = `${baseSlug}-${counter++}`;
-    }
+    const slug = slugify(form.name, { lower: true, strict: true });
 
     const maxOrderingCategory = await this.categoryRepository.findOne({
       order: [['ordering', 'DESC']],
     });
+
     const nextOrdering =
       maxOrderingCategory?.ordering != null
         ? maxOrderingCategory.ordering + 1
@@ -43,10 +38,10 @@ export class CategoryService {
 
     const category = await this.categoryRepository.create({
       name: form.name,
-      slug: uniqueSlug,
+      slug,
       description: form.description || '',
       ordering: nextOrdering,
-      imageUrl: '',
+      imageUrl: form.imageUrl,
     });
 
     return { message: 'Create category successfully', category };
@@ -55,7 +50,7 @@ export class CategoryService {
   async update(form: UpdateCategoryForm) {
     const { id, ...data } = form;
     const category = await this.findById(id);
-    console.log(form);
+
     if (
       data.name &&
       data.name !== category.name &&
@@ -67,16 +62,8 @@ export class CategoryService {
       );
     }
 
-    if (
-      data.slug &&
-      data.slug !== category.slug &&
-      (await this.existsBy('slug', data.slug))
-    ) {
-      throw new BadRequestException('Category slug already exists');
-    }
-
-    if (data.name && !data.slug) {
-      data.slug = data.name.toLowerCase().replace(/\s+/g, '-');
+    if (data.name && data.name !== category.name) {
+      data.slug = slugify(data.name, { lower: true, strict: true });
     }
 
     category.set(data);
@@ -131,14 +118,18 @@ export class CategoryService {
     return count > 0;
   }
 
-  async autocomplete(keyword: string): Promise<Category[]> {
+  async autocomplete(query: FilterCategoryForm): Promise<Category[]> {
+    const { name, page = 0, size = 10 } = query;
+
+    const where: any = {};
+    if (name) {
+      where.name = { [Op.iLike]: `%${name}%` };
+    }
+
     return await this.categoryRepository.findAll({
-      where: {
-        name: {
-          [Op.iLike]: `%${keyword}%`,
-        },
-      },
-      limit: 10,
+      where,
+      limit: size,
+      offset: page * size,
       order: [['ordering', 'ASC']],
     });
   }

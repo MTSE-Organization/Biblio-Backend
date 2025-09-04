@@ -8,18 +8,21 @@ export class UpdateCategoryForm {
   @BigIntDecorator('id', true)
   id: bigint;
 
-  @StringDecorator('name', false)
-  name?: string;
-
-  @StringDecorator('slug', false)
-  slug?: string;
+  @StringDecorator('name', true)
+  name: string;
 
   @StringDecorator('description', false)
   description?: string;
 
-  @NumberDecorator('ordering', false)
-  ordering?: number;
+  @NumberDecorator('ordering', true)
+  ordering: number;
 
-  @NumberDecorator('status', false)
-  status?: number;
+  @NumberDecorator('status', true)
+  status: number;
+
+  @StringDecorator('slug', false)
+  slug?: string;
+
+  @StringDecorator('imageUrl', false)
+  imageUrl?: string;
 }
