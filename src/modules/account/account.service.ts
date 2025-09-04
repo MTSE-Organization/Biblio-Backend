@@ -114,10 +114,6 @@ export class AccountService {
     );
     if (account && this.checkPassword(password, account.password)) {
       const authorities = account.group?.permissions?.map((p) => p.pCode) ?? [];
-      console.log(account.group);
-      console.log(account.group?.permissions);
-      console.log(authorities);
-
       const user = new UserDetailsDto(
         account.id,
         account.kind,
