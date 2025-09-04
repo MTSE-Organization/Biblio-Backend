@@ -4,9 +4,6 @@ export class CreateCategoryForm {
   @StringDecorator('name', true)
   name: string;
 
-  @StringDecorator('slug', true)
-  slug: string;
-
   @StringDecorator('description', false)
   description: string;
 
@@ -15,4 +12,7 @@ export class CreateCategoryForm {
 
   @NumberDecorator('status', false)
   status?: number;
+
+  @StringDecorator('imageUrl', false)
+  imageUrl?: string;
 }
