@@ -3,13 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { CreateCategoryForm } from './form/create-category.form';
-import { UpdateCategoryForm } from './form/update-category.form';
-import { FilterCategoryForm } from './form/filter-category.form';
 import slugify from 'slugify';
 import { Op } from 'sequelize';
-import { UpdateOrderingForm } from './form/update-ordering.form';
-
+import {
+  CreateCategoryForm,
+  FilterCategoryForm,
+  UpdateCategoryForm,
+} from './form';
+import { UpdateOrderingForm } from '@/common/forms';
 @Injectable()
 export class CategoryService {
   constructor(

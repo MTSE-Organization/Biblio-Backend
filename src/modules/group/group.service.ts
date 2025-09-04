@@ -69,7 +69,6 @@ export class GroupService {
     }
 
     const permissions = await this.permissionService.findByIds(permissionIds);
-    console.log(permissionIds);
 
     await group.update({ name, ...data });
     await group.$set('permissions', permissions);

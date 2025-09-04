@@ -1,4 +1,10 @@
-import { BigIntDecorator, StringDecorator } from '@/common/decorators';
+import {
+  BigIntDecorator,
+  BooleanDecorator,
+  DateDecorator,
+  NumberDecorator,
+  StringDecorator,
+} from '@/common/decorators';
 
 export class UpdateProductForm {
   @BigIntDecorator('id', true)
@@ -10,6 +16,30 @@ export class UpdateProductForm {
   @StringDecorator('description', true)
   description: string;
 
-  @StringDecorator('pCode', true)
-  pCode: string;
+  @NumberDecorator('price', true)
+  price: number;
+
+  @DateDecorator('releaseDate', true)
+  releaseDate: Date;
+
+  @NumberDecorator('length')
+  length: number | null = null;
+
+  @NumberDecorator('length')
+  width: number | null = null;
+
+  @NumberDecorator('length')
+  height: number | null = null;
+
+  @NumberDecorator('ageRating')
+  ageRating: number | null = null;
+
+  @BooleanDecorator('isFeatured', true)
+  isFeatured: boolean;
+
+  @NumberDecorator('quantity', true)
+  quantity: number;
+
+  @BigIntDecorator('categoryId', true)
+  categoryId: bigint;
 }
