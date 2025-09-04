@@ -1,10 +1,12 @@
 import { Permission } from '@/models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreatePermissionForm } from './forms';
-import { FilterPermissionForm } from './forms/filter-permission.form';
+import {
+  CreatePermissionForm,
+  FilterPermissionForm,
+  UpdatePermissionForm,
+} from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { UpdatePermissionForm } from './forms/update-permission.form';
 import { ErrorCode } from '@/constants/error-code.constant';
 
 @Injectable()

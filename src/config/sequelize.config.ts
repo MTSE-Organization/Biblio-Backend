@@ -5,6 +5,8 @@ import {
   GroupPermission,
   Permission,
 } from '@/models';
+import { ProductImage } from '@/models/product-image.model';
+import { Product } from '@/models/product.model';
 import { ConfigService } from '@nestjs/config';
 import { SequelizeModuleAsyncOptions } from '@nestjs/sequelize';
 import { Dialect } from 'sequelize/lib/sequelize';
@@ -20,7 +22,15 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
     dialect: configService.get<Dialect>('DB_DIALECT'),
     synchronize: false,
     autoLoadModels: true,
-    models: [Category, Group, Permission, GroupPermission, Account],
+    models: [
+      Category,
+      Group,
+      Permission,
+      GroupPermission,
+      Account,
+      Product,
+      ProductImage,
+    ],
     define: {
       underscored: true,
       createdAt: 'created_date',

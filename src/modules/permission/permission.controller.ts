@@ -9,12 +9,14 @@ import {
   Query,
 } from '@nestjs/common';
 import { PermissionService } from './permission.service';
-import { CreatePermissionForm } from './forms';
-import { FilterPermissionForm } from './forms/filter-permission.form';
+import {
+  CreatePermissionForm,
+  FilterPermissionForm,
+  UpdatePermissionForm,
+} from './forms';
 import { MapperUtil } from '@/utils';
 import { PermissionDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
-import { UpdatePermissionForm } from './forms/update-permission.form';
 
 @Controller('permission')
 export class PermissionController {

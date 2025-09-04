@@ -10,7 +10,10 @@ import { Category } from './category.model';
 import { Auditable } from './auditable.model';
 import { ProductImage } from './product-image.model';
 
-@Table
+@Table({
+  tableName: 'db_product',
+  timestamps: true,
+})
 export class Product extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
   declare name: string;

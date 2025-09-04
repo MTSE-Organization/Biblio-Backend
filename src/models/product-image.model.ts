@@ -8,7 +8,10 @@ import {
 import { Auditable } from './auditable.model';
 import { Product } from './product.model';
 
-@Table
+@Table({
+  tableName: 'db_product_image',
+  timestamps: true,
+})
 export class ProductImage extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
   declare url: string;
