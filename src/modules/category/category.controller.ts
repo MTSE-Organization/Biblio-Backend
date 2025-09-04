@@ -17,7 +17,7 @@ import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
 import { PCode } from '@/common/decorators';
 import { CategoryDto } from './dtos/category.dto';
 import { MapperUtil } from '@/utils';
-import { UpdateOrderingForm } from './form/update-ordering.form';
+import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 import { CategoryAutoCompleteDto } from './dtos/category-auto-complete.dto';
 import { ResponseListDto } from '@/common/interfaces';
 
@@ -40,7 +40,7 @@ export class CategoryController {
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
       totalElements: count,
-      totalPages: Math.ceil(count / (form.size || 10)),
+      totalPages: Math.ceil(count / form.size),
     };
   }
 
@@ -75,7 +75,7 @@ export class CategoryController {
     const response: ResponseListDto<CategoryAutoCompleteDto[]> = {
       content: MapperUtil.toDtoList(categories, CategoryAutoCompleteDto),
       totalElements: count,
-      totalPages: 1,
+      totalPages: Math.ceil(count / form.size),
     };
     return response;
   }

@@ -20,9 +20,6 @@ export class UpdateCategoryForm {
   @NumberDecorator('status', true)
   status: number;
 
-  @StringDecorator('slug', false)
-  slug?: string;
-
   @StringDecorator('imageUrl', false)
   imageUrl?: string;
 }

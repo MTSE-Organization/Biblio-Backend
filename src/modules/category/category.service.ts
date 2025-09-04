@@ -8,7 +8,7 @@ import { UpdateCategoryForm } from './form/update-category.form';
 import { FilterCategoryForm } from './form/filter-category.form';
 import slugify from 'slugify';
 import { Op } from 'sequelize';
-import { UpdateOrderingForm } from './form/update-ordering.form';
+import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 
 @Injectable()
 export class CategoryService {
@@ -63,10 +63,11 @@ export class CategoryService {
     }
 
     if (data.name && data.name !== category.name) {
-      data.slug = slugify(data.name, { lower: true, strict: true });
+      category.slug = slugify(data.name, { lower: true, strict: true });
     }
 
     category.set(data);
+
     await category.save();
 
     return { message: 'Update category successfully', category };
