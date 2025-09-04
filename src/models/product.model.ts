@@ -50,7 +50,7 @@ export class Product extends Auditable {
 
   @ForeignKey(() => Category)
   @Column({ allowNull: false, type: DataType.BIGINT })
-  declare categoryId: number;
+  declare categoryId: bigint;
 
   @BelongsTo(() => Category)
   declare category: Category;
