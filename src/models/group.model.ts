@@ -1,7 +1,14 @@
-import { BelongsToMany, Column, DataType, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  HasMany,
+  Table,
+} from 'sequelize-typescript';
 import { Permission } from './permission.model';
 import { GroupPermission } from './group-permission.model';
 import { Auditable } from './auditable.model';
+import { Account } from '@/models/account.model';
 
 @Table({
   tableName: 'db_group',
@@ -22,4 +29,7 @@ export class Group extends Auditable {
 
   @BelongsToMany(() => Permission, () => GroupPermission)
   declare permissions: Permission[];
+
+  @HasMany(() => Account)
+  declare accounts: Account[];
 }

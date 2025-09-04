@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupForm, FilterGroupForm, UpdateGroupForm } from './forms';
 import { GroupDto } from './dtos';
@@ -37,7 +46,7 @@ export class GroupController {
     return this.groupService.update(form);
   }
 
-  @Get('delete/:id')
+  @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
     return await this.groupService.deleteById(id);
   }

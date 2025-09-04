@@ -78,6 +78,13 @@ export class GroupService {
 
   async deleteById(id: bigint) {
     const group = await this.findById(id);
+    const accountCount = await group.$count('accounts');
+    if (accountCount > 0) {
+      throw new BadRequestException(
+        'Group is in use by accounts, cannot delete',
+        ErrorCode.GROUP_ERROR_IN_USED,
+      );
+    }
     await group.destroy();
     return { message: 'Delete group successfully' };
   }
