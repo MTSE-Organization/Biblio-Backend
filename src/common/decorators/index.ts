@@ -1,9 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsDate,
   IsEmail,
   IsNotEmpty,
   IsNumber,
@@ -134,5 +135,21 @@ export const BigIntArrayDecorator = (name: string, required = false) => {
     Validate(IsBigIntArray, {
       message: `Each element of ${name} must be a valid integer`,
     }),
+  );
+};
+
+export const DateDecorator = (name: string, required: boolean = false) => {
+  return applyDecorators(
+    ApiProperty({
+      required: required,
+      type: String,
+      format: 'date-time',
+      description: `${name} field`,
+    }),
+    Type(() => Date),
+    IsDate({ message: `${name} must be a valid date` }),
+    ...(required
+      ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
+      : [IsOptional()]),
   );
 };
