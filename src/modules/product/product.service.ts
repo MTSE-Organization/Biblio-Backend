@@ -15,4 +15,11 @@ export class ProductService {
     await this.productRepository.create(data);
     return { message: 'Create product successfully' };
   }
+
+  async existsBy(field: keyof Product, value: any): Promise<boolean> {
+    const count = await this.productRepository.count({
+      where: { [field]: value },
+    });
+    return count > 0;
+  }
 }

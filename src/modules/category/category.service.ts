@@ -9,12 +9,14 @@ import { FilterCategoryForm } from './form/filter-category.form';
 import slugify from 'slugify';
 import { Op } from 'sequelize';
 import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category)
     private readonly categoryRepository: typeof Category,
+    private readonly productService: ProductService,
   ) {}
 
   async create(form: CreateCategoryForm) {
@@ -75,6 +77,15 @@ export class CategoryService {
 
   async delete(id: bigint) {
     const category = await this.findById(id);
+
+    const hasProducts = await this.productService.existsBy('categoryId', id);
+    if (hasProducts) {
+      throw new BadRequestException(
+        'Cannot delete category because it is in use by one or more products',
+        ErrorCode.CATEGORY_ERROR_IN_USE,
+      );
+    }
+
     await category.destroy();
     return { message: 'Delete category successfully' };
   }
