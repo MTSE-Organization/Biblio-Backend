@@ -10,3 +10,8 @@
 
 - Trang Kim Lợi: Register, Login, Forgot Password
 - Phạm Khánh Huy: Build source, OTP, JWT, Get and update profile
+
+**WEEK 2**:
+
+- Trang Kim Lợi: Category, ProductImage
+- Phạm Khánh Huy: Product

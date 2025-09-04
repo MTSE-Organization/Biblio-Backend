@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
+import { Expose, Type } from 'class-transformer';
 
 export class ProductDto {
   @Expose()
@@ -8,13 +9,38 @@ export class ProductDto {
   name: string;
 
   @Expose()
+  slug: string;
+
+  @Expose()
   description: string;
 
   @Expose()
-  pCode: string;
+  price: number;
 
   @Expose()
-  nameGroup: string;
+  releaseDate: Date;
+
+  @Expose()
+  length: number;
+
+  @Expose()
+  width: number;
+
+  @Expose()
+  height: number;
+
+  @Expose()
+  ageRating: number;
+
+  @Expose()
+  isFeatured: boolean;
+
+  @Expose()
+  quantity: number;
+
+  @Expose()
+  @Type(() => CategoryAutoCompleteDto)
+  category: CategoryAutoCompleteDto;
 
   @Expose()
   createdDate: Date;
