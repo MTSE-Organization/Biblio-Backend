@@ -1,10 +1,9 @@
 import { Category } from '@/models';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import slugify from 'slugify';
-import { Op } from 'sequelize';
 import { ProductService } from '../product/product.service';
 import {
   CreateCategoryForm,
@@ -18,6 +17,8 @@ export class CategoryService {
   constructor(
     @InjectModel(Category)
     private readonly categoryRepository: typeof Category,
+
+    @Inject(forwardRef(() => ProductService))
     private readonly productService: ProductService,
   ) {}
 
@@ -95,17 +96,11 @@ export class CategoryService {
   async findAll(
     query?: FilterCategoryForm,
   ): Promise<{ categories: Category[]; count: number }> {
-    const { page = 0, size = 10, name } = query || {};
+    const { page = 0, size = 10 } = query || {};
     const skip = page * size;
 
-    const whereClause: any = {};
-
-    if (name) {
-      whereClause.name = { [Op.like]: `%${name}%` };
-    }
-
     const { rows, count } = await this.categoryRepository.findAndCountAll({
-      where: whereClause,
+      where: query?.getFilter(),
       limit: size,
       offset: skip,
       order: [['ordering', 'ASC']],
@@ -133,15 +128,10 @@ export class CategoryService {
   }
 
   async autocomplete(query: FilterCategoryForm): Promise<Category[]> {
-    const { name, page = 0, size = 10 } = query;
-
-    const where: any = {};
-    if (name) {
-      where.name = { [Op.iLike]: `%${name}%` };
-    }
+    const { page = 0, size = 10 } = query;
 
     return await this.categoryRepository.findAll({
-      where,
+      where: query.getFilter(),
       limit: size,
       offset: page * size,
       order: [['ordering', 'ASC']],

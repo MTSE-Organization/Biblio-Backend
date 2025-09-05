@@ -17,7 +17,4 @@ export class UpdateProductImageForm {
 
   @BooleanDecorator('isDefault', true)
   isDefault: boolean;
-
-  @BigIntDecorator('productId', true)
-  productId: bigint;
 }

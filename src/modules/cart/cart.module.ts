@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
 import { AccountModule } from '../account/account.module';
@@ -10,6 +10,10 @@ import { CartItemModule } from '../cart-item/cart-item.module';
   controllers: [CartController],
   providers: [CartService],
   exports: [CartService],
-  imports: [SequelizeModule.forFeature([Cart]), AccountModule, CartItemModule],
+  imports: [
+    SequelizeModule.forFeature([Cart]),
+    AccountModule,
+    forwardRef(() => CartItemModule),
+  ],
 })
 export class CartModule {}
