@@ -7,16 +7,20 @@ import { FilterProductImageForm } from './form/filter-product-image.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
-import { Op } from 'sequelize';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class ProductImageService {
   constructor(
     @InjectModel(ProductImage)
     private readonly productImageRepository: typeof ProductImage,
+
+    private readonly productService: ProductService,
   ) {}
 
   async create(form: CreateProductImageForm) {
+    await this.productService.findById(form.productId);
+
     const maxOrderingImage = await this.productImageRepository.findOne({
       where: { productId: form.productId },
       order: [['ordering', 'DESC']],

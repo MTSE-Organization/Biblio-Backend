@@ -69,7 +69,7 @@ export class ProductImageController {
     return await this.productImageService.delete(id);
   }
 
-  @PCode('PIMG_O')
+  @PCode('PIMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
