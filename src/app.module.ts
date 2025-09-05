@@ -23,6 +23,8 @@ import { cacheConfig, jwtConfig, mailConfig } from './config';
 import { FileModule } from './modules/file/file.module';
 import { ProductImageModule } from './modules/product-image/product-image.module';
 import { ProductModule } from './modules/product/product.module';
+import { CartModule } from './modules/cart/cart.module';
+import { CartItemModule } from './modules/cart-item/cart-item.module';
 //#endregion
 
 @Module({
@@ -42,6 +44,8 @@ import { ProductModule } from './modules/product/product.module';
     FileModule,
     ProductImageModule,
     ProductModule,
+    CartModule,
+    CartItemModule,
   ],
 })
 export class AppModule implements NestModule {

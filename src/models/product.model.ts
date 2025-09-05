@@ -39,13 +39,13 @@ export class Product extends Auditable {
   @Column({ type: DataType.FLOAT })
   declare height: number;
 
-  @Column({ type: DataType.NUMBER })
+  @Column({ type: DataType.INTEGER })
   declare ageRating: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   declare isFeatured: boolean;
 
-  @Column({ type: DataType.NUMBER, defaultValue: 0 })
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare quantity: number;
 
   @ForeignKey(() => Category)
