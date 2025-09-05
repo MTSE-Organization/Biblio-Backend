@@ -10,16 +10,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryForm } from './form/create-category.form';
-import { UpdateCategoryForm } from './form/update-category.form';
-import { FilterCategoryForm } from './form/filter-category.form';
 import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
 import { PCode } from '@/common/decorators';
-import { CategoryDto } from './dtos/category.dto';
 import { MapperUtil } from '@/utils';
-import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
-import { CategoryAutoCompleteDto } from './dtos/category-auto-complete.dto';
 import { ResponseListDto } from '@/common/interfaces';
+import {
+  CreateCategoryForm,
+  FilterCategoryForm,
+  UpdateCategoryForm,
+} from './form';
+import { CategoryAutoCompleteDto, CategoryDto } from './dtos';
+import { UpdateOrderingForm } from '@/common/forms';
 
 @Controller('category')
 export class CategoryController {
