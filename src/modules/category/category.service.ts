@@ -5,17 +5,20 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import slugify from 'slugify';
 import { Op } from 'sequelize';
+import { ProductService } from '../product/product.service';
 import {
   CreateCategoryForm,
   FilterCategoryForm,
   UpdateCategoryForm,
 } from './form';
 import { UpdateOrderingForm } from '@/common/forms';
+
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category)
     private readonly categoryRepository: typeof Category,
+    private readonly productService: ProductService,
   ) {}
 
   async create(form: CreateCategoryForm) {
@@ -64,10 +67,11 @@ export class CategoryService {
     }
 
     if (data.name && data.name !== category.name) {
-      data.slug = slugify(data.name, { lower: true, strict: true });
+      category.slug = slugify(data.name, { lower: true, strict: true });
     }
 
     category.set(data);
+
     await category.save();
 
     return { message: 'Update category successfully', category };
@@ -75,6 +79,15 @@ export class CategoryService {
 
   async delete(id: bigint) {
     const category = await this.findById(id);
+
+    const hasProducts = await this.productService.existsBy('categoryId', id);
+    if (hasProducts) {
+      throw new BadRequestException(
+        'Cannot delete category because it is in use by one or more products',
+        ErrorCode.CATEGORY_ERROR_IN_USE,
+      );
+    }
+
     await category.destroy();
     return { message: 'Delete category successfully' };
   }

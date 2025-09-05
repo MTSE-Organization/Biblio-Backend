@@ -28,6 +28,13 @@ export class ProductService {
     return { message: 'Create product successfully' };
   }
 
+  async existsBy(field: keyof Product, value: any): Promise<boolean> {
+    const count = await this.productRepository.count({
+      where: { [field]: value },
+    });
+    return count > 0;
+  }
+  
   async update(form: UpdateProductForm) {
     const product = await this.findById(form.id);
     if (product.categoryId !== form.categoryId) {
