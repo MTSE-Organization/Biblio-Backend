@@ -48,6 +48,9 @@ export class Product extends Auditable {
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare quantity: number;
 
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  declare discount: number;
+
   @ForeignKey(() => Category)
   @Column({ allowNull: false, type: DataType.BIGINT })
   declare categoryId: bigint;
