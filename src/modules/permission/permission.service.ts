@@ -1,5 +1,5 @@
 import { Permission } from '@/models';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import {
   CreatePermissionForm,
@@ -8,15 +8,22 @@ import {
 } from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
+import { PermissionGroupService } from '../permission-group/permission-group.service';
+import { PermissionGroup } from '@/models/permission-group.model';
 
 @Injectable()
 export class PermissionService {
   constructor(
     @InjectModel(Permission)
     private readonly permissionRepository: typeof Permission,
+
+    @Inject(forwardRef(() => PermissionGroupService))
+    private readonly permissionGroupService: PermissionGroupService,
   ) {}
 
   async create(form: CreatePermissionForm) {
+    await this.permissionGroupService.findById(form.permissionGroupId);
+
     if (await this.existsBy('name', form.name)) {
       throw new BadRequestException(
         'Permission name exists',
@@ -74,12 +81,15 @@ export class PermissionService {
     const { rows, count } = await this.permissionRepository.findAndCountAll({
       limit: size,
       offset: skip,
+      include: [{ model: PermissionGroup }],
     });
     return { permissions: rows, count };
   }
 
   async findById(id: bigint): Promise<Permission> {
-    const permission = await this.permissionRepository.findByPk(id);
+    const permission = await this.permissionRepository.findByPk(id, {
+      include: [{ model: PermissionGroup }],
+    });
     if (!permission) {
       throw new NotFoundException(
         'Permission not found',
@@ -101,5 +111,12 @@ export class PermissionService {
       where: { [field]: value },
     });
     return count > 0;
+  }
+
+  async deleteByGroupPermissionId(permissionGroupId: bigint): Promise<number> {
+    const deletedCount = await this.permissionRepository.destroy({
+      where: { permission_group_id: permissionGroupId },
+    });
+    return deletedCount;
   }
 }

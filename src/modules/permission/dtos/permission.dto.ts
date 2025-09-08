@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { PermissionGroupAutoCompleteDto } from '@/modules/permission-group/dtos';
+import { Expose, Type } from 'class-transformer';
 
 export class PermissionDto {
   @Expose()
@@ -14,7 +15,8 @@ export class PermissionDto {
   pCode: string;
 
   @Expose()
-  nameGroup: string;
+  @Type(() => PermissionGroupAutoCompleteDto)
+  permissionGroup: PermissionGroupAutoCompleteDto;
 
   @Expose()
   createdDate: Date;

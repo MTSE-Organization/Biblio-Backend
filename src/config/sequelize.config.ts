@@ -7,6 +7,7 @@ import {
 } from '@/models';
 import { CartItem } from '@/models/cart-item.model';
 import { Cart } from '@/models/cart.model';
+import { PermissionGroup } from '@/models/permission-group.model';
 import { ProductImage } from '@/models/product-image.model';
 import { Product } from '@/models/product.model';
 import { ConfigService } from '@nestjs/config';
@@ -27,6 +28,7 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
     models: [
       Category,
       Group,
+      PermissionGroup,
       Permission,
       GroupPermission,
       Account,

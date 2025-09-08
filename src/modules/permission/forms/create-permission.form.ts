@@ -1,4 +1,4 @@
-import { StringDecorator } from '@/common/decorators';
+import { BigIntDecorator, StringDecorator } from '@/common/decorators';
 
 export class CreatePermissionForm {
   @StringDecorator('name', true)
@@ -10,6 +10,6 @@ export class CreatePermissionForm {
   @StringDecorator('pCode', true)
   pCode: string;
 
-  @StringDecorator('nameGroup', true)
-  nameGroup: string;
+  @BigIntDecorator('permissionGroupId', true)
+  permissionGroupId: bigint;
 }
