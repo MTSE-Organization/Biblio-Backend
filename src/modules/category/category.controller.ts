@@ -41,7 +41,7 @@ export class CategoryController {
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
       totalElements: count,
-      totalPages: Math.ceil(count / (form.size || 10)),
+      totalPages: Math.ceil(count / form.size),
     };
   }
 
@@ -76,7 +76,7 @@ export class CategoryController {
     const response: ResponseListDto<CategoryAutoCompleteDto[]> = {
       content: MapperUtil.toDtoList(categories, CategoryAutoCompleteDto),
       totalElements: count,
-      totalPages: 1,
+      totalPages: Math.ceil(count / form.size),
     };
     return response;
   }

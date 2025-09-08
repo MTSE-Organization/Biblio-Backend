@@ -1,5 +1,5 @@
 import { Product } from '@/models/product.model';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateProductForm,
@@ -17,6 +17,8 @@ export class ProductService {
   constructor(
     @InjectModel(Product)
     private readonly productRepository: typeof Product,
+
+    @Inject(forwardRef(() => CategoryService))
     private readonly categoryService: CategoryService,
   ) {}
 
@@ -26,6 +28,13 @@ export class ProductService {
     const data = { slug: slug, ...form };
     await this.productRepository.create(data);
     return { message: 'Create product successfully' };
+  }
+
+  async existsBy(field: keyof Product, value: any): Promise<boolean> {
+    const count = await this.productRepository.count({
+      where: { [field]: value },
+    });
+    return count > 0;
   }
 
   async update(form: UpdateProductForm) {
