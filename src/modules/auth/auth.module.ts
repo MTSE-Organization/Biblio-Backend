@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { AccountModule } from '../account/account.module';
-import { JwtStrategy, LocalStrategy } from './stratigies';
+import { JwtStrategy, LocalStrategy } from './strategies';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
 import { OtpModule } from '../otp/otp.module';
 import { MailModule } from '../mail/mail.module';
