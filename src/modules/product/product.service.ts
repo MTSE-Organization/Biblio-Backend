@@ -11,6 +11,7 @@ import { ErrorCode } from '@/constants/error-code.constant';
 import { Category } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
+import { Constant } from '@/constants/constant';
 
 @Injectable()
 export class ProductService {
@@ -78,7 +79,7 @@ export class ProductService {
 
   async delete(id: bigint) {
     const product = await this.findById(id);
-    await product.destroy();
+    await product.update({ status: Constant.STATUS_DELETED });
     return { message: 'Delete product successfully' };
   }
 

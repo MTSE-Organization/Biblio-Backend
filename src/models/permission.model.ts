@@ -1,5 +1,12 @@
-import { Column, DataType, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Table,
+} from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
+import { PermissionGroup } from './permission-group.model';
 
 @Table({
   tableName: 'db_permission',
@@ -20,6 +27,10 @@ export class Permission extends Auditable {
   })
   declare pCode: string;
 
-  @Column({ allowNull: false, type: DataType.STRING })
-  declare nameGroup: string;
+  @ForeignKey(() => PermissionGroup)
+  @Column({ allowNull: false, type: DataType.BIGINT })
+  declare permissionGroupId: bigint;
+
+  @BelongsTo(() => PermissionGroup)
+  declare permissionGroup: PermissionGroup;
 }
