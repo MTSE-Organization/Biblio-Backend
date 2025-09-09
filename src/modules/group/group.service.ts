@@ -36,7 +36,6 @@ export class GroupService {
 
     const filter = query.getFilter();
     const { rows, count } = await this.groupRepository.findAndCountAll({
-      include: [{ model: Permission, through: { attributes: [] } }],
       limit: size,
       offset: skip,
       where: filter,
