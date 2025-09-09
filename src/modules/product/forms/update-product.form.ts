@@ -40,6 +40,9 @@ export class UpdateProductForm {
   @NumberDecorator('quantity', true)
   quantity: number;
 
+  @NumberDecorator('discount')
+  discount: number | null = null;
+
   @BigIntDecorator('categoryId', true)
   categoryId: bigint;
 }
