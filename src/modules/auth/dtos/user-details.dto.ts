@@ -1,11 +1,11 @@
 export class UserDetailsDto {
-  id: number;
+  id: bigint;
   kind: number;
   authorities: string[];
   isSuperAdmin: boolean;
 
   constructor(
-    id: number,
+    id: bigint,
     kind: number,
     authorities: string[],
     isSuperAdmin: boolean,

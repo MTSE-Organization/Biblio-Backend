@@ -17,7 +17,7 @@ const snowflake = new SnowflakeID({
 export abstract class Auditable extends Model {
   @PrimaryKey
   @Column({ type: DataType.BIGINT })
-  declare id: number;
+  declare id: bigint;
 
   @CreatedAt
   @Column({ field: 'created_date' })

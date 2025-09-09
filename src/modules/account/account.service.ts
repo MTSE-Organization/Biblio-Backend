@@ -1,27 +1,32 @@
 import { Constant } from '@/constants/constant';
 import { Account, Group, Permission } from '@/models';
-import { Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterForm } from '../auth/forms/register.form';
-import {
-  BadRequestException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
+import { CartService } from '../cart/cart.service';
 
 @Injectable()
 export class AccountService {
   constructor(
     @InjectModel(Account) private readonly accountRepository: typeof Account,
     private readonly groupService: GroupService,
+
+    @Inject(forwardRef(() => CartService))
+    private readonly cartService: CartService,
   ) {}
 
-  async findById(id: number): Promise<Account> {
+  async findById(id: bigint): Promise<Account> {
     const account: Account | null = await this.accountRepository.findByPk(id, {
       include: [
         {
@@ -187,6 +192,21 @@ export class AccountService {
     account.avatarPath = data.avatarPath;
     await account.save();
     return { message: 'Profile updated successfully' };
+  }
+
+  async delete(id: bigint, isSuperAdmin: boolean) {
+    const account = await this.findById(id);
+    if (
+      account.isSuperAdmin ||
+      (isSuperAdmin === false && account.kind === Constant.ACCOUNT_KIND_ADMIN)
+    ) {
+      throw new BadRequestException(
+        'Not allow to delete account',
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE,
+      );
+    }
+    await account.destroy();
+    return { message: 'Delete account successfully' };
   }
 
   async existsBy(field: keyof Account, value: any): Promise<boolean> {

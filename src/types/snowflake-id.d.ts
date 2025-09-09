@@ -6,6 +6,6 @@ declare module 'snowflake-id' {
 
   export default class SnowflakeID {
     constructor(options?: Options);
-    generate(): number;
+    generate(): bigint;
   }
 }
