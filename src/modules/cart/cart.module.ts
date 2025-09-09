@@ -12,8 +12,8 @@ import { CartItemModule } from '../cart-item/cart-item.module';
   exports: [CartService],
   imports: [
     SequelizeModule.forFeature([Cart]),
-    AccountModule,
-    forwardRef(() => CartItemModule),
+    forwardRef(() => AccountModule),
+    CartItemModule,
   ],
 })
 export class CartModule {}

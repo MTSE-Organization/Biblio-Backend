@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Put,
   Query,
   Req,
@@ -15,6 +17,7 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AccountProfileDto } from './dtos/account-profile.dto';
+import { UserDetailsDto } from '../auth/dtos';
 
 @Controller('account')
 export class AccountController {
@@ -45,5 +48,13 @@ export class AccountController {
   async updateProfile(@Req() req: any, @Body() form: UpdateProfileForm) {
     const { id: userId } = req.user;
     return await this.accountService.updateProfile(userId, form);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete/:id')
+  async delete(@Param('id') id: bigint, @Req() req) {
+    const user: UserDetailsDto = req.user;
+    const isSuperAdmin = user.isSuperAdmin;
+    return await this.accountService.delete(id, isSuperAdmin);
   }
 }
