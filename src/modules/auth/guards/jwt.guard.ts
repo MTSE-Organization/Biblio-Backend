@@ -1,8 +1,6 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { UnauthorizedException } from '@/common/exceptions';
+import { ErrorCode } from '@/constants/error-code.constant';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -21,7 +19,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           : info?.name === 'JsonWebTokenError'
             ? 'Invalid token'
             : 'Unauthorized';
-      throw new UnauthorizedException(message);
+      throw new UnauthorizedException(
+        message,
+        ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+      );
     }
     return user as TUser;
   }

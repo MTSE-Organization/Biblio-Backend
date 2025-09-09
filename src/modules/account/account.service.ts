@@ -131,7 +131,10 @@ export class AccountService {
       );
       return user;
     }
-    throw new UnauthorizedException();
+    throw new UnauthorizedException(
+      'Unauthorized',
+      ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+    );
   }
 
   async activateUser(email: string) {
