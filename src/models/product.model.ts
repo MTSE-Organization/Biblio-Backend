@@ -31,23 +31,17 @@ export class Product extends Auditable {
   @Column({ allowNull: false, type: DataType.DATE })
   declare releaseDate: Date;
 
-  @Column({ type: DataType.FLOAT })
-  declare length: number;
-
-  @Column({ type: DataType.FLOAT })
-  declare width: number;
-
-  @Column({ type: DataType.FLOAT })
-  declare height: number;
-
   @Column({ type: DataType.INTEGER })
   declare ageRating: number;
+
+  @Column({ type: DataType.STRING })
+  declare language: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   declare isFeatured: boolean;
 
-  @Column({ type: DataType.INTEGER, defaultValue: 0 })
-  declare quantity: number;
+  @Column({ type: DataType.TEXT })
+  declare metaData: string;
 
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare discount: number;

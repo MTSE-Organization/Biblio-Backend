@@ -5,6 +5,7 @@ import {
   NumberDecorator,
   StringDecorator
 } from '@/common/decorators';
+import { Min } from 'class-validator';
 
 export class CreateProductForm {
   @StringDecorator('name', true)
@@ -14,32 +15,31 @@ export class CreateProductForm {
   description: string;
 
   @NumberDecorator('price', true)
+  @Min(0)
   price: number;
 
   @DateDecorator('releaseDate', true)
   releaseDate: Date;
 
-  @NumberDecorator('length')
-  length: number | null = null;
-
-  @NumberDecorator('length')
-  width: number | null = null;
-
-  @NumberDecorator('length')
-  height: number | null = null;
-
   @NumberDecorator('ageRating')
-  ageRating: number | null = null;
+  ageRating: number;
+
+  @StringDecorator('string')
+  language: string;
 
   @BooleanDecorator('isFeatured', true)
   isFeatured: boolean;
 
-  @NumberDecorator('quantity', true)
-  quantity: number;
+  @StringDecorator('metaData')
+  metaData: string;
 
   @NumberDecorator('discount')
-  discount: number | null = null;
+  @Min(0)
+  discount: number;
 
   @BigIntDecorator('categoryId', true)
   categoryId: bigint;
+
+  @BigIntDecorator('publisherId', true)
+  publisherId: bigint;
 }
