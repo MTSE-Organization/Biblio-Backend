@@ -9,45 +9,45 @@ module.exports = {
       id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
-        allowNull: false,
+        allowNull: false
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
       },
       bio: {
-        type: DataTypes.TEXT,
+        type: DataTypes.TEXT
       },
       avatar_path: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       kind: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: false
       },
       gender: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER
       },
       date_of_birth: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATE
       },
       country: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
       },
       created_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATE
       },
       modified_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATE
       },
       status: {
         defaultValue: 1,
-        type: DataTypes.INTEGER,
-      },
+        type: DataTypes.INTEGER
+      }
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('db_contributor');
-  },
+  }
 };

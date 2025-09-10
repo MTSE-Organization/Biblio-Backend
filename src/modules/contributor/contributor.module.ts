@@ -4,6 +4,6 @@ import { ContributorController } from './contributor.controller';
 
 @Module({
   controllers: [ContributorController],
-  providers: [ContributorService],
+  providers: [ContributorService]
 })
 export class ContributorModule {}

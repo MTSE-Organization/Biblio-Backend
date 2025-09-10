@@ -3,7 +3,7 @@ import {
   Category,
   Group,
   GroupPermission,
-  Permission,
+  Permission
 } from '@/models';
 import { CartItem } from '@/models/cart-item.model';
 import { Cart } from '@/models/cart.model';
@@ -39,12 +39,12 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
       Cart,
       CartItem,
       Contributor,
-      Publisher,
+      Publisher
     ],
     define: {
       underscored: true,
       createdAt: 'created_date',
-      updatedAt: 'modified_date',
-    },
-  }),
+      updatedAt: 'modified_date'
+    }
+  })
 };

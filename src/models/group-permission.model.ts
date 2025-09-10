@@ -3,14 +3,14 @@ import {
   DataType,
   ForeignKey,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Group } from './group.model';
 import { Permission } from './permission.model';
 
 @Table({
   tableName: 'db_group_permission',
-  timestamps: false,
+  timestamps: false
 })
 export class GroupPermission extends Model<GroupPermission> {
   @ForeignKey(() => Group)

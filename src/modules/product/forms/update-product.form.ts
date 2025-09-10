@@ -3,7 +3,7 @@ import {
   BooleanDecorator,
   DateDecorator,
   NumberDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 
 export class UpdateProductForm {

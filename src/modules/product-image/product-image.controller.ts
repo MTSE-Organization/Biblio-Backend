@@ -7,7 +7,7 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ProductImageService } from './product-image.service';
 import { CreateProductImageForm } from './form/create-product-image.form';
@@ -42,7 +42,7 @@ export class ProductImageController {
     const response: ResponseListDto<ProductImageDto[]> = {
       content: MapperUtil.toDtoList(content, ProductImageDto),
       totalElements,
-      totalPages,
+      totalPages
     };
 
     return response;

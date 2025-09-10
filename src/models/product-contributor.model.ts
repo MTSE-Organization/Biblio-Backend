@@ -3,14 +3,14 @@ import {
   DataType,
   ForeignKey,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Product } from './product.model';
 import { Contributor } from './contributor';
 
 @Table({
   tableName: 'db_product_contributor',
-  timestamps: false,
+  timestamps: false
 })
 export class ProductContributor extends Model<ProductContributor> {
   @ForeignKey(() => Product)

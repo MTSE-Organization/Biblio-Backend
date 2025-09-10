@@ -12,9 +12,9 @@ module.exports = {
         primaryKey: true,
         references: {
           model: 'db_product',
-          key: 'id',
+          key: 'id'
         },
-        onDelete: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       contributor_id: {
         type: DataTypes.BIGINT,
@@ -22,14 +22,14 @@ module.exports = {
         primaryKey: true,
         references: {
           model: 'db_contributor',
-          key: 'id',
+          key: 'id'
         },
-        onDelete: 'CASCADE',
-      },
+        onDelete: 'CASCADE'
+      }
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('db_product_contributor');
-  },
+  }
 };
