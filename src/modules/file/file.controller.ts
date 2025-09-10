@@ -33,8 +33,7 @@ export class FileController {
     @Param('fileName') fileName: string,
     @Res() res: Response
   ) {
-    const uploadDir =
-      this.configService.get<string>('UPLOAD_DIR') || './uploads';
+    const uploadDir = this.configService.get<string>('UPLOAD_DIR')!;
     const filePath = path.join(uploadDir, `/${folder}/${fileName}`);
 
     if (!fs.existsSync(filePath)) {

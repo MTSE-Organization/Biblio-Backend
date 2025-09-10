@@ -26,7 +26,6 @@ import { ProductModule } from './modules/product/product.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { PermissionGroupModule } from './modules/permission-group/permission-group.module';
-import { CloudinaryModule } from '@/modules/cloudinary/cloudinary.module';
 import { ContributorModule } from './modules/contributor/contributor.module';
 import { PublisherModule } from './modules/publisher/publisher.module';
 //#endregion
@@ -51,7 +50,6 @@ import { PublisherModule } from './modules/publisher/publisher.module';
     CartModule,
     CartItemModule,
     PermissionGroupModule,
-    CloudinaryModule,
     ContributorModule,
     PublisherModule
   ]
