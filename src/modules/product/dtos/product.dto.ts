@@ -1,9 +1,10 @@
 import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
+import { ProductImageDto } from '@/modules/product-image/dtos/product-image.dto';
 import { Expose, Type } from 'class-transformer';
 
 export class ProductDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   name: string;
@@ -39,6 +40,9 @@ export class ProductDto {
   quantity: number;
 
   @Expose()
+  discount: number;
+
+  @Expose()
   @Type(() => CategoryAutoCompleteDto)
   category: CategoryAutoCompleteDto;
 
@@ -50,4 +54,8 @@ export class ProductDto {
 
   @Expose()
   status: number;
+
+  @Expose()
+  @Type(() => ProductImageDto)
+  images?: ProductImageDto[];
 }

@@ -8,7 +8,7 @@ import {
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { Category } from '@/models';
+import { Category, ProductImage } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
 import { Constant } from '@/constants/constant';
@@ -59,21 +59,35 @@ export class ProductService {
     const { rows, count } = await this.productRepository.findAndCountAll({
       limit: size,
       offset: skip,
-      include: [{ model: Category }],
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          separate: true,
+          limit: 1,
+          order: [
+            ['isDefault', 'DESC'],
+            ['id', 'ASC'],
+          ],
+        },
+      ],
     });
+
     return { products: rows, count };
   }
 
   async findById(id: bigint): Promise<Product> {
     const product = await this.productRepository.findByPk(id, {
-      include: [{ model: Category }],
+      include: [{ model: Category }, { model: ProductImage }],
     });
+
     if (!product) {
       throw new NotFoundException(
         'Product not found',
         ErrorCode.PRODUCT_ERROR_NOT_FOUND,
       );
     }
+
     return product;
   }
 

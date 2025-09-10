@@ -8,6 +8,7 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 import { ProductService } from '../product/product.service';
+import { UpdateDefaultImageForm } from './form/update-default-image.form';
 
 @Injectable()
 export class ProductImageService {
@@ -20,6 +21,10 @@ export class ProductImageService {
 
   async create(form: CreateProductImageForm) {
     await this.productService.findById(form.productId);
+
+    if (form.isDefault) {
+      await this.clearDefaultImage(form.productId);
+    }
 
     const maxOrderingImage = await this.productImageRepository.findOne({
       where: { productId: form.productId },
@@ -34,12 +39,23 @@ export class ProductImageService {
       ordering: nextOrdering,
     });
 
-    return { message: 'Create product image successfully', productImage };
+    return {
+      message: 'Create product image successfully',
+      productImage: {
+        ...productImage.toJSON(),
+        id: productImage.id.toString(),
+        productId: productImage.productId.toString(),
+      },
+    };
   }
 
   async update(form: UpdateProductImageForm) {
     const { id, ...data } = form;
     const productImage = await this.findById(id);
+
+    if (form.isDefault) {
+      await this.clearDefaultImage(productImage.productId);
+    }
 
     productImage.set(data);
     await productImage.save();
@@ -131,5 +147,32 @@ export class ProductImageService {
       );
     }
     return image;
+  }
+  async updateDefault(form: UpdateDefaultImageForm) {
+    const { id, productId } = form;
+
+    const productImages = await this.productImageRepository.findAll({
+      where: { productId },
+    });
+
+    if (!productImages || productImages.length === 0) {
+      throw new NotFoundException(
+        'No images found for this product',
+        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND,
+      );
+    }
+
+    for (const image of productImages) {
+      image.isDefault = image.id.toString() === id.toString();
+      await image.save();
+    }
+
+    return { message: 'Updated default product image successfully' };
+  }
+  private async clearDefaultImage(productId: bigint) {
+    await this.productImageRepository.update(
+      { isDefault: false },
+      { where: { productId } },
+    );
   }
 }

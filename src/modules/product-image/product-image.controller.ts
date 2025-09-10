@@ -19,6 +19,7 @@ import { PCode } from '@/common/decorators';
 import { MapperUtil } from '@/utils';
 import { ProductImageDto } from './dtos/product-image.dto';
 import { ResponseListDto } from '@/common/interfaces';
+import { UpdateDefaultImageForm } from './form/update-default-image.form';
 
 @Controller('product-image')
 export class ProductImageController {
@@ -74,5 +75,11 @@ export class ProductImageController {
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
     return await this.productImageService.updateOrdering(form);
+  }
+  @PCode('PIMG_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('update-default')
+  async updateDefault(@Body() form: UpdateDefaultImageForm) {
+    return await this.productImageService.updateDefault(form);
   }
 }
