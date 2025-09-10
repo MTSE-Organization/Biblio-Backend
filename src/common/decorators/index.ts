@@ -13,7 +13,7 @@ import {
   Validate,
   ValidationArguments,
   ValidatorConstraint,
-  ValidatorConstraintInterface,
+  ValidatorConstraintInterface
 } from 'class-validator';
 
 export * from './pcode.decorator';
@@ -23,12 +23,12 @@ export const StringDecorator = (name: string, required: boolean = false) => {
     ApiProperty({
       required: required,
       type: String,
-      description: `${name} field`,
+      description: `${name} field`
     }),
     IsString({ message: `${name} must be a string` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };
 
@@ -37,12 +37,12 @@ export const NumberDecorator = (name: string, required: boolean = false) => {
     ApiProperty({
       required: required,
       type: Number,
-      description: `${name} field`,
+      description: `${name} field`
     }),
     IsNumber({}, { message: `${name} must be a number` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };
 
@@ -51,7 +51,7 @@ export const BooleanDecorator = (name: string, required: boolean = false) => {
     ApiProperty({
       required: required,
       type: Boolean,
-      description: `${name} field`,
+      description: `${name} field`
     }),
     Transform(({ value }) => {
       if (typeof value === 'boolean') return value;
@@ -62,7 +62,7 @@ export const BooleanDecorator = (name: string, required: boolean = false) => {
     IsBoolean({ message: `${name} must be a boolean` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };
 
@@ -72,12 +72,12 @@ export const EmailDecorator = (name: string, required: boolean = false) => {
       required,
       type: String,
       description: `${name} (email) field`,
-      example: 'example@gmail.com',
+      example: 'example@gmail.com'
     }),
     IsEmail({}, { message: `${name} must be a valid email` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };
 
@@ -86,12 +86,12 @@ export const BigIntDecorator = (name: string, required: boolean = false) => {
     ApiProperty({
       required: required,
       type: BigInt,
-      description: `${name} field`,
+      description: `${name} field`
     }),
     Transform(({ value }) => BigInt(value)),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };
 
@@ -121,7 +121,7 @@ export const BigIntArrayDecorator = (name: string, required = false) => {
     ApiProperty({
       required,
       type: [String],
-      description: `${name} field`,
+      description: `${name} field`
     }),
     Transform(({ value }: { value: any }) => {
       if (!value) return value as unknown;
@@ -133,8 +133,8 @@ export const BigIntArrayDecorator = (name: string, required = false) => {
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
       : [IsOptional()]),
     Validate(IsBigIntArray, {
-      message: `Each element of ${name} must be a valid integer`,
-    }),
+      message: `Each element of ${name} must be a valid integer`
+    })
   );
 };
 
@@ -144,12 +144,12 @@ export const DateDecorator = (name: string, required: boolean = false) => {
       required: required,
       type: String,
       format: 'date-time',
-      description: `${name} field`,
+      description: `${name} field`
     }),
     Type(() => Date),
     IsDate({ message: `${name} must be a valid date` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
-      : [IsOptional()]),
+      : [IsOptional()])
   );
 };

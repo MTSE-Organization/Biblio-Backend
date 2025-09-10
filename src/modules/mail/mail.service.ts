@@ -14,8 +14,8 @@ export class MailService {
         template: 'register',
         context: {
           name: 'Test',
-          otp: otp,
-        },
+          otp: otp
+        }
       })
       .then((info) => console.log('Mail sent:', info))
       .catch((err) => console.error('Mail error:', err));
@@ -30,8 +30,8 @@ export class MailService {
         template: 'forgot-password',
         context: {
           name: 'Test',
-          otp: otp,
-        },
+          otp: otp
+        }
       })
       .then((info) => console.log('Mail sent:', info))
       .catch((err) => console.error('Mail error:', err));

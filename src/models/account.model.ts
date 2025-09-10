@@ -3,14 +3,14 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Group } from './group.model';
 
 @Table({
   tableName: 'db_account',
-  timestamps: true,
+  timestamps: true
 })
 export class Account extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
@@ -33,7 +33,7 @@ export class Account extends Auditable {
 
   @Column({
     type: DataType.BOOLEAN,
-    defaultValue: false,
+    defaultValue: false
   })
   declare isSuperAdmin: boolean;
 

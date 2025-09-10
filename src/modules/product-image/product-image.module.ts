@@ -9,6 +9,6 @@ import { ProductModule } from '../product/product.module';
   controllers: [ProductImageController],
   imports: [SequelizeModule.forFeature([ProductImage]), ProductModule],
   providers: [ProductImageService],
-  exports: [ProductImageService],
+  exports: [ProductImageService]
 })
 export class ProductImageModule {}

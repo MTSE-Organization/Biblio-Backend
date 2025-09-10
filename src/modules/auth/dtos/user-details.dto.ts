@@ -8,7 +8,7 @@ export class UserDetailsDto {
     id: bigint,
     kind: number,
     authorities: string[],
-    isSuperAdmin: boolean,
+    isSuperAdmin: boolean
   ) {
     this.id = id;
     this.kind = kind;

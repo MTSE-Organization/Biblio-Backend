@@ -9,7 +9,7 @@ export class BadRequestException extends HttpException {
   constructor(message: string, code: string | number = 'BAD_REQUEST') {
     const response: BadRequestResponse = {
       message,
-      code,
+      code
     };
 
     super(response, HttpStatus.BAD_REQUEST);

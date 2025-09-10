@@ -7,7 +7,7 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { JwtAuthGuard } from '../auth/guards';
@@ -29,7 +29,7 @@ export class AccountController {
     const response: ResponseListDto<AccountDto[]> = {
       content: MapperUtil.toDtoList(accounts, AccountDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
     return response;
   }
@@ -39,7 +39,7 @@ export class AccountController {
   async profile(@Req() req: any): Promise<AccountProfileDto> {
     const account = await this.accountService.findById(req.user.id);
     return plainToInstance(AccountProfileDto, account, {
-      excludeExtraneousValues: true,
+      excludeExtraneousValues: true
     });
   }
 

@@ -1,7 +1,7 @@
 import {
   BigIntArrayDecorator,
   BigIntDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 
 export class UpdateGroupForm {

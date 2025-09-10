@@ -3,14 +3,14 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { PermissionGroup } from './permission-group.model';
 
 @Table({
   tableName: 'db_permission',
-  timestamps: true,
+  timestamps: true
 })
 export class Permission extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
@@ -23,7 +23,7 @@ export class Permission extends Auditable {
     allowNull: false,
     unique: true,
     type: DataType.STRING,
-    field: 'p_code',
+    field: 'p_code'
   })
   declare pCode: string;
 

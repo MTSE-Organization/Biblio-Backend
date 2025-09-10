@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreatePermissionForm,
   FilterPermissionForm,
-  UpdatePermissionForm,
+  UpdatePermissionForm
 } from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
@@ -18,7 +18,7 @@ export class PermissionService {
     private readonly permissionRepository: typeof Permission,
 
     @Inject(forwardRef(() => PermissionGroupService))
-    private readonly permissionGroupService: PermissionGroupService,
+    private readonly permissionGroupService: PermissionGroupService
   ) {}
 
   async create(form: CreatePermissionForm) {
@@ -27,13 +27,13 @@ export class PermissionService {
     if (await this.existsBy('name', form.name)) {
       throw new BadRequestException(
         'Permission name exists',
-        ErrorCode.PERMISSION_ERROR_NAME_EXISTS,
+        ErrorCode.PERMISSION_ERROR_NAME_EXISTS
       );
     }
     if (await this.existsBy('pCode', form.pCode)) {
       throw new BadRequestException(
         'Permission code exists',
-        ErrorCode.PERMISSION_ERROR_CODE_EXISTS,
+        ErrorCode.PERMISSION_ERROR_CODE_EXISTS
       );
     }
     await this.permissionRepository.create({ ...form });
@@ -49,7 +49,7 @@ export class PermissionService {
     ) {
       throw new BadRequestException(
         'Permission name exists',
-        ErrorCode.PERMISSION_ERROR_NAME_EXISTS,
+        ErrorCode.PERMISSION_ERROR_NAME_EXISTS
       );
     }
     if (
@@ -58,7 +58,7 @@ export class PermissionService {
     ) {
       throw new BadRequestException(
         'Permission code exists',
-        ErrorCode.PERMISSION_ERROR_CODE_EXISTS,
+        ErrorCode.PERMISSION_ERROR_CODE_EXISTS
       );
     }
     permission.set(data);
@@ -73,7 +73,7 @@ export class PermissionService {
   }
 
   async findAll(
-    query: FilterPermissionForm,
+    query: FilterPermissionForm
   ): Promise<{ permissions: Permission[]; count: number }> {
     const { page, size } = query;
     const skip = page * size;
@@ -81,19 +81,19 @@ export class PermissionService {
     const { rows, count } = await this.permissionRepository.findAndCountAll({
       limit: size,
       offset: skip,
-      include: [{ model: PermissionGroup }],
+      include: [{ model: PermissionGroup }]
     });
     return { permissions: rows, count };
   }
 
   async findById(id: bigint): Promise<Permission> {
     const permission = await this.permissionRepository.findByPk(id, {
-      include: [{ model: PermissionGroup }],
+      include: [{ model: PermissionGroup }]
     });
     if (!permission) {
       throw new NotFoundException(
         'Permission not found',
-        ErrorCode.PERMISSION_ERROR_NOT_FOUND,
+        ErrorCode.PERMISSION_ERROR_NOT_FOUND
       );
     }
     return permission;
@@ -101,21 +101,21 @@ export class PermissionService {
 
   async findByIds(ids: bigint[]): Promise<Permission[]> {
     const permissions = await this.permissionRepository.findAll({
-      where: { id: ids },
+      where: { id: ids }
     });
     return permissions;
   }
 
   async existsBy(field: keyof Permission, value: any): Promise<boolean> {
     const count = await this.permissionRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }
 
   async deleteByGroupPermissionId(permissionGroupId: bigint): Promise<number> {
     const deletedCount = await this.permissionRepository.destroy({
-      where: { permission_group_id: permissionGroupId },
+      where: { permission_group_id: permissionGroupId }
     });
     return deletedCount;
   }

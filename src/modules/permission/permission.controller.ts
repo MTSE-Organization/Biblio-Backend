@@ -6,13 +6,13 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query
 } from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import {
   CreatePermissionForm,
   FilterPermissionForm,
-  UpdatePermissionForm,
+  UpdatePermissionForm
 } from './forms';
 import { MapperUtil } from '@/utils';
 import { PermissionDto } from './dtos';
@@ -33,7 +33,7 @@ export class PermissionController {
     const response: ResponseListDto<PermissionDto[]> = {
       content: MapperUtil.toDtoList(permissions, PermissionDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
     return response;
   }

@@ -5,7 +5,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
+  Logger
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -57,10 +57,10 @@ export class AllExceptionFilter implements ExceptionFilter {
       ...(error && { error }),
       date: new Date().toLocaleString('vi-VN', {
         timeZone: 'Asia/Ho_Chi_Minh',
-        hour12: false,
+        hour12: false
       }),
       path: request.url,
-      takenTime,
+      takenTime
     };
     response.status(status).json(res);
   }

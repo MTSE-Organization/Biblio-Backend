@@ -9,7 +9,7 @@ export const cacheConfig: CacheModuleAsyncOptions = {
     const host = configService.get<string>('REDIS_HOST');
     const port = configService.get<number>('REDIS_PORT');
     return {
-      stores: [createKeyv(`redis://${host}:${port}`)],
+      stores: [createKeyv(`redis://${host}:${port}`)]
     };
-  },
+  }
 };

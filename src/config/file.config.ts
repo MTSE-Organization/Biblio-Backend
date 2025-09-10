@@ -21,11 +21,11 @@ export const fileConfig: MulterModuleAsyncOptions = {
             Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-        },
+        }
       }),
       limits: {
-        fileSize: configService.get<number>('MAX_SIZE'),
-      },
+        fileSize: configService.get<number>('MAX_SIZE')
+      }
     };
-  },
+  }
 };

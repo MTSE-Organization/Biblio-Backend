@@ -16,13 +16,13 @@ export class AuthorizationGuard implements CanActivate {
       if (pcode && !authorities.includes(pcode)) {
         throw new UnauthorizedException(
           'You do not have permission',
-          ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+          ErrorCode.AUTH_ERROR_UNAUTHORIZED
         );
       }
     } catch (error) {
       throw new UnauthorizedException(
         'You do not have permission',
-        ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+        ErrorCode.AUTH_ERROR_UNAUTHORIZED
       );
     }
     return true;

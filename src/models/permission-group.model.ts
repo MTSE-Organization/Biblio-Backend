@@ -3,7 +3,7 @@ import { Auditable } from './auditable.model';
 
 @Table({
   tableName: 'db_permission_group',
-  timestamps: true,
+  timestamps: true
 })
 export class PermissionGroup extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })

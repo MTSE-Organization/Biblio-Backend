@@ -3,7 +3,7 @@ import {
   Column,
   DataType,
   HasMany,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Permission } from './permission.model';
 import { GroupPermission } from './group-permission.model';
@@ -12,7 +12,7 @@ import { Account } from '@/models/account.model';
 
 @Table({
   tableName: 'db_group',
-  timestamps: true,
+  timestamps: true
 })
 export class Group extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })

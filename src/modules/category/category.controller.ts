@@ -7,7 +7,7 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
@@ -17,7 +17,7 @@ import { ResponseListDto } from '@/common/interfaces';
 import {
   CreateCategoryForm,
   FilterCategoryForm,
-  UpdateCategoryForm,
+  UpdateCategoryForm
 } from './form';
 import { CategoryAutoCompleteDto, CategoryDto } from './dtos';
 import { UpdateOrderingForm } from '@/common/forms';
@@ -41,7 +41,7 @@ export class CategoryController {
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
   }
 
@@ -76,7 +76,7 @@ export class CategoryController {
     const response: ResponseListDto<CategoryAutoCompleteDto[]> = {
       content: MapperUtil.toDtoList(categories, CategoryAutoCompleteDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
     return response;
   }

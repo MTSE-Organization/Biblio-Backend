@@ -5,7 +5,7 @@ export class SlugifyUtil {
     return slugify(value, {
       lower: true,
       strict: true,
-      locale: 'vi',
+      locale: 'vi'
     });
   }
 }

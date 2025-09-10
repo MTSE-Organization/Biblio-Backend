@@ -14,9 +14,9 @@ import { MailModule } from '../mail/mail.module';
     LocalStrategy,
     LocalAuthGuard,
     JwtStrategy,
-    JwtAuthGuard,
+    JwtAuthGuard
   ],
   imports: [AccountModule, OtpModule, MailModule],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard]
 })
 export class AuthModule {}

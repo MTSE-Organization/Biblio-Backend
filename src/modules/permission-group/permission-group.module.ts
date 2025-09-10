@@ -10,8 +10,8 @@ import { PermissionModule } from '../permission/permission.module';
   providers: [PermissionGroupService],
   imports: [
     SequelizeModule.forFeature([PermissionGroup]),
-    forwardRef(() => PermissionModule),
+    forwardRef(() => PermissionModule)
   ],
-  exports: [PermissionGroupService],
+  exports: [PermissionGroupService]
 })
 export class PermissionGroupModule {}

@@ -3,7 +3,7 @@ import { Auditable } from './auditable.model';
 
 @Table({
   tableName: 'db_category',
-  timestamps: true,
+  timestamps: true
 })
 export class Category extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })

@@ -40,20 +40,6 @@ export class ProductImageService {
     return { message: 'Create product image successfully' };
   }
 
-  async update(form: UpdateProductImageForm) {
-    const { id, ...data } = form;
-    const productImage = await this.findById(id);
-
-    if (form.isDefault) {
-      await this.clearDefaultImage(productImage.productId);
-    }
-
-    productImage.set(data);
-    await productImage.save();
-
-    return { message: 'Update product image successfully', productImage };
-  }
-
   async delete(id: bigint) {
     const productImage = await this.findById(id);
     await productImage.destroy();

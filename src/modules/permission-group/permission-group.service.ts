@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreatePermissionGroupForm,
   FilterPermissionGroupForm,
-  UpdatePermissionGroupForm,
+  UpdatePermissionGroupForm
 } from './forms';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { PermissionService } from '../permission/permission.service';
@@ -17,14 +17,14 @@ export class PermissionGroupService {
     private readonly permissionGroupRepository: typeof PermissionGroup,
 
     @Inject(forwardRef(() => PermissionService))
-    private readonly permissionService: PermissionService,
+    private readonly permissionService: PermissionService
   ) {}
 
   async create(form: CreatePermissionGroupForm) {
     if (await this.existsBy('name', form.name)) {
       throw new BadRequestException(
         'Permission Group name exists',
-        ErrorCode.PERMISSION_GROUP_ERROR_NAME_EXISTS,
+        ErrorCode.PERMISSION_GROUP_ERROR_NAME_EXISTS
       );
     }
     await this.permissionGroupRepository.create({ ...form });
@@ -40,7 +40,7 @@ export class PermissionGroupService {
     ) {
       throw new BadRequestException(
         'Permission Group name exists',
-        ErrorCode.PERMISSION_GROUP_ERROR_NAME_EXISTS,
+        ErrorCode.PERMISSION_GROUP_ERROR_NAME_EXISTS
       );
     }
     permissionGroup.set(data);
@@ -58,7 +58,7 @@ export class PermissionGroupService {
   }
 
   async findAll(
-    query: FilterPermissionGroupForm,
+    query: FilterPermissionGroupForm
   ): Promise<{ permissionGroups: PermissionGroup[]; count: number }> {
     const { page, size } = query;
     const skip = page * size;
@@ -66,7 +66,7 @@ export class PermissionGroupService {
     const { rows, count } =
       await this.permissionGroupRepository.findAndCountAll({
         limit: size,
-        offset: skip,
+        offset: skip
       });
     return { permissionGroups: rows, count };
   }
@@ -76,7 +76,7 @@ export class PermissionGroupService {
     if (!permissionGroup) {
       throw new NotFoundException(
         'Permission Group not found',
-        ErrorCode.PERMISSION_GROUP_ERROR_NOT_FOUND,
+        ErrorCode.PERMISSION_GROUP_ERROR_NOT_FOUND
       );
     }
     return permissionGroup;
@@ -84,7 +84,7 @@ export class PermissionGroupService {
 
   async existsBy(field: keyof PermissionGroup, value: any): Promise<boolean> {
     const count = await this.permissionGroupRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }

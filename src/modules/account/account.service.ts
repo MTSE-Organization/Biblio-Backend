@@ -4,7 +4,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterForm } from '../auth/forms/register.form';
@@ -23,7 +23,7 @@ export class AccountService {
     private readonly groupService: GroupService,
 
     @Inject(forwardRef(() => CartService))
-    private readonly cartService: CartService,
+    private readonly cartService: CartService
   ) {}
 
   async findById(id: bigint): Promise<Account> {
@@ -31,15 +31,15 @@ export class AccountService {
       include: [
         {
           model: Group,
-          include: [{ model: Permission, through: { attributes: [] } }],
-        },
-      ],
+          include: [{ model: Permission, through: { attributes: [] } }]
+        }
+      ]
     });
 
     if (!account) {
       throw new NotFoundException(
         'Account not found',
-        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
       );
     }
     return account;
@@ -47,19 +47,19 @@ export class AccountService {
 
   async findByIdAndStatus(id: number, status: number): Promise<Account> {
     const account: Account | null = await this.accountRepository.findOne({
-      where: { id, status },
+      where: { id, status }
     });
     if (!account) {
       throw new NotFoundException(
         'Account not found',
-        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
       );
     }
     return account;
   }
 
   async list(
-    query: FilterAccountForm,
+    query: FilterAccountForm
   ): Promise<{ accounts: Account[]; count: number }> {
     const { page, size } = query;
     const skip = page * size;
@@ -70,7 +70,7 @@ export class AccountService {
       include: [Group],
       limit: size,
       offset: skip,
-      where: filter,
+      where: filter
     });
 
     return { accounts: rows, count };
@@ -82,16 +82,16 @@ export class AccountService {
 
   async findByEmailAndStatus(
     email: string,
-    status: number,
+    status: number
   ): Promise<Account | null> {
     return await this.accountRepository.findOne({
       where: { email, status },
       include: [
         {
           model: Group,
-          include: [{ model: Permission, through: { attributes: [] } }],
-        },
-      ],
+          include: [{ model: Permission, through: { attributes: [] } }]
+        }
+      ]
     });
   }
 
@@ -100,7 +100,7 @@ export class AccountService {
     const data = {
       ...form,
       kind: Constant.ACCOUNT_KIND_USER,
-      status: Constant.STATUS_PENDING,
+      status: Constant.STATUS_PENDING
     };
     const group = await this.groupService.findByName(Constant.GROUP_NAME_USER);
     const account = await this.accountRepository.create(data);
@@ -119,7 +119,7 @@ export class AccountService {
   async validateUser(email: string, password: string): Promise<UserDetailsDto> {
     const account = await this.findByEmailAndStatus(
       email,
-      Constant.STATUS_ACTIVE,
+      Constant.STATUS_ACTIVE
     );
     if (account && this.checkPassword(password, account.password)) {
       const authorities = account.group?.permissions?.map((p) => p.pCode) ?? [];
@@ -127,13 +127,13 @@ export class AccountService {
         account.id,
         account.kind,
         authorities,
-        account.isSuperAdmin,
+        account.isSuperAdmin
       );
       return user;
     }
     throw new UnauthorizedException(
       'Unauthorized',
-      ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+      ErrorCode.AUTH_ERROR_UNAUTHORIZED
     );
   }
 
@@ -142,7 +142,7 @@ export class AccountService {
     if (!account) {
       throw new NotFoundException(
         'Account not found',
-        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
       );
     }
     account.status = Constant.STATUS_ACTIVE;
@@ -152,12 +152,12 @@ export class AccountService {
   async changePassword(email: string, password: string) {
     const account = await this.findByEmailAndStatus(
       email,
-      Constant.STATUS_ACTIVE,
+      Constant.STATUS_ACTIVE
     );
     if (!account) {
       throw new NotFoundException(
         'Account not found',
-        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
       );
     }
     account.password = this.hashPassword(password);
@@ -171,7 +171,7 @@ export class AccountService {
       if (existingAccount) {
         throw new BadRequestException(
           'Account error email existed',
-          ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED,
+          ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED
         );
       }
       account.email = data.email;
@@ -183,7 +183,7 @@ export class AccountService {
       if (await this.existsBy('phone', data.phone)) {
         throw new BadRequestException(
           'Account error phone existed',
-          ErrorCode.ACCOUNT_ERROR_PHONE_EXISTED,
+          ErrorCode.ACCOUNT_ERROR_PHONE_EXISTED
         );
       }
       account.phone = data.phone;
@@ -202,7 +202,7 @@ export class AccountService {
     ) {
       throw new BadRequestException(
         'Not allow to delete account',
-        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE,
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
       );
     }
     await account.destroy();
@@ -211,7 +211,7 @@ export class AccountService {
 
   async existsBy(field: keyof Account, value: any): Promise<boolean> {
     const count = await this.accountRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }

@@ -5,7 +5,7 @@ import {
   Post,
   Res,
   UploadedFile,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -23,7 +23,7 @@ export class FileController {
   @UseInterceptors(FileInterceptor('file'), new FileRenameInterceptor())
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
-      filePath: `/${file.destination.replace('\\', '/')}/${file.filename}`,
+      filePath: `/${file.destination.replace('\\', '/')}/${file.filename}`
     };
   }
 
@@ -31,7 +31,7 @@ export class FileController {
   downloadFile(
     @Param('folder') folder: string,
     @Param('fileName') fileName: string,
-    @Res() res: Response,
+    @Res() res: Response
   ) {
     const uploadDir =
       this.configService.get<string>('UPLOAD_DIR') || './uploads';

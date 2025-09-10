@@ -21,7 +21,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             : 'Unauthorized';
       throw new UnauthorizedException(
         message,
-        ErrorCode.AUTH_ERROR_UNAUTHORIZED,
+        ErrorCode.AUTH_ERROR_UNAUTHORIZED
       );
     }
     return user as TUser;
