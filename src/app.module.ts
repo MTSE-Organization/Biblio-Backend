@@ -3,7 +3,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
-  RequestMethod,
+  RequestMethod
 } from '@nestjs/common';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
@@ -26,6 +26,7 @@ import { ProductModule } from './modules/product/product.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { PermissionGroupModule } from './modules/permission-group/permission-group.module';
+import { CloudinaryModule } from '@/modules/cloudinary/cloudinary.module';
 //#endregion
 
 @Module({
@@ -48,7 +49,8 @@ import { PermissionGroupModule } from './modules/permission-group/permission-gro
     CartModule,
     CartItemModule,
     PermissionGroupModule,
-  ],
+    CloudinaryModule
+  ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
