@@ -10,16 +10,17 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { ProductImageService } from './product-image.service';
-import { CreateProductImageForm } from './form/create-product-image.form';
-import { UpdateProductImageForm } from './form/update-product-image.form';
-import { FilterProductImageForm } from './form/filter-product-image.form';
-import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
 import { PCode } from '@/common/decorators';
 import { MapperUtil } from '@/utils';
-import { ProductImageDto } from './dtos/product-image.dto';
 import { ResponseListDto } from '@/common/interfaces';
-import { UpdateDefaultImageForm } from './form/update-default-image.form';
+import {
+  CreateProductImageForm,
+  FilterProductImageForm,
+  UpdateDefaultImageForm
+} from './form';
+import { UpdateOrderingForm } from '@/common/forms';
+import { ProductImageDto } from './dtos';
 
 @Controller('product-image')
 export class ProductImageController {
@@ -56,13 +57,6 @@ export class ProductImageController {
     return MapperUtil.toDto(productImage, ProductImageDto);
   }
 
-  @PCode('PRD_IMG_U')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Put('update')
-  async update(@Body() form: UpdateProductImageForm) {
-    return await this.productImageService.update(form);
-  }
-
   @PCode('PRD_IMG_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -76,9 +70,10 @@ export class ProductImageController {
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
     return await this.productImageService.updateOrdering(form);
   }
-  @PCode('PIMG_U')
+
+  @PCode('PRD_IMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Put('update-default')
+  @Put('set-default')
   async updateDefault(@Body() form: UpdateDefaultImageForm) {
     return await this.productImageService.updateDefault(form);
   }

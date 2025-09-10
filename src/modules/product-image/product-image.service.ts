@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductImage } from '@/models';
-import { CreateProductImageForm } from './form/create-product-image.form';
-import { UpdateProductImageForm } from './form/update-product-image.form';
-import { FilterProductImageForm } from './form/filter-product-image.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 import { ProductService } from '../product/product.service';
 import { UpdateDefaultImageForm } from './form/update-default-image.form';
+import { CreateProductImageForm, FilterProductImageForm } from './form';
+import { UpdateOrderingForm } from '@/common/forms';
 
 @Injectable()
 export class ProductImageService {
@@ -39,14 +37,7 @@ export class ProductImageService {
       ordering: nextOrdering
     });
 
-    return {
-      message: 'Create product image successfully',
-      productImage: {
-        ...productImage.toJSON(),
-        id: productImage.id.toString(),
-        productId: productImage.productId.toString()
-      }
-    };
+    return { message: 'Create product image successfully' };
   }
 
   async update(form: UpdateProductImageForm) {
@@ -110,7 +101,7 @@ export class ProductImageService {
       );
     }
 
-    const ids = forms.map((f) => f.id);
+    const ids = forms.map((f) => BigInt(f.id));
     const productImages = await this.productImageRepository.findAll({
       where: { id: ids }
     });
@@ -122,17 +113,15 @@ export class ProductImageService {
       );
     }
 
-    const orderingMap = new Map<number, number>();
+    const orderingMap = new Map<bigint, number>();
     for (const form of forms) {
-      orderingMap.set(Number(form.id), form.ordering);
+      orderingMap.set(BigInt(form.id), form.ordering);
     }
 
     for (const image of productImages) {
-      const newOrdering = orderingMap.get(Number(image.id));
-      if (newOrdering !== undefined) {
-        image.ordering = newOrdering;
-        await image.save();
-      }
+      const newOrdering = orderingMap.get(image.id) as number;
+      image.ordering = newOrdering;
+      await image.save();
     }
 
     return { message: 'Update ordering product image success' };
@@ -148,11 +137,15 @@ export class ProductImageService {
     }
     return image;
   }
+
   async updateDefault(form: UpdateDefaultImageForm) {
-    const { id, productId } = form;
+    const { id } = form;
+
+    const productImage = await this.findById(form.id);
+    console.log(productImage);
 
     const productImages = await this.productImageRepository.findAll({
-      where: { productId }
+      where: { productId: productImage.productId }
     });
 
     if (!productImages || productImages.length === 0) {
@@ -169,6 +162,7 @@ export class ProductImageService {
 
     return { message: 'Updated default product image successfully' };
   }
+
   private async clearDefaultImage(productId: bigint) {
     await this.productImageRepository.update(
       { isDefault: false },

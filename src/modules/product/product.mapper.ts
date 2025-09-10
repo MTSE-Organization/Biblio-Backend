@@ -1,0 +1,19 @@
+import { Product } from '@/models/product.model';
+import { ProductAutoCompleteDto } from './dtos';
+import { MapperUtil } from '@/utils';
+
+export class ProductMapper {
+  static toAutoCompleteDto(product: Product): ProductAutoCompleteDto {
+    const plain = (product as any).get?.({ plain: true }) ?? product;
+
+    if (plain.images && plain.images.length > 0) {
+      plain.image = plain.images[0];
+    }
+
+    return MapperUtil.toDto(plain, ProductAutoCompleteDto);
+  }
+
+  static toAutoCompleteDtoList(products: Product[]): ProductAutoCompleteDto[] {
+    return products.map((p) => this.toAutoCompleteDto(p));
+  }
+}

@@ -1,5 +1,5 @@
 import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
-import { ProductImageAutoCompleteDto } from '@/modules/product-image/dtos/product-image-auto-complete.dto';
+import { ProductImageAutoCompleteDto } from '@/modules/product-image/dtos';
 import { Expose, Type } from 'class-transformer';
 
 export class ProductAutoCompleteDto {

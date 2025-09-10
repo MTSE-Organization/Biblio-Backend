@@ -3,14 +3,14 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Product } from './product.model';
 
 @Table({
   tableName: 'db_product_image',
-  timestamps: true,
+  timestamps: true
 })
 export class ProductImage extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
