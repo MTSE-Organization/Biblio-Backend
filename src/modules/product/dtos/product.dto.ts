@@ -4,7 +4,7 @@ import { Expose, Type } from 'class-transformer';
 
 export class ProductDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   name: string;
@@ -58,8 +58,4 @@ export class ProductDto {
   @Expose()
   @Type(() => ProductImageDto)
   images?: ProductImageDto[];
-
-  @Expose()
-  @Type(() => ProductImageDto)
-  defaultImage?: ProductImageDto;
 }

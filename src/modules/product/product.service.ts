@@ -63,8 +63,12 @@ export class ProductService {
         { model: Category },
         {
           model: ProductImage,
-          where: { isDefault: true },
-          required: false,
+          separate: true,
+          limit: 1,
+          order: [
+            ['isDefault', 'DESC'],
+            ['id', 'ASC'],
+          ],
         },
       ],
     });

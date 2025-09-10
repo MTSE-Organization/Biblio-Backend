@@ -19,19 +19,20 @@ import { PCode } from '@/common/decorators';
 import { MapperUtil } from '@/utils';
 import { ProductImageDto } from './dtos/product-image.dto';
 import { ResponseListDto } from '@/common/interfaces';
+import { UpdateDefaultImageForm } from './form/update-default-image.form';
 
 @Controller('product-image')
 export class ProductImageController {
   constructor(private readonly productImageService: ProductImageService) {}
 
-  @PCode('PIMG_C')
+  // @PCode('PIMG_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateProductImageForm) {
     return await this.productImageService.create(form);
   }
 
-  @PCode('PIMG_L')
+  // @PCode('PIMG_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterProductImageForm) {
@@ -47,7 +48,7 @@ export class ProductImageController {
     return response;
   }
 
-  @PCode('PIMG_V')
+  // @PCode('PIMG_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
@@ -74,5 +75,11 @@ export class ProductImageController {
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
     return await this.productImageService.updateOrdering(form);
+  }
+  @PCode('PIMG_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('update-default')
+  async updateDefault(@Body() form: UpdateDefaultImageForm) {
+    return await this.productImageService.updateDefault(form);
   }
 }

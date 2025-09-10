@@ -15,10 +15,13 @@ import {
   FilterProductForm,
   UpdateProductForm,
 } from './forms';
-import { ProductDto } from './dtos';
+import { ProductAutoCompleteDto, ProductDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { JwtAuthGuard } from '../auth/guards';
+import { ProductImageDto } from '../product-image/dtos/product-image.dto';
+import { plainToInstance } from 'class-transformer';
+import { ProductImageAutoCompleteDto } from '../product-image/dtos/product-image-auto-complete.dto';
 
 @Controller('product')
 export class ProductController {
@@ -33,11 +36,26 @@ export class ProductController {
   @Get('list')
   async list(@Query() form: FilterProductForm) {
     const { products, count } = await this.productService.findAll(form);
-    const response: ResponseListDto<ProductDto[]> = {
-      content: MapperUtil.toDtoList(products, ProductDto),
+    const content = MapperUtil.toDtoList(products, ProductAutoCompleteDto);
+
+    for (let i = 0; i < content.length; i++) {
+      const product = products[i] as any;
+      const images = product.images || [];
+
+      // if (images.length > 0) {
+      //   const defaultImg = images.find((img: any) => img.isDefault) || images[0];
+      //   content[i].image = plainToInstance(ProductImageAutoCompleteDto, defaultImg, {
+      //     excludeExtraneousValues: true,
+      //   });
+      // }
+    }
+
+    const response: ResponseListDto<ProductAutoCompleteDto[]> = {
+      content,
       totalElements: count,
       totalPages: Math.ceil(count / form.size),
     };
+
     return response;
   }
 
