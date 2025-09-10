@@ -7,13 +7,13 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
   CreateProductForm,
   FilterProductForm,
-  UpdateProductForm,
+  UpdateProductForm
 } from './forms';
 import { ProductAutoCompleteDto, ProductDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
@@ -53,7 +53,7 @@ export class ProductController {
     const response: ResponseListDto<ProductAutoCompleteDto[]> = {
       content,
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
 
     return response;
@@ -78,25 +78,31 @@ export class ProductController {
 
   @Get('latest')
   async getLatest() {
-    return MapperUtil.toDtoList(
-      await this.productService.findLatest(),
-      ProductDto,
-    );
+    return {
+      content: MapperUtil.toDtoList(
+        await this.productService.findLatest(),
+        ProductDto
+      )
+    };
   }
 
   @Get('best-seller')
   async getBestSeller() {
-    return MapperUtil.toDtoList(
-      await this.productService.findBestSeller(),
-      ProductDto,
-    );
+    return {
+      content: MapperUtil.toDtoList(
+        await this.productService.findBestSeller(),
+        ProductDto
+      )
+    };
   }
 
   @Get('top-discount')
   async getTopDiscount() {
-    return MapperUtil.toDtoList(
-      await this.productService.findTopDiscount(),
-      ProductDto,
-    );
+    return {
+      content: MapperUtil.toDtoList(
+        await this.productService.findTopDiscount(),
+        ProductDto
+      )
+    };
   }
 }
