@@ -2,7 +2,7 @@ import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
-  CallHandler,
+  CallHandler
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -32,7 +32,7 @@ export class TransformInterceptor<T>
   }
   intercept(
     context: ExecutionContext,
-    next: CallHandler,
+    next: CallHandler
   ): Observable<ApiResponse<T>> {
     const request = context.switchToHttp().getRequest();
     const startTime = Number(request['startTime']);
@@ -63,10 +63,10 @@ export class TransformInterceptor<T>
             message,
             date: new Date().toLocaleString('vi-VN', {
               timeZone: 'Asia/Ho_Chi_Minh',
-              hour12: false,
+              hour12: false
             }),
             path: url,
-            takenTime,
+            takenTime
           };
         }
 
@@ -76,12 +76,12 @@ export class TransformInterceptor<T>
           data,
           date: new Date().toLocaleString('vi-VN', {
             timeZone: 'Asia/Ho_Chi_Minh',
-            hour12: false,
+            hour12: false
           }),
           path: url,
-          takenTime,
+          takenTime
         };
-      }),
+      })
     );
   }
 }

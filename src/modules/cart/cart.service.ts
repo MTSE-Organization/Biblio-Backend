@@ -20,7 +20,7 @@ export class CartService {
     @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService,
 
-    private readonly cartItemService: CartItemService,
+    private readonly cartItemService: CartItemService
   ) {}
 
   async get(accountId: bigint) {
@@ -40,12 +40,12 @@ export class CartService {
 
   async findById(id: bigint): Promise<Cart> {
     const cart = await this.cartRepository.findByPk(id, {
-      include: [{ model: CartItem, include: [{ model: Product }] }],
+      include: [{ model: CartItem, include: [{ model: Product }] }]
     });
     if (cart == null) {
       throw new NotFoundException(
         'Cart not found',
-        ErrorCode.CART_ERROR_NOT_FOUND,
+        ErrorCode.CART_ERROR_NOT_FOUND
       );
     }
     return cart;
@@ -60,11 +60,11 @@ export class CartService {
           include: [
             {
               model: Product,
-              include: [{ model: Category }, { model: ProductImage }],
-            },
-          ],
-        },
-      ],
+              include: [{ model: Category }, { model: ProductImage }]
+            }
+          ]
+        }
+      ]
     });
   }
 
@@ -76,7 +76,7 @@ export class CartService {
 
   async existsBy(field: keyof Cart, value: any): Promise<boolean> {
     const count = await this.cartRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }

@@ -9,6 +9,6 @@ import { PermissionModule } from '../permission/permission.module';
   controllers: [GroupController],
   providers: [GroupService],
   imports: [SequelizeModule.forFeature([Group]), PermissionModule],
-  exports: [GroupService],
+  exports: [GroupService]
 })
 export class GroupModule {}

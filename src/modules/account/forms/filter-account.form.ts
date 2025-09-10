@@ -1,7 +1,7 @@
 import {
   BooleanDecorator,
   NumberDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 import { PaginationForm } from '@/common/forms';
 import { Transform, Type } from 'class-transformer';

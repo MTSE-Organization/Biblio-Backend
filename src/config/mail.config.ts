@@ -12,18 +12,18 @@ export const mailConfig: MailerAsyncOptions = {
       secure: false,
       auth: {
         user: configService.get<string>('MAIL_USERNAME'),
-        pass: configService.get<string>('MAIL_PASSWORD'),
-      },
+        pass: configService.get<string>('MAIL_PASSWORD')
+      }
     },
     defaults: {
-      from: `"No Reply" <${configService.get<string>('MAIL_FROM')}>`,
+      from: `"No Reply" <${configService.get<string>('MAIL_FROM')}>`
     },
     template: {
       dir: join(__dirname, '../mail/templates/'),
       adapter: new HandlebarsAdapter(),
       options: {
-        strict: true,
-      },
-    },
-  }),
+        strict: true
+      }
+    }
+  })
 };

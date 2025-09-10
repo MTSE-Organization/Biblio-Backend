@@ -10,8 +10,8 @@ import { CategoryModule } from '../category/category.module';
   providers: [ProductService],
   imports: [
     SequelizeModule.forFeature([Product]),
-    forwardRef(() => CategoryModule),
+    forwardRef(() => CategoryModule)
   ],
-  exports: [ProductService],
+  exports: [ProductService]
 })
 export class ProductModule {}

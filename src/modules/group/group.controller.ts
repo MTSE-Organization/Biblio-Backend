@@ -6,7 +6,7 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupForm, FilterGroupForm, UpdateGroupForm } from './forms';
@@ -30,7 +30,7 @@ export class GroupController {
     const response: ResponseListDto<GroupAutoCompleteDto[]> = {
       content: MapperUtil.toDtoList(groups, GroupAutoCompleteDto),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
     return response;
   }

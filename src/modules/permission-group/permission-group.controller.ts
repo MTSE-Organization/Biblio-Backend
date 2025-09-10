@@ -6,13 +6,13 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query
 } from '@nestjs/common';
 import { PermissionGroupService } from './permission-group.service';
 import {
   CreatePermissionGroupForm,
   FilterPermissionGroupForm,
-  UpdatePermissionGroupForm,
+  UpdatePermissionGroupForm
 } from './forms';
 import { PermissionGroupAutoCompleteDto, PermissionGroupDto } from './dtos';
 import { MapperUtil } from '@/utils';
@@ -21,7 +21,7 @@ import { ResponseListDto } from '@/common/interfaces';
 @Controller('permission-group')
 export class PermissionGroupController {
   constructor(
-    private readonly permissionGroupService: PermissionGroupService,
+    private readonly permissionGroupService: PermissionGroupService
   ) {}
 
   @Post('create')
@@ -36,10 +36,10 @@ export class PermissionGroupController {
     const response: ResponseListDto<PermissionGroupAutoCompleteDto[]> = {
       content: MapperUtil.toDtoList(
         permissionGroups,
-        PermissionGroupAutoCompleteDto,
+        PermissionGroupAutoCompleteDto
       ),
       totalElements: count,
-      totalPages: Math.ceil(count / form.size),
+      totalPages: Math.ceil(count / form.size)
     };
     return response;
   }

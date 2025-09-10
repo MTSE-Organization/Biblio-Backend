@@ -4,7 +4,7 @@ import {
   Delete,
   Param,
   Put,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { JwtAuthGuard } from '../auth/guards';

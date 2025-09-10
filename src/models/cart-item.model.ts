@@ -3,7 +3,7 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Product } from './product.model';
@@ -11,7 +11,7 @@ import { Cart } from './cart.model';
 
 @Table({
   tableName: 'db_cart_item',
-  timestamps: true,
+  timestamps: true
 })
 export class CartItem extends Auditable {
   @ForeignKey(() => Cart)

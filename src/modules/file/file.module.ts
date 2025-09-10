@@ -7,6 +7,6 @@ import { fileConfig } from '@/config';
 @Module({
   imports: [MulterModule.registerAsync(fileConfig)],
   controllers: [FileController],
-  providers: [FileService],
+  providers: [FileService]
 })
 export class FileModule {}

@@ -5,13 +5,13 @@ import {
   DataType,
   Model,
   PrimaryKey,
-  UpdatedAt,
+  UpdatedAt
 } from 'sequelize-typescript';
 import SnowflakeID from 'snowflake-id';
 
 const snowflake = new SnowflakeID({
   mid: 1,
-  offset: Date.UTC(2004, 8, 2),
+  offset: Date.UTC(2004, 8, 2)
 });
 
 export abstract class Auditable extends Model {

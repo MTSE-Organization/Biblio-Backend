@@ -5,7 +5,7 @@ import {
   ActiveAccountForm,
   ChangePasswordForm,
   ForgotPasswordForm,
-  RegisterForm,
+  RegisterForm
 } from './forms';
 
 @Controller('auth')

@@ -10,7 +10,7 @@ import { Constant } from '@/constants/constant';
 import {
   ActiveAccountForm,
   ChangePasswordForm,
-  ForgotPasswordForm,
+  ForgotPasswordForm
 } from './forms';
 import { UserDetailsDto } from './dtos';
 
@@ -20,7 +20,7 @@ export class AuthService {
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
-    private readonly mailService: MailService,
+    private readonly mailService: MailService
   ) {}
 
   async register(form: RegisterForm) {
@@ -28,13 +28,13 @@ export class AuthService {
     if (account) {
       throw new BadRequestException(
         'Account already exists',
-        ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED,
+        ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED
       );
     }
     if (form.password !== form.confirmPassword) {
       throw new BadRequestException(
         'Password and Confirm Password do not match',
-        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH,
+        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH
       );
     }
     await this.accountService.createUser(form);
@@ -47,7 +47,7 @@ export class AuthService {
     void this.mailService.sendActivationMail(form.email, otp);
 
     return {
-      message: 'Register successfully',
+      message: 'Register successfully'
     };
   }
 
@@ -70,12 +70,12 @@ export class AuthService {
   async forgotPassword(form: ForgotPasswordForm) {
     const account = await this.accountService.findByEmailAndStatus(
       form.email,
-      Constant.STATUS_ACTIVE,
+      Constant.STATUS_ACTIVE
     );
     if (!account) {
       throw new NotFoundException(
         'Account not found',
-        ErrorCode.ACCOUNT_ERROR_NOT_FOUND,
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
       );
     }
 
@@ -87,7 +87,7 @@ export class AuthService {
     void this.mailService.sendForgotPasswordMail(form.email, otp);
 
     return {
-      message: 'Send OTP successfully',
+      message: 'Send OTP successfully'
     };
   }
 
@@ -96,13 +96,13 @@ export class AuthService {
     if (!isVerified) {
       throw new BadRequestException(
         'Invalid or expired OTP',
-        ErrorCode.AUTH_ERROR_OTP_INVALID_OR_EXPIRED,
+        ErrorCode.AUTH_ERROR_OTP_INVALID_OR_EXPIRED
       );
     }
     if (form.password !== form.confirmPassword) {
       throw new BadRequestException(
         'Password and Confirm Password do not match',
-        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH,
+        ErrorCode.AUTH_ERROR_PASSWORD_MISMATCH
       );
     }
     await this.accountService.changePassword(form.email, form.password);

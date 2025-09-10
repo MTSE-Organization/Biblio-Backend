@@ -8,7 +8,7 @@ import { UserDetailsDto } from '../dtos';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private accountService: AccountService) {
     super({
-      usernameField: 'email',
+      usernameField: 'email'
     });
   }
 

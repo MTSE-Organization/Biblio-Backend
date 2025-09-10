@@ -12,14 +12,14 @@ export class CartItemService {
     @InjectModel(CartItem)
     private readonly cartItemRepository: typeof CartItem,
 
-    private readonly productService: ProductService,
+    private readonly productService: ProductService
   ) {}
 
   async create(form: AddItemForm) {
     await this.productService.findById(form.productId);
     const cartItem = await this.findByCartAndProduct(
       form.cartId,
-      form.productId,
+      form.productId
     );
     if (cartItem == null) {
       await this.cartItemRepository.create({ ...form });
@@ -45,7 +45,7 @@ export class CartItemService {
     if (cartItem == null) {
       throw new NotFoundException(
         'Cart Item not found',
-        ErrorCode.CART_ITEM_ERROR_NOT_FOUND,
+        ErrorCode.CART_ITEM_ERROR_NOT_FOUND
       );
     }
     return cartItem;
@@ -53,7 +53,7 @@ export class CartItemService {
 
   async findByCartAndProduct(cartId: bigint, productId: bigint) {
     return await this.cartItemRepository.findOne({
-      where: { cartId: cartId, productId: productId },
+      where: { cartId: cartId, productId: productId }
     });
   }
 }

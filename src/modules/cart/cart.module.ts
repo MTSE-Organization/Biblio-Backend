@@ -13,7 +13,7 @@ import { CartItemModule } from '../cart-item/cart-item.module';
   imports: [
     SequelizeModule.forFeature([Cart]),
     forwardRef(() => AccountModule),
-    CartItemModule,
-  ],
+    CartItemModule
+  ]
 })
 export class CartModule {}
