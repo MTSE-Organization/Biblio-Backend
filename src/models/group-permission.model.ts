@@ -15,9 +15,9 @@ import { Permission } from './permission.model';
 export class GroupPermission extends Model<GroupPermission> {
   @ForeignKey(() => Group)
   @Column({ type: DataType.BIGINT, primaryKey: true })
-  groupId: number;
+  groupId: bigint;
 
   @ForeignKey(() => Permission)
   @Column({ type: DataType.BIGINT, primaryKey: true })
-  permissionId: number;
+  permissionId: bigint;
 }

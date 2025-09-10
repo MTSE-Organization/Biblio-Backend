@@ -26,6 +26,8 @@ import { ProductModule } from './modules/product/product.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { PermissionGroupModule } from './modules/permission-group/permission-group.module';
+import { ContributorModule } from './modules/contributor/contributor.module';
+import { PublisherModule } from './modules/publisher/publisher.module';
 //#endregion
 
 @Module({
@@ -48,6 +50,8 @@ import { PermissionGroupModule } from './modules/permission-group/permission-gro
     CartModule,
     CartItemModule,
     PermissionGroupModule,
+    ContributorModule,
+    PublisherModule,
   ],
 })
 export class AppModule implements NestModule {

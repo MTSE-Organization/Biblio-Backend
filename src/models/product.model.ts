@@ -9,6 +9,7 @@ import {
 import { Category } from './category.model';
 import { Auditable } from './auditable.model';
 import { ProductImage } from './product-image.model';
+import { Publisher } from './publisher';
 
 @Table({
   tableName: 'db_product',
@@ -60,4 +61,11 @@ export class Product extends Auditable {
 
   @HasMany(() => ProductImage)
   declare images: ProductImage[];
+
+  @ForeignKey(() => Publisher)
+  @Column({ allowNull: false, type: DataType.BIGINT })
+  declare publisherId: bigint;
+
+  @BelongsTo(() => Publisher)
+  declare publisher: Publisher;
 }

@@ -21,6 +21,10 @@
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
     "db:generate": "sequelize-cli migration:generate --name",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo",
+    "db:seed:undo:all": "sequelize-cli db:seed:undo:all",
+    "db:seed:generate": "sequelize-cli seed:generate --name",
     "prepare": "husky",
     "lint-staged": "lint-staged"
   },
