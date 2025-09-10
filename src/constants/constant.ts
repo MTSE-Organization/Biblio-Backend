@@ -11,6 +11,8 @@ export const Constant = {
   STATUS_DELETED: -2,
 
   // Group
+  GROUP_KIND_ADMIN: 1,
+  GROUP_KIND_USER: 2,
   GROUP_NAME_USER: 'Role User',
 } as const;
 
