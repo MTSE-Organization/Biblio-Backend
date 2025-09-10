@@ -59,6 +59,7 @@ export class ProductService {
     const { rows, count } = await this.productRepository.findAndCountAll({
       limit: size,
       offset: skip,
+      where: query.getFilter(),
       include: [
         { model: Category },
         {

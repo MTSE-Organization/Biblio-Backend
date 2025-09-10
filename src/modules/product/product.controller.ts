@@ -18,17 +18,60 @@ import {
 import { ProductAutoCompleteDto, ProductDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
-import { JwtAuthGuard } from '../auth/guards';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
+import { PCode } from '@/common/decorators';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @PCode('PRD_C')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateProductForm) {
     return await this.productService.create(form);
+  }
+
+  @PCode('PRD_L')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('admin/list')
+  async adminList(@Query() form: FilterProductForm) {
+    const { products, count } = await this.productService.findAll(form);
+
+    const response: ResponseListDto<ProductAutoCompleteDto[]> = {
+      content: ProductMapper.toAutoCompleteDtoList(products),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+
+    return response;
+  }
+
+  @PCode('PRD_V')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('admin/get/:id')
+  async adminGet(@Param('id') id: bigint) {
+    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
+  }
+
+  @PCode('PRD_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('update')
+  async update(@Body() form: UpdateProductForm) {
+    return await this.productService.update(form);
+  }
+
+  @PCode('PRD_D')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Delete('delete/:id')
+  async delete(@Param('id') id: bigint) {
+    return await this.productService.delete(id);
+  }
+
+  @Get('get/:id')
+  async get(@Param('id') id: bigint) {
+    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
   }
 
   @Get('list')
@@ -42,23 +85,6 @@ export class ProductController {
     };
 
     return response;
-  }
-
-  @Get('get/:id')
-  async get(@Param('id') id: bigint) {
-    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Put('update')
-  async update(@Body() form: UpdateProductForm) {
-    return await this.productService.update(form);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete('delete/:id')
-  async delete(@Param('id') id: bigint) {
-    return await this.productService.delete(id);
   }
 
   @Get('latest')
