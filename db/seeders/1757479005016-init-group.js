@@ -12,7 +12,7 @@ module.exports = {
           is_system_role: 1,
           created_date: '2025-09-10 04:30:59',
           modified_date: '2025-09-10 04:30:59',
-          status: 1,
+          status: 1
         },
         {
           id: 2,
@@ -22,7 +22,7 @@ module.exports = {
           is_system_role: 1,
           created_date: '2025-09-10 04:30:59',
           modified_date: '2025-09-10 04:30:59',
-          status: 1,
+          status: 1
         },
         {
           id: 3,
@@ -32,14 +32,14 @@ module.exports = {
           is_system_role: 1,
           created_date: '2025-09-10 04:30:59',
           modified_date: '2025-09-10 04:30:59',
-          status: 1,
-        },
+          status: 1
+        }
       ],
-      {},
+      {}
     );
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('db_group', null, {});
-  },
+  }
 };

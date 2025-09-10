@@ -2,7 +2,7 @@ import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
-  CallHandler,
+  CallHandler
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import * as fs from 'fs';
@@ -17,7 +17,7 @@ export class FileRenameInterceptor implements NestInterceptor {
 
   async intercept(
     context: ExecutionContext,
-    next: CallHandler,
+    next: CallHandler
   ): Promise<Observable<any>> {
     const req = context.switchToHttp().getRequest();
 
@@ -28,7 +28,7 @@ export class FileRenameInterceptor implements NestInterceptor {
         await fs.promises.unlink(req.file.path).catch(() => {});
         throw new BadRequestException(
           'Kind is required',
-          ErrorCode.FILE_ERROR_KIND_REQUIRED,
+          ErrorCode.FILE_ERROR_KIND_REQUIRED
         );
       }
 
@@ -36,7 +36,7 @@ export class FileRenameInterceptor implements NestInterceptor {
         await fs.promises.unlink(req.file.path).catch(() => {});
         throw new BadRequestException(
           'Kind is invalid',
-          ErrorCode.FILE_ERROR_KIND_INVALID,
+          ErrorCode.FILE_ERROR_KIND_INVALID
         );
       }
 

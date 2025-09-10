@@ -4,7 +4,7 @@ import {
   DataType,
   ForeignKey,
   HasMany,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Category } from './category.model';
 import { Auditable } from './auditable.model';
@@ -13,7 +13,7 @@ import { Publisher } from './publisher';
 
 @Table({
   tableName: 'db_product',
-  timestamps: true,
+  timestamps: true
 })
 export class Product extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })

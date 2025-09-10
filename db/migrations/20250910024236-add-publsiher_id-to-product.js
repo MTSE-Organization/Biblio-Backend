@@ -10,12 +10,12 @@ module.exports = {
       after: 'category_id',
       references: {
         model: 'db_publisher',
-        key: 'id',
-      },
+        key: 'id'
+      }
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.removeColumn('db_product', 'publisher_id');
-  },
+  }
 };

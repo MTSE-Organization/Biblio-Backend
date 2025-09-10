@@ -9,8 +9,8 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mysql',
-  },
+    dialect: 'mysql'
+  }
 );
 
 function formatDate(value) {
@@ -52,7 +52,7 @@ const [, , tableName, seederName] = process.argv;
 
 if (!tableName || !seederName) {
   console.error(
-    'Usage: node scripts/generate-seeder.js <tableName> <seederName>',
+    'Usage: node scripts/generate-seeder.js <tableName> <seederName>'
   );
   process.exit(1);
 }

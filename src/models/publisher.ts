@@ -3,7 +3,7 @@ import { Auditable } from './auditable.model';
 
 @Table({
   tableName: 'db_publisher',
-  timestamps: true,
+  timestamps: true
 })
 export class Publisher extends Auditable {
   @Column({ allowNull: false, type: DataType.STRING })
