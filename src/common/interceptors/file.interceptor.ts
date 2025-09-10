@@ -10,10 +10,11 @@ import * as path from 'path';
 import { BadRequestException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { fileFolders } from '@/constants/constant';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FileRenameInterceptor implements NestInterceptor {
-  constructor(private readonly rootDir: string = './uploads') {}
+  constructor(private readonly configService: ConfigService) {}
 
   async intercept(
     context: ExecutionContext,
@@ -50,7 +51,10 @@ export class FileRenameInterceptor implements NestInterceptor {
           break;
       }
 
-      const uploadDir = path.join(this.rootDir, folder);
+      const uploadDir = path.join(
+        this.configService.get<string>('UPLOAD_DIR')!,
+        folder
+      );
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }

@@ -8,8 +8,13 @@ export const cacheConfig: CacheModuleAsyncOptions = {
   useFactory: (configService: ConfigService) => {
     const host = configService.get<string>('REDIS_HOST');
     const port = configService.get<number>('REDIS_PORT');
+    const password = configService.get<string>('REDIS_PASSWORD');
+
+    const redisUri = password
+      ? `redis://:${password}@${host}:${port}`
+      : `redis://${host}:${port}`;
     return {
-      stores: [createKeyv(`redis://${host}:${port}`)]
+      stores: [createKeyv(redisUri)]
     };
   }
 };

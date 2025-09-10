@@ -20,7 +20,7 @@ export class FileController {
   constructor(private readonly configService: ConfigService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'), new FileRenameInterceptor())
+  @UseInterceptors(FileInterceptor('file'), FileRenameInterceptor)
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
       filePath: `/${file.destination.replace('\\', '/')}/${file.filename}`
