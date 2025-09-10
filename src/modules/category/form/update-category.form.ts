@@ -1,7 +1,7 @@
 import {
   BigIntDecorator,
   NumberDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 
 export class UpdateCategoryForm {
@@ -13,9 +13,6 @@ export class UpdateCategoryForm {
 
   @StringDecorator('description', false)
   description?: string;
-
-  @NumberDecorator('ordering', true)
-  ordering: number;
 
   @NumberDecorator('status', true)
   status: number;

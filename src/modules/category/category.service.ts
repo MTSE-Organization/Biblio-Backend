@@ -3,14 +3,14 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import slugify from 'slugify';
 import { ProductService } from '../product/product.service';
 import {
   CreateCategoryForm,
   FilterCategoryForm,
-  UpdateCategoryForm,
+  UpdateCategoryForm
 } from './form';
 import { UpdateOrderingForm } from '@/common/forms';
+import { SlugifyUtil } from '@/utils';
 
 @Injectable()
 export class CategoryService {
@@ -19,21 +19,21 @@ export class CategoryService {
     private readonly categoryRepository: typeof Category,
 
     @Inject(forwardRef(() => ProductService))
-    private readonly productService: ProductService,
+    private readonly productService: ProductService
   ) {}
 
   async create(form: CreateCategoryForm) {
     if (await this.existsBy('name', form.name)) {
       throw new BadRequestException(
         'Category name already exists',
-        ErrorCode.CATEGORY_ERROR_NAME_EXISTED,
+        ErrorCode.CATEGORY_ERROR_NAME_EXISTED
       );
     }
 
-    const slug = slugify(form.name, { lower: true, strict: true });
+    const slug = SlugifyUtil.toSlugify(form.name);
 
     const maxOrderingCategory = await this.categoryRepository.findOne({
-      order: [['ordering', 'DESC']],
+      order: [['ordering', 'DESC']]
     });
 
     const nextOrdering =
@@ -46,10 +46,10 @@ export class CategoryService {
       slug,
       description: form.description || '',
       ordering: nextOrdering,
-      imageUrl: form.imageUrl,
+      imageUrl: form.imageUrl
     });
 
-    return { message: 'Create category successfully', category };
+    return { message: 'Create category successfully' };
   }
 
   async update(form: UpdateCategoryForm) {
@@ -63,19 +63,19 @@ export class CategoryService {
     ) {
       throw new BadRequestException(
         'Category name already exists',
-        ErrorCode.CATEGORY_ERROR_NAME_EXISTED,
+        ErrorCode.CATEGORY_ERROR_NAME_EXISTED
       );
     }
 
     if (data.name && data.name !== category.name) {
-      category.slug = slugify(data.name, { lower: true, strict: true });
+      category.slug = SlugifyUtil.toSlugify(form.name);
     }
 
     category.set(data);
 
     await category.save();
 
-    return { message: 'Update category successfully', category };
+    return { message: 'Update category successfully' };
   }
 
   async delete(id: bigint) {
@@ -85,7 +85,7 @@ export class CategoryService {
     if (hasProducts) {
       throw new BadRequestException(
         'Cannot delete category because it is in use by one or more products',
-        ErrorCode.CATEGORY_ERROR_IN_USE,
+        ErrorCode.CATEGORY_ERROR_IN_USE
       );
     }
 
@@ -94,7 +94,7 @@ export class CategoryService {
   }
 
   async findAll(
-    query?: FilterCategoryForm,
+    query?: FilterCategoryForm
   ): Promise<{ categories: Category[]; count: number }> {
     const { page = 0, size = 10 } = query || {};
     const skip = page * size;
@@ -103,7 +103,7 @@ export class CategoryService {
       where: query?.getFilter(),
       limit: size,
       offset: skip,
-      order: [['ordering', 'ASC']],
+      order: [['ordering', 'ASC']]
     });
 
     return { categories: rows, count };
@@ -114,7 +114,7 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(
         'Category not found',
-        ErrorCode.CATEGORY_ERROR_NOT_FOUND,
+        ErrorCode.CATEGORY_ERROR_NOT_FOUND
       );
     }
     return category;
@@ -122,7 +122,7 @@ export class CategoryService {
 
   async existsBy(field: keyof Category, value: any): Promise<boolean> {
     const count = await this.categoryRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }
@@ -134,43 +134,41 @@ export class CategoryService {
       where: query.getFilter(),
       limit: size,
       offset: page * size,
-      order: [['ordering', 'ASC']],
+      order: [['ordering', 'ASC']]
     });
   }
 
   async updateOrdering(
-    forms: UpdateOrderingForm[],
+    forms: UpdateOrderingForm[]
   ): Promise<{ message: string }> {
     if (!forms || forms.length === 0) {
       throw new BadRequestException(
         'Input list cannot be empty',
-        ErrorCode.CATEGORY_ERROR_INVALID_REQUEST,
+        ErrorCode.CATEGORY_ERROR_INVALID_REQUEST
       );
     }
 
-    const ids = forms.map((f) => f.id);
+    const ids = forms.map((f) => BigInt(f.id));
     const categories = await this.categoryRepository.findAll({
-      where: { id: ids },
+      where: { id: ids }
     });
 
     if (categories.length !== ids.length) {
       throw new NotFoundException(
         'One or more categories not found',
-        ErrorCode.CATEGORY_ERROR_NOT_FOUND,
+        ErrorCode.CATEGORY_ERROR_NOT_FOUND
       );
     }
 
-    const orderingMap = new Map<number, number>();
+    const orderingMap = new Map<bigint, number>();
     for (const form of forms) {
-      orderingMap.set(Number(form.id), form.ordering);
+      orderingMap.set(form.id, form.ordering);
     }
 
     for (const category of categories) {
-      const newOrdering = orderingMap.get(Number(category.id));
-      if (newOrdering !== undefined) {
-        category.ordering = newOrdering;
-        await category.save();
-      }
+      const newOrdering = orderingMap.get(category.id) as number;
+      category.ordering = newOrdering;
+      await category.save();
     }
 
     return { message: 'Update ordering category success' };

@@ -7,9 +7,6 @@ export class CreateCategoryForm {
   @StringDecorator('description', false)
   description: string;
 
-  @NumberDecorator('ordering', false)
-  ordering?: number;
-
   @NumberDecorator('status', false)
   status?: number;
 

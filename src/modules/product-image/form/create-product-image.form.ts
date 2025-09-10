@@ -1,15 +1,11 @@
 import {
   BigIntDecorator,
   BooleanDecorator,
-  NumberDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 export class CreateProductImageForm {
-  @StringDecorator('url', false)
-  url?: string;
-
-  @NumberDecorator('ordering', false)
-  ordering?: number;
+  @StringDecorator('url', true)
+  url: string;
 
   @BooleanDecorator('isDefault', true)
   isDefault: boolean;
