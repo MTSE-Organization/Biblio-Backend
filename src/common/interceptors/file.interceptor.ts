@@ -50,7 +50,6 @@ export class FileRenameInterceptor implements NestInterceptor {
           folder = 'avatars';
           break;
       }
-
       const uploadDir = path.join(
         this.configService.get<string>('UPLOAD_DIR')!,
         folder
