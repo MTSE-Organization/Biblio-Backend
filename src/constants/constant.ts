@@ -11,10 +11,12 @@ export const Constant = {
   STATUS_DELETED: -2,
 
   // Group
-  GROUP_NAME_USER: 'Role User',
+  GROUP_KIND_ADMIN: 1,
+  GROUP_KIND_USER: 2,
+  GROUP_NAME_USER: 'Role User'
 } as const;
 
 export const fileFolders = {
   ['1']: 'systems',
-  ['2']: 'avatars',
+  ['2']: 'avatars'
 };

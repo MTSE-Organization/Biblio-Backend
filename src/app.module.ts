@@ -27,6 +27,8 @@ import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { PermissionGroupModule } from './modules/permission-group/permission-group.module';
 import { CloudinaryModule } from '@/modules/cloudinary/cloudinary.module';
+import { ContributorModule } from './modules/contributor/contributor.module';
+import { PublisherModule } from './modules/publisher/publisher.module';
 //#endregion
 
 @Module({
@@ -49,7 +51,9 @@ import { CloudinaryModule } from '@/modules/cloudinary/cloudinary.module';
     CartModule,
     CartItemModule,
     PermissionGroupModule,
-    CloudinaryModule
+    CloudinaryModule,
+    ContributorModule,
+    PublisherModule
   ]
 })
 export class AppModule implements NestModule {

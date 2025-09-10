@@ -1,4 +1,4 @@
-import { FileRenameInterceptor } from '@/common/interceptors/file.interceptor';
+import { FileRenameInterceptor } from '@/common/interceptors/cloudinary.interceptor';
 import { CloudinaryService } from '@/modules/cloudinary/cloudinary.service';
 import {
   Controller,
@@ -9,7 +9,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 
-@Controller('file2')
+@Controller('cloudinary/file')
 export class CloudinaryController {
   constructor(private readonly cloudinaryService: CloudinaryService) {}
 

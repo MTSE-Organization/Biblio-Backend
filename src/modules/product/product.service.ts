@@ -4,11 +4,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateProductForm,
   FilterProductForm,
-  UpdateProductForm,
+  UpdateProductForm
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
-import { Category } from '@/models';
+import { Category, ProductImage } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
 import { Constant } from '@/constants/constant';
@@ -20,7 +20,7 @@ export class ProductService {
     private readonly productRepository: typeof Product,
 
     @Inject(forwardRef(() => CategoryService))
-    private readonly categoryService: CategoryService,
+    private readonly categoryService: CategoryService
   ) {}
 
   async create(form: CreateProductForm) {
@@ -33,7 +33,7 @@ export class ProductService {
 
   async existsBy(field: keyof Product, value: any): Promise<boolean> {
     const count = await this.productRepository.count({
-      where: { [field]: value },
+      where: { [field]: value }
     });
     return count > 0;
   }
@@ -51,7 +51,7 @@ export class ProductService {
   }
 
   async findAll(
-    query: FilterProductForm,
+    query: FilterProductForm
   ): Promise<{ products: Product[]; count: number }> {
     const { page, size } = query;
     const skip = page * size;
@@ -59,21 +59,35 @@ export class ProductService {
     const { rows, count } = await this.productRepository.findAndCountAll({
       limit: size,
       offset: skip,
-      include: [{ model: Category }],
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          separate: true,
+          limit: 1,
+          order: [
+            ['isDefault', 'DESC'],
+            ['id', 'ASC']
+          ]
+        }
+      ]
     });
+
     return { products: rows, count };
   }
 
   async findById(id: bigint): Promise<Product> {
     const product = await this.productRepository.findByPk(id, {
-      include: [{ model: Category }],
+      include: [{ model: Category }, { model: ProductImage }]
     });
+
     if (!product) {
       throw new NotFoundException(
         'Product not found',
-        ErrorCode.PRODUCT_ERROR_NOT_FOUND,
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
       );
     }
+
     return product;
   }
 
@@ -87,7 +101,7 @@ export class ProductService {
     return this.productRepository.findAll({
       limit,
       order: [['createdDate', 'DESC']],
-      include: [{ model: Category }],
+      include: [{ model: Category }]
     });
   }
 
@@ -96,7 +110,7 @@ export class ProductService {
       where: { isFeatured: true },
       limit,
       order: [['quantity', 'DESC']],
-      include: [{ model: Category }],
+      include: [{ model: Category }]
     });
   }
 
@@ -104,7 +118,7 @@ export class ProductService {
     return this.productRepository.findAll({
       limit,
       order: [['price', 'DESC']],
-      include: [{ model: Category }],
+      include: [{ model: Category }]
     });
   }
 }

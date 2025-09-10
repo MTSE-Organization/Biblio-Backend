@@ -1,12 +1,28 @@
-import { Expose } from 'class-transformer';
+import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
+import { ProductImageAutoCompleteDto } from '@/modules/product-image/dtos/product-image-auto-complete.dto';
+import { Expose, Type } from 'class-transformer';
 
 export class ProductAutoCompleteDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   name: string;
 
   @Expose()
-  pCode: string;
+  @Type(() => ProductImageAutoCompleteDto)
+  image?: ProductImageAutoCompleteDto;
+
+  @Expose()
+  @Type(() => CategoryAutoCompleteDto)
+  category?: CategoryAutoCompleteDto;
+
+  @Expose()
+  price: number;
+
+  @Expose()
+  quantity: number;
+
+  @Expose()
+  discount: number;
 }

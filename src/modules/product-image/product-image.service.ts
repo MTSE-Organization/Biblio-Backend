@@ -8,6 +8,7 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { UpdateOrderingForm } from '../../common/forms/update-ordering.form';
 import { ProductService } from '../product/product.service';
+import { UpdateDefaultImageForm } from './form/update-default-image.form';
 
 @Injectable()
 export class ProductImageService {
@@ -15,15 +16,19 @@ export class ProductImageService {
     @InjectModel(ProductImage)
     private readonly productImageRepository: typeof ProductImage,
 
-    private readonly productService: ProductService,
+    private readonly productService: ProductService
   ) {}
 
   async create(form: CreateProductImageForm) {
     await this.productService.findById(form.productId);
 
+    if (form.isDefault) {
+      await this.clearDefaultImage(form.productId);
+    }
+
     const maxOrderingImage = await this.productImageRepository.findOne({
       where: { productId: form.productId },
-      order: [['ordering', 'DESC']],
+      order: [['ordering', 'DESC']]
     });
 
     const nextOrdering =
@@ -31,15 +36,26 @@ export class ProductImageService {
 
     const productImage = await this.productImageRepository.create({
       ...form,
-      ordering: nextOrdering,
+      ordering: nextOrdering
     });
 
-    return { message: 'Create product image successfully', productImage };
+    return {
+      message: 'Create product image successfully',
+      productImage: {
+        ...productImage.toJSON(),
+        id: productImage.id.toString(),
+        productId: productImage.productId.toString()
+      }
+    };
   }
 
   async update(form: UpdateProductImageForm) {
     const { id, ...data } = form;
     const productImage = await this.findById(id);
+
+    if (form.isDefault) {
+      await this.clearDefaultImage(productImage.productId);
+    }
 
     productImage.set(data);
     await productImage.save();
@@ -70,13 +86,13 @@ export class ProductImageService {
       where,
       limit: size,
       offset,
-      order: [['ordering', 'ASC']],
+      order: [['ordering', 'ASC']]
     });
 
     return {
       content: rows,
       totalElements: count,
-      totalPages: Math.ceil(count / size),
+      totalPages: Math.ceil(count / size)
     };
   }
 
@@ -85,24 +101,24 @@ export class ProductImageService {
   }
 
   async updateOrdering(
-    forms: UpdateOrderingForm[],
+    forms: UpdateOrderingForm[]
   ): Promise<{ message: string }> {
     if (!forms || forms.length === 0) {
       throw new BadRequestException(
         'Input list cannot be empty',
-        ErrorCode.PRODUCT_IMAGE_ERROR_INVALID_REQUEST,
+        ErrorCode.PRODUCT_IMAGE_ERROR_INVALID_REQUEST
       );
     }
 
     const ids = forms.map((f) => f.id);
     const productImages = await this.productImageRepository.findAll({
-      where: { id: ids },
+      where: { id: ids }
     });
 
     if (productImages.length !== ids.length) {
       throw new NotFoundException(
         'One or more product images not found',
-        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND,
+        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND
       );
     }
 
@@ -127,9 +143,36 @@ export class ProductImageService {
     if (!image) {
       throw new NotFoundException(
         'Product image not found',
-        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND,
+        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND
       );
     }
     return image;
+  }
+  async updateDefault(form: UpdateDefaultImageForm) {
+    const { id, productId } = form;
+
+    const productImages = await this.productImageRepository.findAll({
+      where: { productId }
+    });
+
+    if (!productImages || productImages.length === 0) {
+      throw new NotFoundException(
+        'No images found for this product',
+        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND
+      );
+    }
+
+    for (const image of productImages) {
+      image.isDefault = image.id.toString() === id.toString();
+      await image.save();
+    }
+
+    return { message: 'Updated default product image successfully' };
+  }
+  private async clearDefaultImage(productId: bigint) {
+    await this.productImageRepository.update(
+      { isDefault: false },
+      { where: { productId } }
+    );
   }
 }

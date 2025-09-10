@@ -3,7 +3,7 @@ import {
   BooleanDecorator,
   DateDecorator,
   NumberDecorator,
-  StringDecorator,
+  StringDecorator
 } from '@/common/decorators';
 
 export class CreateProductForm {
@@ -36,6 +36,9 @@ export class CreateProductForm {
 
   @NumberDecorator('quantity', true)
   quantity: number;
+
+  @NumberDecorator('discount')
+  discount: number | null = null;
 
   @BigIntDecorator('categoryId', true)
   categoryId: bigint;

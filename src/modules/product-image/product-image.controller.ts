@@ -7,7 +7,7 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ProductImageService } from './product-image.service';
 import { CreateProductImageForm } from './form/create-product-image.form';
@@ -19,19 +19,20 @@ import { PCode } from '@/common/decorators';
 import { MapperUtil } from '@/utils';
 import { ProductImageDto } from './dtos/product-image.dto';
 import { ResponseListDto } from '@/common/interfaces';
+import { UpdateDefaultImageForm } from './form/update-default-image.form';
 
 @Controller('product-image')
 export class ProductImageController {
   constructor(private readonly productImageService: ProductImageService) {}
 
-  @PCode('PIMG_C')
+  @PCode('PRD_IMG_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateProductImageForm) {
     return await this.productImageService.create(form);
   }
 
-  @PCode('PIMG_L')
+  @PCode('PRD_IMG_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterProductImageForm) {
@@ -41,13 +42,13 @@ export class ProductImageController {
     const response: ResponseListDto<ProductImageDto[]> = {
       content: MapperUtil.toDtoList(content, ProductImageDto),
       totalElements,
-      totalPages,
+      totalPages
     };
 
     return response;
   }
 
-  @PCode('PIMG_V')
+  @PCode('PRD_IMG_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
@@ -55,24 +56,30 @@ export class ProductImageController {
     return MapperUtil.toDto(productImage, ProductImageDto);
   }
 
-  @PCode('PIMG_U')
+  @PCode('PRD_IMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateProductImageForm) {
     return await this.productImageService.update(form);
   }
 
-  @PCode('PIMG_D')
+  @PCode('PRD_IMG_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
     return await this.productImageService.delete(id);
   }
 
-  @PCode('PIMG_U')
+  @PCode('PRD_IMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
     return await this.productImageService.updateOrdering(form);
+  }
+  @PCode('PIMG_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('update-default')
+  async updateDefault(@Body() form: UpdateDefaultImageForm) {
+    return await this.productImageService.updateDefault(form);
   }
 }
