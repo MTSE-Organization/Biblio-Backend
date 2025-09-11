@@ -35,8 +35,8 @@ export class ProductController {
 
   @PCode('PRD_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Get('admin/list')
-  async adminList(@Query() form: FilterProductForm) {
+  @Get('private/list')
+  async privateList(@Query() form: FilterProductForm) {
     const { products, count } = await this.productService.findAll(form);
 
     const response: ResponseListDto<ProductAutoCompleteDto[]> = {
@@ -50,8 +50,8 @@ export class ProductController {
 
   @PCode('PRD_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Get('admin/get/:id')
-  async adminGet(@Param('id') id: bigint) {
+  @Get('private/get/:id')
+  async privateGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
   }
 
