@@ -5,6 +5,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from '@/common/interceptors/response.interceptor';
 import { AllExceptionFilter } from './common/filters/all-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DelayInterceptor } from '@/common/interceptors/delay.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,6 +27,7 @@ async function bootstrap() {
 
   // config interceptors
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(new DelayInterceptor());
 
   // config exception filters
   app.useGlobalFilters(new AllExceptionFilter());
