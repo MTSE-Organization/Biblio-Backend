@@ -10,6 +10,7 @@ import { Cart } from '@/models/cart.model';
 import { Contributor } from '@/models/contributor';
 import { PermissionGroup } from '@/models/permission-group.model';
 import { ProductImage } from '@/models/product-image.model';
+import { ProductVariant } from '@/models/product-variant.model';
 import { Product } from '@/models/product.model';
 import { Publisher } from '@/models/publisher';
 import { ConfigService } from '@nestjs/config';
@@ -39,7 +40,8 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
       Cart,
       CartItem,
       Contributor,
-      Publisher
+      Publisher,
+      ProductVariant
     ],
     define: {
       underscored: true,
