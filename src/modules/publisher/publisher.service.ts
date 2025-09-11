@@ -19,7 +19,6 @@ export class PublisherService {
 
   async create(form: CreatePublisherForm) {
     const data = { ...form };
-    console.log('Form data:', data);
 
     await this.publisherRepository.create(data);
     return { message: 'Create publisher successfully' };
