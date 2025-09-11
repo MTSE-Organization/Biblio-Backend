@@ -6,8 +6,8 @@ import {
   Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
-import { Product } from './product.model';
 import { Cart } from './cart.model';
+import { ProductVariant } from './product-variant.model';
 
 @Table({
   tableName: 'db_cart_item',
@@ -21,12 +21,12 @@ export class CartItem extends Auditable {
   @BelongsTo(() => Cart)
   declare cart: Cart;
 
-  @ForeignKey(() => Product)
+  @ForeignKey(() => ProductVariant)
   @Column({ allowNull: false, type: DataType.BIGINT })
-  declare productId: bigint;
+  declare productVariantId: bigint;
 
-  @BelongsTo(() => Product)
-  declare product: Product;
+  @BelongsTo(() => ProductVariant)
+  declare productVariant: ProductVariant;
 
   @Column({ type: DataType.INTEGER, defaultValue: 1 })
   declare quantity: number;

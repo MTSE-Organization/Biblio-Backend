@@ -1,4 +1,4 @@
-import { ProductDto } from '@/modules/product/dtos';
+import { ProductVariantDto } from '@/modules/product-variant/dtos';
 import { Expose, Type } from 'class-transformer';
 
 export class CartItemDto {
@@ -9,8 +9,8 @@ export class CartItemDto {
   cartId: bigint;
 
   @Expose()
-  @Type(() => ProductDto)
-  product: ProductDto;
+  @Type(() => ProductVariantDto)
+  productVariant: ProductVariantDto;
 
   @Expose()
   quantity: number;

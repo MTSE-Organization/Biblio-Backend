@@ -12,6 +12,8 @@ import { Category, ProductImage } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
 import { Constant } from '@/constants/constant';
+import { PublisherService } from '../publisher/publisher.service';
+import { Publisher } from '@/models/publisher';
 
 @Injectable()
 export class ProductService {
@@ -20,11 +22,16 @@ export class ProductService {
     private readonly productRepository: typeof Product,
 
     @Inject(forwardRef(() => CategoryService))
-    private readonly categoryService: CategoryService
+    private readonly categoryService: CategoryService,
+
+    private readonly publisherService: PublisherService
   ) {}
 
   async create(form: CreateProductForm) {
-    await this.categoryService.findById(form.categoryId);
+    await Promise.all([
+      this.categoryService.findById(form.categoryId),
+      this.publisherService.findById(form.publisherId)
+    ]);
     const slug = SlugifyUtil.toSlugify(form.name);
     const data = { slug: slug, ...form };
     await this.productRepository.create(data);
@@ -43,6 +50,9 @@ export class ProductService {
     if (product.categoryId !== form.categoryId) {
       await this.categoryService.findById(form.categoryId);
       product.categoryId = form.categoryId;
+    }
+    if (product.publisherId !== form.publisherId) {
+      await this.publisherService.findById(form.publisherId);
     }
     const slug = SlugifyUtil.toSlugify(form.name);
     const { categoryId, ...data } = form;
@@ -79,7 +89,11 @@ export class ProductService {
 
   async findById(id: bigint): Promise<Product> {
     const product = await this.productRepository.findByPk(id, {
-      include: [{ model: Category }, { model: ProductImage }]
+      include: [
+        { model: Category },
+        { model: ProductImage },
+        { model: Publisher }
+      ]
     });
 
     if (!product) {

@@ -20,7 +20,8 @@ export class CartController {
 
   @UseGuards(JwtAuthGuard)
   @Post('add-item')
-  async addItem(@Body() form: AddItemForm) {
-    return await this.cartService.addItem(form);
+  async addItem(@Req() req, @Body() form: AddItemForm) {
+    const user: UserDetailsDto = req.user;
+    return await this.cartService.addItem(form, user.id);
   }
 }

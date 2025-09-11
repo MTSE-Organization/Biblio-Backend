@@ -2,9 +2,9 @@ import { CartItem } from '@/models/cart-item.model';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AddItemForm } from '../cart/forms';
-import { ProductService } from '../product/product.service';
 import { UpdateCartItemForm } from './forms';
 import { ErrorCode } from '@/constants/error-code.constant';
+import { ProductVariantService } from '../product-variant/product-variant.service';
 
 @Injectable()
 export class CartItemService {
@@ -12,17 +12,17 @@ export class CartItemService {
     @InjectModel(CartItem)
     private readonly cartItemRepository: typeof CartItem,
 
-    private readonly productService: ProductService
+    private readonly productVariantService: ProductVariantService
   ) {}
 
-  async create(form: AddItemForm) {
-    await this.productService.findById(form.productId);
+  async create(cartId: bigint, form: AddItemForm) {
+    await this.productVariantService.findById(form.productVariantId);
     const cartItem = await this.findByCartAndProduct(
-      form.cartId,
-      form.productId
+      cartId,
+      form.productVariantId
     );
     if (cartItem == null) {
-      await this.cartItemRepository.create({ ...form });
+      await this.cartItemRepository.create({ cartId, ...form });
     } else {
       await cartItem.update({ quantity: cartItem.quantity + form.quantity });
     }
@@ -51,9 +51,9 @@ export class CartItemService {
     return cartItem;
   }
 
-  async findByCartAndProduct(cartId: bigint, productId: bigint) {
+  async findByCartAndProduct(cartId: bigint, variantId: bigint) {
     return await this.cartItemRepository.findOne({
-      where: { cartId: cartId, productId: productId }
+      where: { cartId: cartId, productVariantId: variantId }
     });
   }
 }
