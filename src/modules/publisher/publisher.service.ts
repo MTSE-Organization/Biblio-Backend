@@ -31,6 +31,7 @@ export class PublisherService {
     const skip = page * size;
 
     const { rows, count } = await this.publisherRepository.findAndCountAll({
+      where: query?.getFilter(),
       offset: skip,
       limit: size
     });
