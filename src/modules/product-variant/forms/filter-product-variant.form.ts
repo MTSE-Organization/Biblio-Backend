@@ -1,0 +1,26 @@
+import { BigIntDecorator, NumberDecorator } from '@/common/decorators';
+import { PaginationForm } from '@/common/forms';
+import { Type } from 'class-transformer';
+
+export class FilterProductVariantForm extends PaginationForm {
+  @Type(() => Number)
+  @NumberDecorator('condition')
+  condition: string;
+
+  @Type(() => Number)
+  @NumberDecorator('format')
+  format: number;
+
+  @Type(() => BigInt)
+  @BigIntDecorator('productId')
+  productId: bigint;
+
+  getFilter(): Record<string, any> {
+    const where: Record<string, any> = {};
+    if (this.condition !== undefined) where.condition = this.condition;
+    if (this.format !== undefined) where.format = this.format;
+    if (this.productId !== undefined) where.productId = this.productId;
+
+    return where;
+  }
+}

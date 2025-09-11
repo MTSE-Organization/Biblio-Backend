@@ -1,0 +1,106 @@
+import { Injectable } from '@nestjs/common';
+import {
+  CreateProductVariantForm,
+  FilterProductVariantForm,
+  UpdateProductVariantForm
+} from './forms';
+import { InjectModel } from '@nestjs/sequelize';
+import { ProductVariant } from '@/models/product-variant.model';
+import { ProductService } from '../product/product.service';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
+import { ErrorCode } from '@/constants/error-code.constant';
+import { Product } from '@/models/product.model';
+import { Category } from '@/models';
+import { Constant } from '@/constants/constant';
+
+@Injectable()
+export class ProductVariantService {
+  constructor(
+    @InjectModel(ProductVariant)
+    private readonly productVariantRepository: typeof ProductVariant,
+
+    private readonly productService: ProductService
+  ) {}
+
+  async create(form: CreateProductVariantForm) {
+    await this.productService.findById(form.productId);
+    if (await this.existsByConditionAndFormat(form.condition, form.format)) {
+      throw new BadRequestException(
+        'Product variant existed',
+        ErrorCode.PRODUCT_VARIANT_ERROR_EXISTED
+      );
+    }
+    await this.productVariantRepository.create({ ...form });
+    return { message: 'Create product variant successfully' };
+  }
+
+  async findById(id: bigint): Promise<ProductVariant> {
+    const product = await this.productVariantRepository.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          include: [{ model: Category }]
+        }
+      ]
+    });
+
+    if (!product) {
+      throw new NotFoundException(
+        'Product variant not found',
+        ErrorCode.PRODUCT_VARIANT_ERROR_NOT_FOUND
+      );
+    }
+
+    return product;
+  }
+
+  async findAll(
+    query: FilterProductVariantForm
+  ): Promise<{ productVariants: ProductVariant[]; count: number }> {
+    const { page, size } = query;
+    const skip = page * size;
+
+    const { rows, count } = await this.productVariantRepository.findAndCountAll(
+      {
+        limit: size,
+        offset: skip,
+        where: query.getFilter()
+      }
+    );
+
+    return { productVariants: rows, count };
+  }
+
+  async update(form: UpdateProductVariantForm) {
+    const { id, ...data } = form;
+    const productVariant = await this.findById(id);
+    if (
+      (productVariant.condition !== form.condition ||
+        productVariant.format !== form.format) &&
+      (await this.existsByConditionAndFormat(form.condition, form.format))
+    ) {
+      throw new BadRequestException(
+        'Product variant existed',
+        ErrorCode.PRODUCT_VARIANT_ERROR_EXISTED
+      );
+    }
+    await productVariant.update(data);
+    return { message: 'Update product variant successfully' };
+  }
+
+  async delete(id: bigint) {
+    const productVariant = await this.findById(id);
+    await productVariant.update({ status: Constant.STATUS_DELETED });
+    return { message: 'Delete product variant successfully' };
+  }
+
+  async existsByConditionAndFormat(
+    condition: number,
+    format: number
+  ): Promise<boolean> {
+    const count = await this.productVariantRepository.count({
+      where: { condition, format }
+    });
+    return count > 0;
+  }
+}

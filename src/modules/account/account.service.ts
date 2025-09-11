@@ -1,14 +1,13 @@
 import { Constant } from '@/constants/constant';
 import { Account, Group, Permission } from '@/models';
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  UnauthorizedException
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterForm } from '../auth/forms/register.form';
-import { BadRequestException, NotFoundException } from '@/common/exceptions';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException
+} from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { UserDetailsDto } from '../auth/dtos';

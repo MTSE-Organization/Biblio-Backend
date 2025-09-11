@@ -22,22 +22,16 @@ export class ProductDto {
   releaseDate: Date;
 
   @Expose()
-  length: number;
+  ageRating?: number;
 
   @Expose()
-  width: number;
-
-  @Expose()
-  height: number;
-
-  @Expose()
-  ageRating: number;
+  language?: string;
 
   @Expose()
   isFeatured: boolean;
 
   @Expose()
-  quantity: number;
+  metaData?: string;
 
   @Expose()
   discount: number;
@@ -47,6 +41,10 @@ export class ProductDto {
   category: CategoryAutoCompleteDto;
 
   @Expose()
+  @Type(() => ProductImageDto)
+  images?: ProductImageDto[];
+
+  @Expose()
   createdDate: Date;
 
   @Expose()
@@ -54,8 +52,4 @@ export class ProductDto {
 
   @Expose()
   status: number;
-
-  @Expose()
-  @Type(() => ProductImageDto)
-  images?: ProductImageDto[];
 }

@@ -1,3 +1,44 @@
+import {
+  BigIntDecorator,
+  BooleanDecorator,
+  NumberDecorator,
+  StringDecorator
+} from '@/common/decorators';
 import { PaginationForm } from '@/common/forms';
+import { Type } from 'class-transformer';
+import { Op } from 'sequelize';
 
-export class FilterProductForm extends PaginationForm {}
+export class FilterProductForm extends PaginationForm {
+  @StringDecorator('name')
+  name: string;
+
+  @Type(() => Number)
+  @NumberDecorator('ageRating')
+  ageRating: number;
+
+  @StringDecorator('language')
+  language: string;
+
+  @BooleanDecorator('isFeatured')
+  isFeatured: boolean;
+
+  @Type(() => BigInt)
+  @BigIntDecorator('categoryId')
+  categoryId: bigint;
+
+  @Type(() => BigInt)
+  @BigIntDecorator('publisherId')
+  publisherId: bigint;
+
+  getFilter(): Record<string, any> {
+    const where: Record<string, any> = {};
+    if (this.name) where.name = { [Op.like]: `%${this.name}%` };
+    if (this.ageRating !== undefined) where.ageRating = this.ageRating;
+    if (this.language !== undefined) where.language = this.language;
+    if (this.isFeatured !== undefined) where.isFeatured = this.isFeatured;
+    if (this.categoryId !== undefined) where.categoryId = this.categoryId;
+    if (this.publisherId !== undefined) where.publisherId = this.publisherId;
+
+    return where;
+  }
+}

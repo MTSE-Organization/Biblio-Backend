@@ -5,8 +5,13 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from '@/common/interceptors/response.interceptor';
 import { AllExceptionFilter } from './common/filters/all-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DelayInterceptor } from '@/common/interceptors/delay.interceptor';
 
 async function bootstrap() {
+  const configService = new ConfigService();
+  const port = configService.get<string>('PORT') || 3000;
+  const delay = configService.get<number>('DELAY') || 0;
+  console.log('🚀 ~ bootstrap ~ delay:', delay);
   const app = await NestFactory.create(AppModule);
 
   // config prefix
@@ -26,6 +31,7 @@ async function bootstrap() {
 
   // config interceptors
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalInterceptors(new DelayInterceptor(delay));
 
   // config exception filters
   app.useGlobalFilters(new AllExceptionFilter());
@@ -41,8 +47,6 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, documentFactory);
 
   // config server
-  const configService = new ConfigService();
-  const port = configService.get<string>('PORT') || 3000;
   logger.log(`Server running on port: ${port}`);
   logger.log(`Swagger running at: http://localhost:${port}/api/v1/docs`);
 

@@ -17,6 +17,8 @@ import {
 } from 'class-validator';
 
 export * from './pcode.decorator';
+export * from './product-variant-condition.decorator';
+export * from './product-variant-format.decorator';
 
 export const StringDecorator = (name: string, required: boolean = false) => {
   return applyDecorators(
