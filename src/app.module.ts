@@ -29,6 +29,9 @@ import { PermissionGroupModule } from './modules/permission-group/permission-gro
 import { ContributorModule } from './modules/contributor/contributor.module';
 import { PublisherModule } from './modules/publisher/publisher.module';
 import { ProductVariantModule } from './modules/product-variant/product-variant.module';
+import { AddressModule } from './modules/address/address.module';
+import { ReviewModule } from './modules/review/review.module';
+import { CouponModule } from './modules/coupon/coupon.module';
 //#endregion
 
 @Module({
@@ -53,7 +56,10 @@ import { ProductVariantModule } from './modules/product-variant/product-variant.
     PermissionGroupModule,
     ContributorModule,
     PublisherModule,
-    ProductVariantModule
+    ProductVariantModule,
+    AddressModule,
+    ReviewModule,
+    CouponModule
   ]
 })
 export class AppModule implements NestModule {
