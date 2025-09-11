@@ -10,7 +10,7 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { AccountService } from './account.service';
-import { JwtAuthGuard } from '../auth/guards';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { AccountDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
@@ -18,11 +18,14 @@ import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AccountProfileDto } from './dtos/account-profile.dto';
 import { UserDetailsDto } from '../auth/dtos';
+import { PCode } from '@/common/decorators';
 
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
+  @PCode('ACC_L')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterAccountForm) {
     const { accounts, count } = await this.accountService.list(form);
@@ -50,7 +53,8 @@ export class AccountController {
     return await this.accountService.updateProfile(userId, form);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @PCode('ACC_D')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint, @Req() req) {
     const user: UserDetailsDto = req.user;

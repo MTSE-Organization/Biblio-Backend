@@ -5,6 +5,7 @@ import {
   Post,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common';
 import type { Response } from 'express';
@@ -14,11 +15,15 @@ import path from 'path';
 import * as fs from 'fs';
 import { NotFoundException } from '@/common/exceptions';
 import { FileRenameInterceptor } from '@/common/interceptors/file.interceptor';
+import { PCode } from '@/common/decorators';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 
 @Controller('file')
 export class FileController {
   constructor(private readonly configService: ConfigService) {}
 
+  @PCode('FILE_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'), FileRenameInterceptor)
   uploadFile(@UploadedFile() file: Express.Multer.File) {

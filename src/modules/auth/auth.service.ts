@@ -91,7 +91,14 @@ export class AuthService {
     };
   }
 
-  async changePassword(form: ChangePasswordForm) {
+  async changePassword(accountId: bigint, form: ChangePasswordForm) {
+    const account = await this.accountService.findById(accountId);
+    if (account.email !== form.email) {
+      throw new BadRequestException(
+        'Account invalid email',
+        ErrorCode.ACCOUNT_ERROR_EMAIL_INVALID
+      );
+    }
     const isVerified = await this.otpService.verifyOtp(form.email, form.otp);
     if (!isVerified) {
       throw new BadRequestException(

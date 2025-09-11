@@ -1,16 +1,18 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { JwtAuthGuard } from '../auth/guards';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { UserDetailsDto } from '../auth/dtos';
 import { MapperUtil } from '@/utils';
 import { CartDto } from './dtos';
 import { AddItemForm } from './forms';
+import { PCode } from '@/common/decorators';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @PCode('CART_V')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get')
   async get(@Req() req) {
     const user: UserDetailsDto = req.user;
@@ -18,7 +20,8 @@ export class CartController {
     return MapperUtil.toDto(cart, CartDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @PCode('CART_A_I')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('add-item')
   async addItem(@Req() req, @Body() form: AddItemForm) {
     const user: UserDetailsDto = req.user;

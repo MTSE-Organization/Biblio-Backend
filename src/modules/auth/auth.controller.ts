@@ -7,6 +7,8 @@ import {
   ForgotPasswordForm,
   RegisterForm
 } from './forms';
+import { JwtAuthGuard } from './guards';
+import { UserDetailsDto } from './dtos';
 
 @Controller('auth')
 export class AuthController {
@@ -27,9 +29,11 @@ export class AuthController {
     return await this.authService.forgotPassword(form);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('change-password')
-  async changePassword(@Body() form: ChangePasswordForm) {
-    return await this.authService.changePassword(form);
+  async changePassword(@Req() req, @Body() form: ChangePasswordForm) {
+    const user: UserDetailsDto = req.user;
+    return await this.authService.changePassword(user.id, form);
   }
 
   @UseGuards(LocalAuthGuard)
