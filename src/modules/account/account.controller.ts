@@ -18,12 +18,13 @@ import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AccountProfileDto } from './dtos/account-profile.dto';
 import { UserDetailsDto } from '../auth/dtos';
-import { PCode } from '@/common/decorators';
+import { ApiListResponse, PCode } from '@/common/decorators';
 
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
+  @ApiListResponse(AccountDto, { objectName: 'account' })
   @PCode('ACC_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')

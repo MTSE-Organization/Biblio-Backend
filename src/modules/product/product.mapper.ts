@@ -1,5 +1,5 @@
 import { Product } from '@/models/product.model';
-import { ProductAutoCompleteDto } from './dtos';
+import { ProductAutoCompleteDto, ProductDto } from './dtos';
 import { MapperUtil } from '@/utils';
 
 export class ProductMapper {
@@ -11,6 +11,10 @@ export class ProductMapper {
     }
 
     return MapperUtil.toDto(plain, ProductAutoCompleteDto);
+  }
+
+  static toList(products: Product[]): ProductDto[] {
+    return MapperUtil.toDtoList(products, ProductDto);
   }
 
   static toAutoCompleteDtoList(products: Product[]): ProductAutoCompleteDto[] {
