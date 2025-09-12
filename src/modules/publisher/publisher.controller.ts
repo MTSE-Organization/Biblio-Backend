@@ -55,7 +55,7 @@ export class PublisherController {
 
   @PCode('PUB_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Get('admin/list')
+  @Get('private/list')
   async adminList(@Query() form: FilterPublisherForm) {
     const { publishers, count } = await this.publisherService.findAll(form);
 
@@ -70,7 +70,7 @@ export class PublisherController {
 
   @PCode('PUB_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Get('admin/get/:id')
+  @Get('private/get/:id')
   async adminGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(
       await this.publisherService.findById(id),
