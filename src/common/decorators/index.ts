@@ -19,6 +19,7 @@ import {
 export * from './pcode.decorator';
 export * from './product-variant-condition.decorator';
 export * from './product-variant-format.decorator';
+export * from './swagger.decorator';
 
 export const StringDecorator = (name: string, required: boolean = false) => {
   return applyDecorators(

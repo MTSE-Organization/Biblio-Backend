@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import {
@@ -26,6 +31,7 @@ import { UpdateOrderingForm } from '@/common/forms';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @ApiResponseNoData({ objectName: 'category', type: 'create' })
   @PCode('CAT_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -33,6 +39,7 @@ export class CategoryController {
     return await this.categoryService.create(form);
   }
 
+  @ApiListResponse(CategoryDto, { objectName: 'category' })
   @PCode('CAT_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
@@ -45,6 +52,7 @@ export class CategoryController {
     };
   }
 
+  @ApiResponse(CategoryDto, { objectName: 'category' })
   @PCode('CAT_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
@@ -53,6 +61,7 @@ export class CategoryController {
     return MapperUtil.toDto(category, CategoryDto);
   }
 
+  @ApiResponseNoData({ objectName: 'category', type: 'update' })
   @PCode('CAT_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -61,6 +70,7 @@ export class CategoryController {
     return await this.categoryService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'category', type: 'delete' })
   @PCode('CAT_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -68,6 +78,7 @@ export class CategoryController {
     return await this.categoryService.delete(id);
   }
 
+  @ApiListResponse(CategoryAutoCompleteDto, { objectName: 'category' })
   @UseGuards(JwtAuthGuard)
   @Get('auto-complete')
   async autocomplete(@Query() form: FilterCategoryForm) {
@@ -81,6 +92,7 @@ export class CategoryController {
     return response;
   }
 
+  @ApiResponseNoData({ objectName: 'category', type: 'update-ordering' })
   @PCode('CAT_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')

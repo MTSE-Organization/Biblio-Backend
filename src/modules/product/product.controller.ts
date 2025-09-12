@@ -20,7 +20,7 @@ import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
-import { PCode } from '@/common/decorators';
+import { ApiListResponse, PCode } from '@/common/decorators';
 
 @Controller('product')
 export class ProductController {
@@ -33,14 +33,15 @@ export class ProductController {
     return await this.productService.create(form);
   }
 
+  @ApiListResponse(ProductDto, { objectName: 'product' })
   @PCode('PRD_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
   async privateList(@Query() form: FilterProductForm) {
     const { products, count } = await this.productService.findAll(form);
 
-    const response: ResponseListDto<ProductAutoCompleteDto[]> = {
-      content: ProductMapper.toAutoCompleteDtoList(products),
+    const response: ResponseListDto<ProductDto[]> = {
+      content: ProductMapper.toList(products),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
