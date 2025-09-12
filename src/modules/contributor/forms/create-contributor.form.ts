@@ -1,8 +1,5 @@
-import {
-  StringDecorator,
-  NumberDecorator,
-  DateDecorator
-} from '@/common/decorators';
+import { StringDecorator, DateDecorator } from '@/common/decorators';
+import { GenderDecorator } from '@/common/decorators/gender.decorator';
 
 export class CreateContributorForm {
   @StringDecorator('name', true)
@@ -14,10 +11,7 @@ export class CreateContributorForm {
   @StringDecorator('avatarPath')
   avatarPath: string;
 
-  @NumberDecorator('kind', true)
-  kind: number;
-
-  @NumberDecorator('gender')
+  @GenderDecorator('gender', true)
   gender: number;
 
   @DateDecorator('dateOfBirth')
