@@ -20,11 +20,13 @@ import { JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { Constant } from '@/constants/constant';
+import { PCode } from '@/common/decorators';
 
 @Controller('author')
 export class AuthorController {
   constructor(private readonly contributorService: ContributorService) {}
 
+  @PCode('AUTH_C')
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Body() form: CreateContributorForm) {
@@ -34,17 +36,14 @@ export class AuthorController {
     );
   }
 
+  @PCode('AUTH_L')
   @Get('list')
   async list(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_AUTHOR;
     const { contributors, count } = await this.contributorService.findAll(form);
 
-    const response: ResponseListDto<ContributorAutoCompleteDto[]> = {
-      content: contributors.map((c) => ({
-        id: c.id,
-        name: c.name,
-        avatarPath: c.avatarPath
-      })),
+    const response: ResponseListDto<ContributorDto[]> = {
+      content: MapperUtil.toDtoList(contributors, ContributorDto),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
@@ -52,6 +51,7 @@ export class AuthorController {
     return response;
   }
 
+  @PCode('AUTH_V')
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -63,6 +63,7 @@ export class AuthorController {
     );
   }
 
+  @PCode('AUTH_U')
   @UseGuards(JwtAuthGuard)
   @Put('update')
   async update(@Body() form: UpdateContributorForm) {
@@ -72,6 +73,7 @@ export class AuthorController {
     );
   }
 
+  @PCode('AUTH_D')
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
