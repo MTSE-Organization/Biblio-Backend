@@ -11,7 +11,6 @@ async function bootstrap() {
   const configService = new ConfigService();
   const port = configService.get<string>('PORT') || 3000;
   const delay = configService.get<number>('DELAY') || 0;
-  console.log('🚀 ~ bootstrap ~ delay:', delay);
   const app = await NestFactory.create(AppModule);
 
   // config prefix
