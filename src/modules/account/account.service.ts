@@ -141,7 +141,13 @@ export class AccountService {
       email,
       Constant.STATUS_ACTIVE
     );
-    if (account && this.checkPassword(password, account.password)) {
+    console.log({ account: account });
+    console.log({ password: account?.password });
+    if (
+      account &&
+      account?.password &&
+      this.checkPassword(password, account.password)
+    ) {
       const authorities = account.group?.permissions?.map((p) => p.pCode) ?? [];
       const user = new UserDetailsDto(
         account.id,

@@ -6,4 +6,10 @@ export class ProductImageAutoCompleteDto {
 
   @Expose()
   url: string;
+
+  @Expose()
+  ordering: number;
+
+  @Expose()
+  isDefault: boolean;
 }

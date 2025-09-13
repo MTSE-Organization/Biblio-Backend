@@ -11,6 +11,7 @@ import { Cart } from '@/models/cart.model';
 import { Contributor } from '@/models/contributor';
 import { Coupon } from '@/models/coupon';
 import { PermissionGroup } from '@/models/permission-group.model';
+import { ProductContributor } from '@/models/product-contributor.model';
 import { ProductImage } from '@/models/product-image.model';
 import { ProductVariant } from '@/models/product-variant.model';
 import { Product } from '@/models/product.model';
@@ -43,6 +44,7 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
       Cart,
       CartItem,
       Contributor,
+      ProductContributor,
       Publisher,
       ProductVariant,
       Address,

@@ -1,5 +1,6 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -10,6 +11,8 @@ import { Category } from './category.model';
 import { Auditable } from './auditable.model';
 import { ProductImage } from './product-image.model';
 import { Publisher } from './publisher';
+import { Contributor } from './contributor';
+import { ProductContributor } from './product-contributor.model';
 
 @Table({
   tableName: 'db_product',
@@ -62,4 +65,7 @@ export class Product extends Auditable {
 
   @BelongsTo(() => Publisher)
   declare publisher: Publisher;
+
+  @BelongsToMany(() => Contributor, () => ProductContributor)
+  declare contributors: Contributor[];
 }

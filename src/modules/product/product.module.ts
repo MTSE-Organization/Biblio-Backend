@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Product } from '@/models/product.model';
 import { CategoryModule } from '../category/category.module';
 import { PublisherModule } from '../publisher/publisher.module';
+import { ContributorModule } from '../contributor/contributor.module';
 
 @Module({
   controllers: [ProductController],
@@ -12,7 +13,8 @@ import { PublisherModule } from '../publisher/publisher.module';
   imports: [
     SequelizeModule.forFeature([Product]),
     forwardRef(() => CategoryModule),
-    PublisherModule
+    PublisherModule,
+    ContributorModule
   ],
   exports: [ProductService]
 })
