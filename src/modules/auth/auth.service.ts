@@ -12,7 +12,7 @@ import {
   ChangePasswordForm,
   ForgotPasswordForm
 } from './forms';
-import { UserDetailsDto } from './dtos';
+import { UserDetailsDto, UserInfoGoogleDto } from './dtos';
 
 @Injectable()
 export class AuthService {
@@ -114,5 +114,21 @@ export class AuthService {
     }
     await this.accountService.changePassword(form.email, form.password);
     return { message: 'Change password successfully' };
+  }
+
+  async handleSocialLogin(userInfo: UserInfoGoogleDto) {
+    let account = await this.accountService.findByEmail(userInfo.email);
+    if (!account) {
+      account = await this.accountService.createUserSocial(userInfo);
+    }
+    const authorities = account.group?.permissions?.map((p) => p.pCode) ?? [];
+    const user = new UserDetailsDto(
+      account.id,
+      account.kind,
+      authorities,
+      account.isSuperAdmin
+    );
+    const token = await this.jwtService.signAsync({ payload: { ...user } });
+    return { message: 'Login successfully', token };
   }
 }
