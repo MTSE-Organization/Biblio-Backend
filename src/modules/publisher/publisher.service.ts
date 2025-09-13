@@ -50,6 +50,19 @@ export class PublisherService {
     return publisher;
   }
 
+  async findByIdAndStatus(id: bigint, status: number): Promise<Publisher> {
+    const publisher = await this.publisherRepository.findOne({
+      where: { id, status }
+    });
+    if (!publisher) {
+      throw new NotFoundException(
+        'Publisher not found',
+        ErrorCode.PUBLISHER_ERROR_NOT_FOUND
+      );
+    }
+    return publisher;
+  }
+
   async update(form: UpdatePublisherForm) {
     const publisher = await this.findById(form.id);
     await publisher.update(form);

@@ -20,6 +20,7 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { PCode } from '@/common/decorators';
+import { Constant } from '@/constants/constant';
 
 @Controller('publisher')
 export class PublisherController {
@@ -34,6 +35,7 @@ export class PublisherController {
 
   @Get('list')
   async list(@Query() form: FilterPublisherForm) {
+    form.status = Constant.STATUS_ACTIVE;
     const { publishers, count } = await this.publisherService.findAll(form);
 
     const response: ResponseListDto<PublisherAutoCompleteDto[]> = {
@@ -48,7 +50,7 @@ export class PublisherController {
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
-      await this.publisherService.findById(id),
+      await this.publisherService.findByIdAndStatus(id, Constant.STATUS_ACTIVE),
       PublisherDto
     );
   }
