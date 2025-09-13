@@ -1,4 +1,5 @@
 import {
+  BigIntArrayDecorator,
   BigIntDecorator,
   BooleanDecorator,
   DateDecorator,
@@ -45,4 +46,7 @@ export class UpdateProductForm {
 
   @BigIntDecorator('publisherId', true)
   publisherId: bigint;
+
+  @BigIntArrayDecorator('contributorsIds', true)
+  contributorsIds: [bigint];
 }

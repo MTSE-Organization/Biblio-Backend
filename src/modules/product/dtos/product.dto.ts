@@ -1,5 +1,9 @@
 import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
-import { ProductImageDto } from '@/modules/product-image/dtos';
+import { ContributorAutoCompleteDto } from '@/modules/contributor/dtos';
+import {
+  ProductImageAutoCompleteDto,
+  ProductImageDto
+} from '@/modules/product-image/dtos';
 import { PublisherAutoCompleteDto } from '@/modules/publisher/dtos';
 import { Expose, Type } from 'class-transformer';
 
@@ -42,12 +46,16 @@ export class ProductDto {
   category: CategoryAutoCompleteDto;
 
   @Expose()
-  @Type(() => ProductImageDto)
-  images?: ProductImageDto[];
+  @Type(() => ProductImageAutoCompleteDto)
+  images?: ProductImageAutoCompleteDto[];
 
   @Expose()
   @Type(() => PublisherAutoCompleteDto)
   publisher: PublisherAutoCompleteDto;
+
+  @Expose()
+  @Type(() => ContributorAutoCompleteDto)
+  contributors: ContributorAutoCompleteDto[];
 
   @Expose()
   createdDate: Date;

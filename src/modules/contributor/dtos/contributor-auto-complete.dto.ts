@@ -9,4 +9,7 @@ export class ContributorAutoCompleteDto {
 
   @Expose()
   avatarPath: string;
+
+  @Expose()
+  kind: number;
 }

@@ -9,7 +9,6 @@ import {
 import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { Constant } from '@/constants/constant';
-import { where } from 'sequelize';
 
 @Injectable()
 export class ContributorService {
@@ -73,5 +72,12 @@ export class ContributorService {
     const contributor = await this.findByIdAndKind(id, kind);
     await contributor.update({ status: Constant.STATUS_DELETED });
     return { message: 'Delete contributor successfully' };
+  }
+
+  async findByIds(ids: bigint[]): Promise<Contributor[]> {
+    const contributors = await this.contributorRepository.findAll({
+      where: { id: ids }
+    });
+    return contributors;
   }
 }

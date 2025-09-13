@@ -21,6 +21,7 @@ import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
 import { ApiListResponse, PCode } from '@/common/decorators';
+import { Constant } from '@/constants/constant';
 
 @Controller('product')
 export class ProductController {
@@ -53,7 +54,10 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
   async privateGet(@Param('id') id: bigint) {
-    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
+    return MapperUtil.toDto(
+      await this.productService.findDetail(id),
+      ProductDto
+    );
   }
 
   @PCode('PRD_U')
@@ -72,7 +76,10 @@ export class ProductController {
 
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
-    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
+    return MapperUtil.toDto(
+      await this.productService.findDetail(id, Constant.STATUS_ACTIVE),
+      ProductDto
+    );
   }
 
   @Get('list')
