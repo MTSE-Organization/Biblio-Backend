@@ -10,7 +10,7 @@ import {
 } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
-import { UserDetailsDto } from '../auth/dtos';
+import { UserDetailsDto, UserInfoGoogleDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
@@ -76,7 +76,15 @@ export class AccountService {
   }
 
   async findByEmail(email: string): Promise<Account | null> {
-    return await this.accountRepository.findOne({ where: { email } });
+    return await this.accountRepository.findOne({
+      where: { email },
+      include: [
+        {
+          model: Group,
+          include: [{ model: Permission, through: { attributes: [] } }]
+        }
+      ]
+    });
   }
 
   async findByEmailAndStatus(
@@ -100,6 +108,19 @@ export class AccountService {
       ...form,
       kind: Constant.ACCOUNT_KIND_USER,
       status: Constant.STATUS_PENDING
+    };
+    const group = await this.groupService.findByName(Constant.GROUP_NAME_USER);
+    const account = await this.accountRepository.create(data);
+    await account.$set('group', group);
+    return account;
+  }
+
+  async createUserSocial(userInfo: UserInfoGoogleDto): Promise<Account> {
+    const data = {
+      email: userInfo.email,
+      fullName: userInfo.name,
+      avatarPath: userInfo.picture,
+      kind: Constant.ACCOUNT_KIND_USER
     };
     const group = await this.groupService.findByName(Constant.GROUP_NAME_USER);
     const account = await this.accountRepository.create(data);

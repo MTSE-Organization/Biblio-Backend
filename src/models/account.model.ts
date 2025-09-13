@@ -16,7 +16,7 @@ export class Account extends Auditable {
   @Column({ allowNull: false, unique: true, type: DataType.STRING })
   declare email: string;
 
-  @Column({ allowNull: false, type: DataType.STRING })
+  @Column({ type: DataType.STRING })
   declare password: string;
 
   @Column({ type: DataType.STRING })
