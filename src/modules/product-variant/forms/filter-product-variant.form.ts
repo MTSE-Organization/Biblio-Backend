@@ -19,7 +19,7 @@ export class FilterProductVariantForm extends PaginationForm {
   @BigIntDecorator('productId')
   productId: bigint;
 
-  @StringDecorator('status')
+  @NumberDecorator('status')
   status?: number;
 
   getFilter(): Record<string, any> {

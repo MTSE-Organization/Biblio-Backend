@@ -10,7 +10,7 @@ export class FilterContributorForm extends PaginationForm {
   @NumberDecorator('kind')
   kind?: number;
 
-  @StringDecorator('status')
+  @NumberDecorator('status')
   status?: number;
 
   getFilter(): Record<string, any> {

@@ -1,4 +1,4 @@
-import { StringDecorator } from '@/common/decorators';
+import { NumberDecorator, StringDecorator } from '@/common/decorators';
 import { PaginationForm } from '@/common/forms';
 import { StringUtil } from '@/utils';
 import { Op } from 'sequelize';
@@ -7,7 +7,7 @@ export class FilterCategoryForm extends PaginationForm {
   @StringDecorator('name')
   name?: string;
 
-  @StringDecorator('status')
+  @NumberDecorator('status')
   status?: number;
 
   getFilter(): Record<string, any> {
