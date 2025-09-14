@@ -42,8 +42,6 @@ export class CategoryController {
   }
 
   @ApiListResponse(CategoryDto, { objectName: 'category' })
-  @PCode('CAT_L')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterCategoryForm) {
     form.status = Constant.STATUS_ACTIVE;
@@ -69,8 +67,6 @@ export class CategoryController {
   }
 
   @ApiResponse(CategoryDto, { objectName: 'category' })
-  @PCode('CAT_V')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     const category = await this.categoryService.findByIdAndStatus(
