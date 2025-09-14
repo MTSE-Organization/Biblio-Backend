@@ -8,6 +8,7 @@ import { Contributor } from '@/models/contributor';
 @Module({
   controllers: [AuthorController, TranslatorController],
   providers: [ContributorService],
-  imports: [SequelizeModule.forFeature([Contributor])]
+  imports: [SequelizeModule.forFeature([Contributor])],
+  exports: [ContributorService]
 })
 export class ContributorModule {}

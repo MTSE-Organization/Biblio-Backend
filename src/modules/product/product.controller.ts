@@ -54,7 +54,10 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
   async privateGet(@Param('id') id: bigint) {
-    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
+    return MapperUtil.toDto(
+      await this.productService.findDetail(id),
+      ProductDto
+    );
   }
 
   @PCode('PRD_U')
@@ -73,11 +76,10 @@ export class ProductController {
 
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
-    const product = await this.productService.findByIdAndStatus(
-      id,
-      Constant.STATUS_ACTIVE
+    return MapperUtil.toDto(
+      await this.productService.findDetail(id, Constant.STATUS_ACTIVE),
+      ProductDto
     );
-    return MapperUtil.toDto(product, ProductDto);
   }
 
   @Get('list')

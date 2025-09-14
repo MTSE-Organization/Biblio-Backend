@@ -14,6 +14,10 @@ import { SlugifyUtil } from '@/utils';
 import { Constant } from '@/constants/constant';
 import { PublisherService } from '../publisher/publisher.service';
 import { Publisher } from '@/models/publisher';
+import { ContributorService } from '../contributor/contributor.service';
+import { ProductContributor } from '@/models/product-contributor.model';
+import { Contributor } from '@/models/contributor';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductService {
@@ -24,17 +28,24 @@ export class ProductService {
     @Inject(forwardRef(() => CategoryService))
     private readonly categoryService: CategoryService,
 
-    private readonly publisherService: PublisherService
+    private readonly publisherService: PublisherService,
+
+    private readonly contributorService: ContributorService
   ) {}
 
   async create(form: CreateProductForm) {
+    const { contributorsIds, ...rest } = form;
     await Promise.all([
-      this.categoryService.findById(form.categoryId),
-      this.publisherService.findById(form.publisherId)
+      this.categoryService.findById(rest.categoryId),
+      this.publisherService.findById(rest.publisherId)
     ]);
-    const slug = SlugifyUtil.toSlugify(form.name);
-    const data = { slug: slug, ...form };
-    await this.productRepository.create(data);
+
+    const slug = SlugifyUtil.toSlugify(rest.name);
+    const data = { slug: slug, ...rest };
+    const product = await this.productRepository.create(data);
+    const contributors =
+      await this.contributorService.findByIds(contributorsIds);
+    await product.$set('contributors', contributors);
     return { message: 'Create product successfully' };
   }
 
@@ -55,8 +66,11 @@ export class ProductService {
       await this.publisherService.findById(form.publisherId);
     }
     const slug = SlugifyUtil.toSlugify(form.name);
-    const { categoryId, ...data } = form;
+    const { categoryId, contributorsIds, ...data } = form;
     await product.update({ slug, ...data });
+    const contributors =
+      await this.contributorService.findByIds(contributorsIds);
+    await product.$set('contributors', contributors);
     return { message: 'Update product successfully' };
   }
 
@@ -74,12 +88,12 @@ export class ProductService {
         { model: Category },
         {
           model: ProductImage,
-          separate: true,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
           limit: 1,
-          order: [
-            ['isDefault', 'DESC'],
-            ['id', 'ASC']
-          ]
+          separate: true
         }
       ]
     });
@@ -88,11 +102,32 @@ export class ProductService {
   }
 
   async findById(id: bigint): Promise<Product> {
-    const product = await this.productRepository.findByPk(id, {
+    const product = await this.productRepository.findByPk(id);
+    console.log(product?.contributors);
+
+    if (!product) {
+      throw new NotFoundException(
+        'Product not found',
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
+      );
+    }
+
+    return product;
+  }
+
+  async findDetail(id: bigint, status?: number): Promise<Product> {
+    const where: any = { id };
+    if (status !== undefined) {
+      where.status = status;
+    }
+
+    const product = await this.productRepository.findOne({
+      where,
       include: [
         { model: Category },
-        { model: ProductImage },
-        { model: Publisher }
+        { model: ProductImage, separate: true, order: [['ordering', 'ASC']] },
+        { model: Publisher },
+        { model: Contributor, through: { attributes: [] } }
       ]
     });
 
