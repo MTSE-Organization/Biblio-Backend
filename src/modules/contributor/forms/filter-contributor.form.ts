@@ -2,6 +2,7 @@ import { PaginationForm } from '@/common/forms';
 import { StringDecorator, NumberDecorator } from '@/common/decorators';
 import { Op } from 'sequelize';
 import { StringUtil } from '@/utils';
+import { Type } from 'class-transformer';
 
 export class FilterContributorForm extends PaginationForm {
   @StringDecorator('name')
@@ -10,6 +11,7 @@ export class FilterContributorForm extends PaginationForm {
   @NumberDecorator('kind')
   kind?: number;
 
+  @Type(() => Number)
   @NumberDecorator('status')
   status?: number;
 
