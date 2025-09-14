@@ -1,6 +1,7 @@
 import { PaginationForm } from '@/common/forms';
 import { StringDecorator, NumberDecorator } from '@/common/decorators';
 import { Op } from 'sequelize';
+import { StringUtil } from '@/utils';
 
 export class FilterContributorForm extends PaginationForm {
   @StringDecorator('name')
@@ -9,10 +10,15 @@ export class FilterContributorForm extends PaginationForm {
   @NumberDecorator('kind')
   kind?: number;
 
+  @NumberDecorator('status')
+  status?: number;
+
   getFilter(): Record<string, any> {
     const where: Record<string, any> = {};
-    if (this.name) where.name = { [Op.like]: `%${this.name}%` };
+    if (!StringUtil.isEmpty(this.name))
+      where.name = { [Op.like]: `%${this.name}%` };
     if (this.kind !== undefined) where.kind = this.kind;
+    if (this.status) where.status = this.status;
 
     return where;
   }

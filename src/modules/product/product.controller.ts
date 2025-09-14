@@ -84,6 +84,7 @@ export class ProductController {
 
   @Get('list')
   async list(@Query() form: FilterProductForm) {
+    form.status = Constant.STATUS_ACTIVE;
     const { products, count } = await this.productService.findAll(form);
 
     const response: ResponseListDto<ProductAutoCompleteDto[]> = {

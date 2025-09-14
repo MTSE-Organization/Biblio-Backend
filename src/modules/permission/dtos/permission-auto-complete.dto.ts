@@ -9,4 +9,7 @@ export class PermissionAutoCompleteDto {
 
   @Expose()
   pCode: string;
+
+  @Expose()
+  status: number;
 }

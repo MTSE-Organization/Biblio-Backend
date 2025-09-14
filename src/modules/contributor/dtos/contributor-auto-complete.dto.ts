@@ -12,4 +12,7 @@ export class ContributorAutoCompleteDto {
 
   @Expose()
   kind: number;
+
+  @Expose()
+  status: number;
 }

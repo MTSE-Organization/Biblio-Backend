@@ -120,6 +120,19 @@ export class CategoryService {
     return category;
   }
 
+  async findByIdAndStatus(id: bigint, status: number): Promise<Category> {
+    const category = await this.categoryRepository.findOne({
+      where: { id, status }
+    });
+    if (!category) {
+      throw new NotFoundException(
+        'Category not found',
+        ErrorCode.CATEGORY_ERROR_NOT_FOUND
+      );
+    }
+    return category;
+  }
+
   async existsBy(field: keyof Category, value: any): Promise<boolean> {
     const count = await this.categoryRepository.count({
       where: { [field]: value }

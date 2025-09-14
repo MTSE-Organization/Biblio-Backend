@@ -6,4 +6,7 @@ export class PermissionGroupAutoCompleteDto {
 
   @Expose()
   name: string;
+
+  @Expose()
+  status: number;
 }
