@@ -16,7 +16,7 @@ import {
   UpdateContributorForm
 } from './forms';
 import { ContributorDto, ContributorAutoCompleteDto } from './dtos';
-import { JwtAuthGuard } from '../auth/guards';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { Constant } from '@/constants/constant';
@@ -36,7 +36,6 @@ export class AuthorController {
     );
   }
 
-  @PCode('AUTH_L')
   @Get('list')
   async list(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_AUTHOR;
@@ -53,7 +52,7 @@ export class AuthorController {
   }
 
   @PCode('AUTH_L')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
   async adminList(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_AUTHOR;
@@ -68,7 +67,6 @@ export class AuthorController {
     return response;
   }
 
-  @PCode('AUTH_V')
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -82,7 +80,7 @@ export class AuthorController {
   }
 
   @PCode('AUTH_V')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
   async adminGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(

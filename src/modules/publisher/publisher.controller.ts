@@ -39,7 +39,7 @@ export class PublisherController {
     const { publishers, count } = await this.publisherService.findAll(form);
 
     const response: ResponseListDto<PublisherAutoCompleteDto[]> = {
-      content: publishers.map((p) => ({ id: p.id, name: p.name })),
+      content: MapperUtil.toDtoList(publishers, PublisherAutoCompleteDto),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
@@ -62,7 +62,7 @@ export class PublisherController {
     const { publishers, count } = await this.publisherService.findAll(form);
 
     const response: ResponseListDto<PublisherAutoCompleteDto[]> = {
-      content: publishers.map((p) => ({ id: p.id, name: p.name })),
+      content: MapperUtil.toDtoList(publishers, PublisherAutoCompleteDto),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
