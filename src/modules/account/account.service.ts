@@ -141,8 +141,6 @@ export class AccountService {
       email,
       Constant.STATUS_ACTIVE
     );
-    console.log({ account: account });
-    console.log({ password: account?.password });
     if (
       account &&
       account?.password &&
