@@ -54,6 +54,30 @@ export class ProductVariantService {
     return product;
   }
 
+  async findByIdAndStatus(
+    id: bigint,
+    status: number = Constant.STATUS_ACTIVE
+  ): Promise<ProductVariant> {
+    const productVariant = await this.productVariantRepository.findOne({
+      where: { id, status },
+      include: [
+        {
+          model: Product,
+          include: [{ model: Category }]
+        }
+      ]
+    });
+
+    if (!productVariant) {
+      throw new NotFoundException(
+        'Product variant not found',
+        ErrorCode.PRODUCT_VARIANT_ERROR_NOT_FOUND
+      );
+    }
+
+    return productVariant;
+  }
+
   async findAll(
     query: FilterProductVariantForm
   ): Promise<{ productVariants: ProductVariant[]; count: number }> {

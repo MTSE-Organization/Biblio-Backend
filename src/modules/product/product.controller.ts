@@ -21,6 +21,7 @@ import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
 import { ApiListResponse, PCode } from '@/common/decorators';
+import { Constant } from '@/constants/constant';
 
 @Controller('product')
 export class ProductController {
@@ -72,11 +73,16 @@ export class ProductController {
 
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
-    return MapperUtil.toDto(await this.productService.findById(id), ProductDto);
+    const product = await this.productService.findByIdAndStatus(
+      id,
+      Constant.STATUS_ACTIVE
+    );
+    return MapperUtil.toDto(product, ProductDto);
   }
 
   @Get('list')
   async list(@Query() form: FilterProductForm) {
+    form.status = Constant.STATUS_ACTIVE;
     const { products, count } = await this.productService.findAll(form);
 
     const response: ResponseListDto<ProductAutoCompleteDto[]> = {

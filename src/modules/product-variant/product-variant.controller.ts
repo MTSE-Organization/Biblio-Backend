@@ -20,6 +20,7 @@ import { MapperUtil } from '@/utils';
 import { ProductVariantAutoCompleteDto, ProductVariantDto } from './dtos';
 import { PCode } from '@/common/decorators';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
+import { Constant } from '@/constants/constant';
 
 @Controller('product-variant')
 export class ProductVariantController {
@@ -33,7 +34,8 @@ export class ProductVariantController {
   }
 
   @Get('list')
-  async List(@Query() form: FilterProductVariantForm) {
+  async list(@Query() form: FilterProductVariantForm) {
+    form.status = Constant.STATUS_ACTIVE;
     const { productVariants, count } =
       await this.productVariantService.findAll(form);
 
@@ -81,7 +83,10 @@ export class ProductVariantController {
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
-      await this.productVariantService.findById(id),
+      await this.productVariantService.findByIdAndStatus(
+        id,
+        Constant.STATUS_ACTIVE
+      ),
       ProductVariantDto
     );
   }

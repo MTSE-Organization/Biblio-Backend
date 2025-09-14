@@ -40,6 +40,7 @@ export class TranslatorController {
   @Get('list')
   async list(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_TRANSLATOR;
+    form.status = Constant.STATUS_ACTIVE;
     const { contributors, count } = await this.contributorService.findAll(form);
 
     const response: ResponseListDto<ContributorDto[]> = {
@@ -54,6 +55,36 @@ export class TranslatorController {
   @PCode('TRANS_V')
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
+    return MapperUtil.toDto(
+      await this.contributorService.findByIdAndKindAndStatus(
+        id,
+        Constant.CONTRIBUTOR_KIND_TRANSLATOR,
+        Constant.STATUS_ACTIVE
+      ),
+      ContributorDto
+    );
+  }
+
+  @PCode('TRANS_L')
+  @UseGuards(JwtAuthGuard)
+  @Get('private/list')
+  async adminList(@Query() form: FilterContributorForm) {
+    form.kind = Constant.CONTRIBUTOR_KIND_TRANSLATOR;
+    const { contributors, count } = await this.contributorService.findAll(form);
+
+    const response: ResponseListDto<ContributorDto[]> = {
+      content: MapperUtil.toDtoList(contributors, ContributorDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+
+    return response;
+  }
+
+  @PCode('TRANS_V')
+  @UseGuards(JwtAuthGuard)
+  @Get('private/get/:id')
+  async adminGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(
       await this.contributorService.findByIdAndKind(
         id,

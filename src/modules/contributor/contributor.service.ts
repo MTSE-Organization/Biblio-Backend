@@ -63,6 +63,23 @@ export class ContributorService {
     return contributor;
   }
 
+  async findByIdAndKindAndStatus(
+    id: bigint,
+    kind: number,
+    status: number
+  ): Promise<Contributor> {
+    const contributor = await this.contributorRepository.findOne({
+      where: { id, kind, status }
+    });
+    if (!contributor) {
+      throw new NotFoundException(
+        'Contributor not found',
+        ErrorCode.CONTRIBUTOR_ERROR_NOT_FOUND
+      );
+    }
+    return contributor;
+  }
+
   async update(form: UpdateContributorForm, kind: number) {
     const contributor = await this.findByIdAndKind(form.id, kind);
     await contributor.update(form);

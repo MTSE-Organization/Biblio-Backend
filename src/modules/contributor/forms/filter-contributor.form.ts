@@ -9,10 +9,14 @@ export class FilterContributorForm extends PaginationForm {
   @NumberDecorator('kind')
   kind?: number;
 
+  @StringDecorator('status')
+  status?: number;
+
   getFilter(): Record<string, any> {
     const where: Record<string, any> = {};
     if (this.name) where.name = { [Op.like]: `%${this.name}%` };
     if (this.kind !== undefined) where.kind = this.kind;
+    if (this.status) where.status = this.status;
 
     return where;
   }

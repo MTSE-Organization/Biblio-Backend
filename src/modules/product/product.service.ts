@@ -106,6 +106,29 @@ export class ProductService {
     return product;
   }
 
+  async findByIdAndStatus(
+    id: bigint,
+    status: number = Constant.STATUS_ACTIVE
+  ): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id, status },
+      include: [
+        { model: Category },
+        { model: ProductImage },
+        { model: Publisher }
+      ]
+    });
+
+    if (!product) {
+      throw new NotFoundException(
+        'Product not found',
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
+      );
+    }
+
+    return product;
+  }
+
   async delete(id: bigint) {
     const product = await this.findById(id);
     await product.update({ status: Constant.STATUS_DELETED });

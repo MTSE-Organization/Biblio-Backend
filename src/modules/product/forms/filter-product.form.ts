@@ -30,6 +30,9 @@ export class FilterProductForm extends PaginationForm {
   @BigIntDecorator('publisherId')
   publisherId: bigint;
 
+  @StringDecorator('status')
+  status?: number;
+
   getFilter(): Record<string, any> {
     const where: Record<string, any> = {};
     if (this.name) where.name = { [Op.like]: `%${this.name}%` };
@@ -38,6 +41,7 @@ export class FilterProductForm extends PaginationForm {
     if (this.isFeatured !== undefined) where.isFeatured = this.isFeatured;
     if (this.categoryId !== undefined) where.categoryId = this.categoryId;
     if (this.publisherId !== undefined) where.publisherId = this.publisherId;
+    if (this.status) where.status = this.status;
 
     return where;
   }

@@ -26,6 +26,8 @@ import {
 } from './form';
 import { CategoryAutoCompleteDto, CategoryDto } from './dtos';
 import { UpdateOrderingForm } from '@/common/forms';
+import { constants } from 'buffer';
+import { Constant } from '@/constants/constant';
 
 @Controller('category')
 export class CategoryController {
@@ -44,6 +46,20 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterCategoryForm) {
+    form.status = Constant.STATUS_ACTIVE;
+    const { categories, count } = await this.categoryService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(categories, CategoryDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+  }
+
+  @ApiListResponse(CategoryDto, { objectName: 'category' })
+  @PCode('CAT_L')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('private/list')
+  async adminList(@Query() form: FilterCategoryForm) {
     const { categories, count } = await this.categoryService.findAll(form);
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
@@ -57,6 +73,18 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
+    const category = await this.categoryService.findByIdAndStatus(
+      id,
+      Constant.STATUS_ACTIVE
+    );
+    return MapperUtil.toDto(category, CategoryDto);
+  }
+
+  @ApiResponse(CategoryDto, { objectName: 'category' })
+  @PCode('CAT_V')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('private/get/:id')
+  async adminGet(@Param('id') id: bigint) {
     const category = await this.categoryService.findById(id);
     return MapperUtil.toDto(category, CategoryDto);
   }
