@@ -9,4 +9,7 @@ export class CategoryAutoCompleteDto {
 
   @Expose()
   slug: string;
+
+  @Expose()
+  status: number;
 }

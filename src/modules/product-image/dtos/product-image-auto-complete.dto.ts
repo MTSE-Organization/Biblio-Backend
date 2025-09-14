@@ -12,4 +12,7 @@ export class ProductImageAutoCompleteDto {
 
   @Expose()
   isDefault: boolean;
+
+  @Expose()
+  status: number;
 }

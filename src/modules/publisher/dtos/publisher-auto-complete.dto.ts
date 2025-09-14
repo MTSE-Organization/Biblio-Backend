@@ -9,4 +9,7 @@ export class PublisherAutoCompleteDto {
 
   @Expose()
   logoPath?: string;
+
+  @Expose()
+  status: number;
 }

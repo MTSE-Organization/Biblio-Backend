@@ -21,4 +21,7 @@ export class ProductVariantAutoCompleteDto {
 
   @Expose()
   productId: bigint;
+
+  @Expose()
+  status: number;
 }
