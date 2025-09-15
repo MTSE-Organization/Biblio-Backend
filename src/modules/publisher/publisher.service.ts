@@ -6,7 +6,7 @@ import {
   FilterPublisherForm,
   UpdatePublisherForm
 } from './forms';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { Constant } from '@/constants/constant';
 
@@ -73,5 +73,16 @@ export class PublisherService {
     const publisher = await this.findById(id);
     await publisher.update({ status: Constant.STATUS_DELETED });
     return { message: 'Delete publisher successfully' };
+  }
+
+  async recover(id: bigint) {
+    const publisher = await this.findById(id);
+    if (!publisher)
+      throw new BadRequestException(
+        'Publisher not found',
+        ErrorCode.PUBLISHER_ERROR_NOT_FOUND
+      );
+    await publisher.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover publisher successfully' };
   }
 }

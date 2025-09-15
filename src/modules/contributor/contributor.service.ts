@@ -111,6 +111,6 @@ export class ContributorService {
         ErrorCode.CONTRIBUTOR_ERROR_NOT_FOUND
       );
     await contributor.update({ status: Constant.STATUS_ACTIVE });
-    return { message: 'Recover author successfully' };
+    return { message: 'Recover contributor successfully' };
   }
 }
