@@ -9,9 +9,14 @@ import {
   Query
 } from '@nestjs/common';
 import { AddressService } from './address.service';
-import { CreateAddressForm, UpdateAddressForm } from './forms';
+import {
+  CreateAddressForm,
+  UpdateAddressForm,
+  FilterAddressForm
+} from './forms';
 import { AddressDto } from './dtos';
 import { MapperUtil } from '@/utils';
+import { ResponseListDto } from '@/common/interfaces';
 
 @Controller('address')
 export class AddressController {
@@ -32,10 +37,14 @@ export class AddressController {
     return await this.addressService.delete(id);
   }
 
-  @Get('account/:accountId')
-  async getByAccount(@Param('accountId') accountId: bigint) {
-    const result = await this.addressService.findByAccount(accountId);
-    return MapperUtil.toDtoList(result, AddressDto);
+  @Get('list')
+  async list(@Body() form: FilterAddressForm) {
+    const { addresses, count } = await this.addressService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(addresses, AddressDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
   }
 
   @Put('set-default/:id')
