@@ -93,4 +93,11 @@ export class PublisherController {
   async delete(@Param('id') id: bigint) {
     return await this.publisherService.delete(id);
   }
+
+  @PCode('PUBC_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover/:id')
+  async recover(@Param('id') id: bigint) {
+    return await this.publisherService.recover(id);
+  }
 }

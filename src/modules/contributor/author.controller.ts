@@ -27,7 +27,7 @@ export class AuthorController {
   constructor(private readonly contributorService: ContributorService) {}
 
   @PCode('AUTH_C')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateContributorForm) {
     return await this.contributorService.create(
@@ -93,7 +93,7 @@ export class AuthorController {
   }
 
   @PCode('AUTH_U')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateContributorForm) {
     return await this.contributorService.update(
@@ -103,12 +103,19 @@ export class AuthorController {
   }
 
   @PCode('AUTH_D')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
     return await this.contributorService.delete(
       id,
       Constant.CONTRIBUTOR_KIND_AUTHOR
     );
+  }
+
+  @PCode('AUTH_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover/:id')
+  async recover(@Param('id') id: bigint) {
+    return await this.contributorService.recover(id);
   }
 }

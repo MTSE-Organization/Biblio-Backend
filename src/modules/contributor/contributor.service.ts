@@ -6,7 +6,7 @@ import {
   FilterContributorForm,
   UpdateContributorForm
 } from './forms';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
 
 @Injectable()
@@ -86,6 +86,11 @@ export class ContributorService {
 
   async delete(id: bigint, kind: number) {
     const contributor = await this.findByIdAndKind(id, kind);
+    if (contributor.status === Constant.STATUS_DELETED)
+      throw new BadRequestException(
+        'Contributor has been deleted !',
+        ErrorCode.CONTRIBUTOR_ERROR_DELETED
+      );
     await contributor.update({ status: Constant.STATUS_DELETED });
     return { message: 'Delete contributor successfully' };
   }
@@ -95,5 +100,16 @@ export class ContributorService {
       where: { id: ids }
     });
     return contributors;
+  }
+
+  async recover(id: bigint) {
+    const contributor = await this.findById(id);
+    if (!contributor)
+      throw new BadRequestException(
+        'Contributor not found',
+        ErrorCode.CONTRIBUTOR_ERROR_NOT_FOUND
+      );
+    await contributor.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover contributor successfully' };
   }
 }
