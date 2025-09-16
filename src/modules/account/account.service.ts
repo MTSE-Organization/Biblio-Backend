@@ -1,4 +1,3 @@
-import { Constant } from '@/constants/constant';
 import { Account, Group, Permission } from '@/models';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -8,7 +7,7 @@ import {
   NotFoundException,
   UnauthorizedException
 } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { Constant, ErrorCode } from '@/constants';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
 import { UserDetailsDto, UserInfoGoogleDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';

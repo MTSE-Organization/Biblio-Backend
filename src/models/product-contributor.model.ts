@@ -6,7 +6,7 @@ import {
   Table
 } from 'sequelize-typescript';
 import { Product } from './product.model';
-import { Contributor } from './contributor';
+import { Contributor } from './contributor.model';
 
 @Table({
   tableName: 'db_product_contributor',

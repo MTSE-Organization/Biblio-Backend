@@ -21,7 +21,7 @@ import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
 import { ApiListResponse, PCode } from '@/common/decorators';
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 
 @Controller('product')
 export class ProductController {

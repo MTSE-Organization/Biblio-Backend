@@ -26,7 +26,7 @@ import {
 } from './form';
 import { CategoryAutoCompleteDto, CategoryDto } from './dtos';
 import { UpdateOrderingForm } from '@/common/forms';
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 
 @Controller('category')
 export class CategoryController {

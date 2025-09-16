@@ -8,8 +8,7 @@ import { Observable } from 'rxjs';
 import * as fs from 'fs';
 import * as path from 'path';
 import { BadRequestException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
-import { fileFolders } from '@/constants/constant';
+import { ErrorCode, fileFolders } from '@/constants';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

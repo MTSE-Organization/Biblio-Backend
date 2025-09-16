@@ -5,13 +5,10 @@ import {
   UpdateProductVariantForm
 } from './forms';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProductVariant } from '@/models/product-variant.model';
+import { Category, Product, ProductVariant } from '@/models';
 import { ProductService } from '../product/product.service';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
-import { Product } from '@/models/product.model';
-import { Category } from '@/models';
-import { Constant } from '@/constants/constant';
+import { Constant, ErrorCode } from '@/constants';
 
 @Injectable()
 export class ProductVariantService {

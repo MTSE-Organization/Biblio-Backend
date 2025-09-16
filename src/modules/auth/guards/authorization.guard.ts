@@ -1,6 +1,6 @@
 import { PCODE_KEY } from '@/common/decorators';
 import { UnauthorizedException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { ErrorCode } from '@/constants';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 

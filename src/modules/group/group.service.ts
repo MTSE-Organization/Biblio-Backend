@@ -4,7 +4,7 @@ import { Group, Permission } from '@/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { PermissionService } from '../permission/permission.service';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { ErrorCode } from '@/constants';
 
 @Injectable()
 export class GroupService {

@@ -10,8 +10,8 @@ import {
 import { Category } from './category.model';
 import { Auditable } from './auditable.model';
 import { ProductImage } from './product-image.model';
-import { Publisher } from './publisher';
-import { Contributor } from './contributor';
+import { Publisher } from './publisher.model';
+import { Contributor } from './contributor.model';
 import { ProductContributor } from './product-contributor.model';
 
 @Table({

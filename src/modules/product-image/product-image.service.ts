@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductImage } from '@/models';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
 import { ProductService } from '../product/product.service';
-import { UpdateDefaultImageForm } from './form/update-default-image.form';
-import { CreateProductImageForm, FilterProductImageForm } from './form';
+import { ErrorCode } from '@/constants';
+import {
+  CreateProductImageForm,
+  FilterProductImageForm,
+  UpdateDefaultImageForm
+} from './form';
 import { UpdateOrderingForm } from '@/common/forms';
 
 @Injectable()

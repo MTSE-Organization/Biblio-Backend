@@ -2,7 +2,7 @@ import { Category } from '@/models';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { ErrorCode } from '@/constants';
 import { ProductService } from '../product/product.service';
 import {
   CreateCategoryForm,

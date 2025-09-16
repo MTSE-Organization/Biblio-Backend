@@ -1,4 +1,4 @@
-import { Permission } from '@/models';
+import { Permission, PermissionGroup } from '@/models';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import {
@@ -7,9 +7,8 @@ import {
   UpdatePermissionForm
 } from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
 import { PermissionGroupService } from '../permission-group/permission-group.service';
-import { PermissionGroup } from '@/models/permission-group.model';
+import { ErrorCode } from '@/constants';
 
 @Injectable()
 export class PermissionService {
