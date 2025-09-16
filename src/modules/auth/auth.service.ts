@@ -127,7 +127,7 @@ export class AuthService {
       authorities,
       account.isSuperAdmin
     );
-    const token = await this.jwtService.signAsync({ payload: { ...user } });
+    const token = await this.jwtService.signAsync({ ...user });
     return { message: 'Login successfully', token };
   }
 }
