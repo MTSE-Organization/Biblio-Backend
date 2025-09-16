@@ -59,15 +59,13 @@ export class AccountService {
   async list(
     query: FilterAccountForm
   ): Promise<{ accounts: Account[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
-
+    const { limit, offset } = query.getPagination();
     const filter = query.getFilter();
 
     const { rows, count } = await this.accountRepository.findAndCountAll({
       include: [Group],
-      limit: size,
-      offset: skip,
+      limit: limit,
+      offset: offset,
       where: filter
     });
 

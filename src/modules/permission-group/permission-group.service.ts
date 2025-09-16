@@ -60,13 +60,12 @@ export class PermissionGroupService {
   async findAll(
     query: FilterPermissionGroupForm
   ): Promise<{ permissionGroups: PermissionGroup[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } =
       await this.permissionGroupRepository.findAndCountAll({
-        limit: size,
-        offset: skip
+        limit: limit,
+        offset: offset
       });
     return { permissionGroups: rows, count };
   }

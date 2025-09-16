@@ -74,12 +74,11 @@ export class PermissionService {
   async findAll(
     query: FilterPermissionForm
   ): Promise<{ permissions: Permission[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } = await this.permissionRepository.findAndCountAll({
-      limit: size,
-      offset: skip,
+      limit: limit,
+      offset: offset,
       include: [{ model: PermissionGroup }]
     });
     return { permissions: rows, count };

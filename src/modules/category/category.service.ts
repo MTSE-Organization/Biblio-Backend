@@ -94,15 +94,14 @@ export class CategoryService {
   }
 
   async findAll(
-    query?: FilterCategoryForm
+    query: FilterCategoryForm
   ): Promise<{ categories: Category[]; count: number }> {
-    const { page = 0, size = 10 } = query || {};
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } = await this.categoryRepository.findAndCountAll({
-      where: query?.getFilter(),
-      limit: size,
-      offset: skip,
+      where: query.getFilter(),
+      limit: limit,
+      offset: offset,
       order: [['ordering', 'ASC']]
     });
 
@@ -138,17 +137,6 @@ export class CategoryService {
       where: { [field]: value }
     });
     return count > 0;
-  }
-
-  async autocomplete(query: FilterCategoryForm): Promise<Category[]> {
-    const { page = 0, size = 10 } = query;
-
-    return await this.categoryRepository.findAll({
-      where: query.getFilter(),
-      limit: size,
-      offset: page * size,
-      order: [['ordering', 'ASC']]
-    });
   }
 
   async updateOrdering(

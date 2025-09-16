@@ -35,7 +35,7 @@ export class AddressController {
   @PCode('ADDR_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
-  async create(@Req() req, @Body() form: CreateAddressForm) {
+  async create(@Req() req: any, @Body() form: CreateAddressForm) {
     const user: UserDetailsDto = req.user;
     return await this.addressService.create(form, user.id);
   }
@@ -44,7 +44,7 @@ export class AddressController {
   @PCode('ADDR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
-  async update(@Req() req, @Body() form: UpdateAddressForm) {
+  async update(@Req() req: any, @Body() form: UpdateAddressForm) {
     const user: UserDetailsDto = req.user;
     return await this.addressService.update(form, user.id);
   }
@@ -53,7 +53,7 @@ export class AddressController {
   @PCode('ADDR_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
-  async delete(@Req() req, @Param('id') id: bigint) {
+  async delete(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;
     return await this.addressService.delete(id, user.id);
   }
@@ -62,8 +62,11 @@ export class AddressController {
   @PCode('ADDR_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
-  async list(@Body() form: FilterAddressForm) {
-    const { addresses, count } = await this.addressService.findAll(form);
+  async list(@Req() req: any, @Query() form: FilterAddressForm) {
+    const { addresses, count } = await this.addressService.findAll(
+      form,
+      req.user.id
+    );
     return {
       content: MapperUtil.toDtoList(addresses, AddressDto),
       totalElements: count,
@@ -75,7 +78,7 @@ export class AddressController {
   @PCode('ADDR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('set-default/:id')
-  async setDefault(@Req() req, @Param('id') id: bigint) {
+  async setDefault(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;
     return await this.addressService.setDefault(id, user.id);
   }
@@ -84,7 +87,7 @@ export class AddressController {
   @PCode('ADDR_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
-  async get(@Req() req, @Param('id') id: bigint) {
+  async get(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;
     const address = await this.addressService.findById(id, user.id);
     return MapperUtil.toDto(address, AddressDto);
