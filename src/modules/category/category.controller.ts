@@ -120,4 +120,15 @@ export class CategoryController {
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
     return await this.categoryService.updateOrdering(form);
   }
+
+  @ApiResponseNoData({
+    objectName: 'category',
+    message: 'Recover category successfully'
+  })
+  @PCode('CAT_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover/:id')
+  async recover(@Param('id') id: bigint) {
+    return await this.categoryService.recover(id);
+  }
 }

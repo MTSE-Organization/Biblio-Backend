@@ -2,7 +2,7 @@ import { Category } from '@/models';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants';
+import { Constant, ErrorCode } from '@/constants';
 import { ProductService } from '../product/product.service';
 import {
   CreateCategoryForm,
@@ -89,7 +89,7 @@ export class CategoryService {
       );
     }
 
-    await category.destroy();
+    await category.update({ status: Constant.STATUS_DELETED });
     return { message: 'Delete category successfully' };
   }
 
@@ -173,5 +173,20 @@ export class CategoryService {
     }
 
     return { message: 'Update ordering category success' };
+  }
+
+  async recover(id: bigint) {
+    const category = await this.categoryRepository.findOne({
+      where: {
+        id
+      }
+    });
+    if (!category)
+      throw new BadRequestException(
+        'Category not found',
+        ErrorCode.CATEGORY_ERROR_NOT_FOUND
+      );
+    await category.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover category successfully' };
   }
 }
