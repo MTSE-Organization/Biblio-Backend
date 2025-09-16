@@ -3,7 +3,7 @@ import { ContributorService } from './contributor.service';
 import { AuthorController } from './author.controller';
 import { TranslatorController } from './translator.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Contributor } from '@/models/contributor';
+import { Contributor } from '@/models/contributor.model';
 
 @Module({
   controllers: [AuthorController, TranslatorController],

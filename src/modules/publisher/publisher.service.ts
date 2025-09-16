@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Publisher } from '@/models/publisher';
+import { Publisher } from '@/models/publisher.model';
 import {
   CreatePublisherForm,
   FilterPublisherForm,
   UpdatePublisherForm
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
-import { Constant } from '@/constants/constant';
+import { Constant, ErrorCode } from '@/constants';
 
 @Injectable()
 export class PublisherService {

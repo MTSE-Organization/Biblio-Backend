@@ -15,11 +15,11 @@ import {
   FilterContributorForm,
   UpdateContributorForm
 } from './forms';
-import { ContributorDto, ContributorAutoCompleteDto } from './dtos';
+import { ContributorDto } from './dtos';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 import { PCode } from '@/common/decorators';
 
 @Controller('author')

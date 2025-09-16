@@ -1,13 +1,9 @@
-import { Cart } from '@/models/cart.model';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AccountService } from '../account/account.service';
-import { CartItem } from '@/models/cart-item.model';
-import { Product } from '@/models/product.model';
 import { AddItemForm } from './forms';
 import { CartItemService } from '../cart-item/cart-item.service';
-import { Category, ProductImage } from '@/models';
-import { ProductVariant } from '@/models/product-variant.model';
+import { Cart, CartItem, Category, Product, ProductVariant } from '@/models';
 
 @Injectable()
 export class CartService {

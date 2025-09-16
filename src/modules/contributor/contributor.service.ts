@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Contributor } from '@/models/contributor';
+import { Contributor } from '@/models';
 import {
   CreateContributorForm,
   FilterContributorForm,
   UpdateContributorForm
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
-import { Constant } from '@/constants/constant';
+import { Constant, ErrorCode } from '@/constants';
 
 @Injectable()
 export class ContributorService {

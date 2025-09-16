@@ -1,4 +1,4 @@
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';

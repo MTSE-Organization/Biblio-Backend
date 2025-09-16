@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { ErrorCode } from '@/constants';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 

@@ -1,9 +1,9 @@
-import { CartItem } from '@/models/cart-item.model';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CartItem } from '@/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { AddItemForm } from '../cart/forms';
 import { UpdateCartItemForm } from './forms';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { ErrorCode } from '@/constants';
 import { ProductVariantService } from '../product-variant/product-variant.service';
 
 @Injectable()

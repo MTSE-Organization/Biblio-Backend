@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { AccountService } from '../account/account.service';
 import { RegisterForm } from './forms/register.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
+import { Constant, ErrorCode } from '@/constants';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from '../otp/otp.service';
 import { MailService } from '../mail/mail.service';
-import { Constant } from '@/constants/constant';
 import {
   ActiveAccountForm,
   ChangePasswordForm,

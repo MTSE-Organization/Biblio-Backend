@@ -7,16 +7,12 @@ import {
   UpdateProductForm
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants/error-code.constant';
-import { Category, ProductImage } from '@/models';
+import { Category, Contributor, ProductImage, Publisher } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
-import { Constant } from '@/constants/constant';
+import { Constant, ErrorCode } from '@/constants';
 import { PublisherService } from '../publisher/publisher.service';
-import { Publisher } from '@/models/publisher';
 import { ContributorService } from '../contributor/contributor.service';
-import { ProductContributor } from '@/models/product-contributor.model';
-import { Contributor } from '@/models/contributor';
 import { Op } from 'sequelize';
 
 @Injectable()

@@ -20,7 +20,7 @@ import { MapperUtil } from '@/utils';
 import { ProductVariantAutoCompleteDto, ProductVariantDto } from './dtos';
 import { PCode } from '@/common/decorators';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 
 @Controller('product-variant')
 export class ProductVariantController {

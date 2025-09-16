@@ -20,7 +20,7 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { PCode } from '@/common/decorators';
-import { Constant } from '@/constants/constant';
+import { Constant } from '@/constants';
 
 @Controller('publisher')
 export class PublisherController {
