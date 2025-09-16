@@ -29,7 +29,4 @@ export class CreateAddressForm {
 
   @BooleanDecorator('isDefault')
   isDefault?: boolean;
-
-  @BigIntDecorator('accountId', true)
-  accountId: bigint;
 }

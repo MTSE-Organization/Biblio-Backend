@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Address } from '@/models/address';
 import {
@@ -19,8 +19,8 @@ export class AddressService {
     private readonly accountService: AccountService
   ) {}
 
-  async create(form: CreateAddressForm) {
-    const data = { ...form };
+  async create(form: CreateAddressForm, accountId: bigint) {
+    const data = { ...form, accountId };
 
     await this.accountService.findById(data.accountId);
 
@@ -32,13 +32,20 @@ export class AddressService {
     return { message: 'Address created successfully' };
   }
 
-  async update(form: UpdateAddressForm) {
+  async update(form: UpdateAddressForm, accountId: bigint) {
     const address = await this.addressRepository.findByPk(form.id);
 
     if (!address) {
       throw new NotFoundException(
         'Address not found',
         ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+
+    if (address.accountId !== accountId) {
+      throw new BadRequestException(
+        'Address invalid',
+        ErrorCode.ADDRESS_INVALID
       );
     }
 
@@ -52,12 +59,19 @@ export class AddressService {
     return { message: 'Address updated successfully' };
   }
 
-  async delete(id: bigint) {
+  async delete(id: bigint, accountId: bigint) {
     const address = await this.addressRepository.findByPk(id);
     if (!address) {
       throw new NotFoundException(
         'Address not found',
         ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+
+    if (address.accountId !== accountId) {
+      throw new BadRequestException(
+        'Address invalid',
+        ErrorCode.ADDRESS_INVALID
       );
     }
 
@@ -84,12 +98,19 @@ export class AddressService {
     return { addresses: rows, count };
   }
 
-  async setDefault(id: bigint) {
+  async setDefault(id: bigint, accountId: bigint) {
     const address = await this.addressRepository.findByPk(id);
     if (!address) {
       throw new NotFoundException(
         'Address not found',
         ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+
+    if (address.accountId !== accountId) {
+      throw new BadRequestException(
+        'Address invalid',
+        ErrorCode.ADDRESS_INVALID
       );
     }
 
@@ -104,5 +125,25 @@ export class AddressService {
       { isDefault: false },
       { where: { accountId, isDefault: true } }
     );
+  }
+
+  async findById(id: bigint, accountId: bigint): Promise<Address> {
+    const address = await this.addressRepository.findByPk(id);
+
+    if (!address) {
+      throw new NotFoundException(
+        'Address not found',
+        ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+
+    if (address.accountId !== accountId) {
+      throw new BadRequestException(
+        'Address invalid',
+        ErrorCode.ADDRESS_INVALID
+      );
+    }
+
+    return address;
   }
 }
