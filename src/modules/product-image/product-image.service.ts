@@ -49,31 +49,18 @@ export class ProductImageService {
     return { message: 'Delete product image successfully' };
   }
 
-  async list(form: FilterProductImageForm): Promise<{
-    content: ProductImage[];
-    totalElements: number;
-    totalPages: number;
-  }> {
-    const { productId, page = 0, size = 10 } = form;
-    const offset = page * size;
-
-    const where: any = {};
-    if (productId) {
-      where.productId = productId;
-    }
+  async list(
+    form: FilterProductImageForm
+  ): Promise<{ productImages: ProductImage[]; count: number }> {
+    const { limit, offset } = form.getPagination();
 
     const { rows, count } = await this.productImageRepository.findAndCountAll({
-      where,
-      limit: size,
-      offset,
+      where: form.getFilter(),
+      limit: limit,
+      offset: offset,
       order: [['ordering', 'ASC']]
     });
-
-    return {
-      content: rows,
-      totalElements: count,
-      totalPages: Math.ceil(count / size)
-    };
+    return { productImages: rows, count: count };
   }
 
   async get(id: bigint): Promise<ProductImage> {

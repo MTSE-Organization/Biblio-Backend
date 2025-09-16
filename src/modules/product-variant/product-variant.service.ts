@@ -78,13 +78,12 @@ export class ProductVariantService {
   async findAll(
     query: FilterProductVariantForm
   ): Promise<{ productVariants: ProductVariant[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } = await this.productVariantRepository.findAndCountAll(
       {
-        limit: size,
-        offset: skip,
+        limit: limit,
+        offset: offset,
         where: query.getFilter()
       }
     );

@@ -31,14 +31,12 @@ export class GroupService {
   async list(
     query: FilterGroupForm
   ): Promise<{ groups: Group[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
-    const filter = query.getFilter();
     const { rows, count } = await this.groupRepository.findAndCountAll({
-      limit: size,
-      offset: skip,
-      where: filter
+      limit: limit,
+      offset: offset,
+      where: query.getFilter()
     });
     return { groups: rows, count };
   }

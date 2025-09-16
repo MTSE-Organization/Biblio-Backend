@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Address } from '@/models/address';
 import {
   CreateAddressForm,
   UpdateAddressForm,
@@ -9,6 +8,7 @@ import {
 import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { AccountService } from '@/modules/account/account.service';
+import { Address } from '@/models';
 
 @Injectable()
 export class AddressService {
@@ -80,19 +80,19 @@ export class AddressService {
   }
 
   async findAll(
-    form: FilterAddressForm
+    form: FilterAddressForm,
+    accountId: bigint
   ): Promise<{ addresses: Address[]; count: number }> {
-    const { page, size } = form;
-    const offset = page * size;
+    const { limit, offset } = form.getPagination();
 
     const { rows, count } = await this.addressRepository.findAndCountAll({
-      where: form.getFilter(),
+      where: { accountId },
       order: [
         ['isDefault', 'DESC'],
         ['created_date', 'DESC']
       ],
-      offset,
-      limit: size
+      offset: offset,
+      limit: limit
     });
 
     return { addresses: rows, count };

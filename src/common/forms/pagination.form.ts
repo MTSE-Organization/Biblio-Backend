@@ -12,4 +12,10 @@ export class PaginationForm {
   @NumberDecorator('size')
   @Min(1)
   size: number = 20;
+
+  getPagination(): { limit: number; offset: number } {
+    const limit = this.size;
+    const offset = this.page * this.size;
+    return { limit, offset };
+  }
 }

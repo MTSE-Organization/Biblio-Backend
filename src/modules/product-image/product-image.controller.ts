@@ -37,13 +37,12 @@ export class ProductImageController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Query() form: FilterProductImageForm) {
-    const { content, totalElements, totalPages } =
-      await this.productImageService.list(form);
+    const { productImages, count } = await this.productImageService.list(form);
 
     const response: ResponseListDto<ProductImageDto[]> = {
-      content: MapperUtil.toDtoList(content, ProductImageDto),
-      totalElements,
-      totalPages
+      content: MapperUtil.toDtoList(productImages, ProductImageDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
     };
 
     return response;

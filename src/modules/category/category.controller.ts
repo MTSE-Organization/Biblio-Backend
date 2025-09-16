@@ -105,14 +105,12 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard)
   @Get('auto-complete')
   async autocomplete(@Query() form: FilterCategoryForm) {
-    const categories = await this.categoryService.autocomplete(form);
-    const count = categories.length;
-    const response: ResponseListDto<CategoryAutoCompleteDto[]> = {
+    const { categories, count } = await this.categoryService.findAll(form);
+    return {
       content: MapperUtil.toDtoList(categories, CategoryAutoCompleteDto),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
-    return response;
   }
 
   @ApiResponseNoData({ objectName: 'category', type: 'update-ordering' })

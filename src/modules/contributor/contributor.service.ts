@@ -25,13 +25,12 @@ export class ContributorService {
   async findAll(
     query: FilterContributorForm
   ): Promise<{ contributors: Contributor[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } = await this.contributorRepository.findAndCountAll({
       where: query.getFilter(),
-      offset: skip,
-      limit: size
+      offset: offset,
+      limit: limit
     });
 
     return { contributors: rows, count };

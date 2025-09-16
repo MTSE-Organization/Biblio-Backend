@@ -26,13 +26,12 @@ export class PublisherService {
   async findAll(
     query: FilterPublisherForm
   ): Promise<{ publishers: Publisher[]; count: number }> {
-    const { page, size } = query;
-    const skip = page * size;
+    const { limit, offset } = query.getPagination();
 
     const { rows, count } = await this.publisherRepository.findAndCountAll({
       where: query?.getFilter(),
-      offset: skip,
-      limit: size
+      offset: offset,
+      limit: limit
     });
 
     return { publishers: rows, count };
