@@ -19,7 +19,12 @@ import { PermissionGroupAutoCompleteDto, PermissionGroupDto } from './dtos';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 
 @Controller('permission-group')
 export class PermissionGroupController {
@@ -27,6 +32,10 @@ export class PermissionGroupController {
     private readonly permissionGroupService: PermissionGroupService
   ) {}
 
+  @ApiResponseNoData({
+    objectName: 'permission group',
+    type: 'create'
+  })
   @PCode('PER_GR_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -34,6 +43,9 @@ export class PermissionGroupController {
     return await this.permissionGroupService.create(form);
   }
 
+  @ApiListResponse(PermissionGroupAutoCompleteDto, {
+    objectName: 'permission group'
+  })
   @PCode('PER_GR_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
@@ -51,6 +63,7 @@ export class PermissionGroupController {
     return response;
   }
 
+  @ApiResponse(PermissionGroupDto, { objectName: 'permission group' })
   @PCode('PER_GR_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
@@ -59,13 +72,21 @@ export class PermissionGroupController {
     return MapperUtil.toDto(permissionGroup, PermissionGroupDto);
   }
 
-  @PCode('PER_GR_L')
+  @ApiResponseNoData({
+    objectName: 'group',
+    type: 'update'
+  })
+  @PCode('PER_GR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdatePermissionGroupForm) {
     return await this.permissionGroupService.update(form);
   }
 
+  @ApiResponseNoData({
+    objectName: 'group',
+    type: 'delete'
+  })
   @PCode('PER_GR_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

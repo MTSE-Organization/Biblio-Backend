@@ -5,12 +5,13 @@ import { UserDetailsDto } from '../auth/dtos';
 import { MapperUtil } from '@/utils';
 import { CartDto } from './dtos';
 import { AddItemForm } from './forms';
-import { PCode } from '@/common/decorators';
+import { ApiResponse, ApiResponseNoData, PCode } from '@/common/decorators';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
+  @ApiResponse(CartDto, { objectName: 'cart' })
   @PCode('CART_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get')
@@ -20,6 +21,7 @@ export class CartController {
     return MapperUtil.toDto(cart, CartDto);
   }
 
+  @ApiResponseNoData({ type: 'Add cart item successfully' })
   @PCode('CART_A_I')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('add-item')

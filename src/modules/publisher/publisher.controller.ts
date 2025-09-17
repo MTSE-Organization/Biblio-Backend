@@ -19,13 +19,19 @@ import { PublisherDto, PublisherAutoCompleteDto } from './dtos';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { Constant } from '@/constants';
 
 @Controller('publisher')
 export class PublisherController {
   constructor(private readonly publisherService: PublisherService) {}
 
+  @ApiResponseNoData({ objectName: 'publisher', type: 'create' })
   @PCode('PUB_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -33,6 +39,7 @@ export class PublisherController {
     return await this.publisherService.create(form);
   }
 
+  @ApiListResponse(PublisherAutoCompleteDto, { objectName: 'publisher' })
   @Get('list')
   async list(@Query() form: FilterPublisherForm) {
     form.status = Constant.STATUS_ACTIVE;
@@ -47,6 +54,7 @@ export class PublisherController {
     return response;
   }
 
+  @ApiResponse(PublisherDto, { objectName: 'publisher' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -55,6 +63,7 @@ export class PublisherController {
     );
   }
 
+  @ApiListResponse(PublisherAutoCompleteDto, { objectName: 'publisher' })
   @PCode('PUB_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
@@ -70,6 +79,7 @@ export class PublisherController {
     return response;
   }
 
+  @ApiResponse(PublisherDto, { objectName: 'publisher' })
   @PCode('PUB_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
@@ -80,6 +90,7 @@ export class PublisherController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'publisher', type: 'update' })
   @PCode('PUB_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -87,6 +98,7 @@ export class PublisherController {
     return await this.publisherService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'publisher', type: 'delete' })
   @PCode('PUB_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -94,6 +106,9 @@ export class PublisherController {
     return await this.publisherService.delete(id);
   }
 
+  @ApiResponseNoData({
+    message: 'Recover publisher successfully'
+  })
   @PCode('PUB_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')

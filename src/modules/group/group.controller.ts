@@ -16,12 +16,16 @@ import { MapperUtil } from '@/utils';
 import { GroupAutoCompleteDto } from './dtos/group-auto-complete.dto';
 import { ResponseListDto } from '@/common/interfaces';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
-import { PCode } from '@/common/decorators';
+import { ApiResponse, ApiResponseNoData, PCode } from '@/common/decorators';
 
 @Controller('group')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
+  @ApiResponseNoData({
+    objectName: 'group',
+    type: 'create'
+  })
   @PCode('GR_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -29,6 +33,7 @@ export class GroupController {
     return this.groupService.create(form);
   }
 
+  @ApiResponse(GroupAutoCompleteDto, { objectName: 'group' })
   @PCode('GR_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
@@ -42,6 +47,7 @@ export class GroupController {
     return response;
   }
 
+  @ApiResponse(GroupDto, { objectName: 'group' })
   @PCode('GR_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
@@ -50,6 +56,10 @@ export class GroupController {
     return MapperUtil.toDto(group, GroupDto);
   }
 
+  @ApiResponseNoData({
+    objectName: 'group',
+    type: 'update'
+  })
   @PCode('GR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -57,6 +67,10 @@ export class GroupController {
     return this.groupService.update(form);
   }
 
+  @ApiResponseNoData({
+    objectName: 'group',
+    type: 'delete'
+  })
   @PCode('GR_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

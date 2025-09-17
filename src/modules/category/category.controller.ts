@@ -122,7 +122,6 @@ export class CategoryController {
   }
 
   @ApiResponseNoData({
-    objectName: 'category',
     message: 'Recover category successfully'
   })
   @PCode('CAT_U')

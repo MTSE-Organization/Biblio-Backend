@@ -18,7 +18,12 @@ import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AccountProfileDto } from './dtos/account-profile.dto';
 import { UserDetailsDto } from '../auth/dtos';
-import { ApiListResponse, PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 
 @Controller('account')
 export class AccountController {
@@ -38,6 +43,7 @@ export class AccountController {
     return response;
   }
 
+  @ApiResponse(AccountProfileDto, { objectName: 'profile' })
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(@Req() req: any): Promise<AccountProfileDto> {
@@ -47,6 +53,7 @@ export class AccountController {
     });
   }
 
+  @ApiResponseNoData({ objectName: 'profile', type: 'update' })
   @UseGuards(JwtAuthGuard)
   @Put('update-profile')
   async updateProfile(@Req() req: any, @Body() form: UpdateProfileForm) {
@@ -54,6 +61,7 @@ export class AccountController {
     return await this.accountService.updateProfile(userId, form);
   }
 
+  @ApiResponseNoData({ objectName: 'profile', type: 'delete' })
   @PCode('ACC_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

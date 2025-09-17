@@ -18,13 +18,22 @@ import {
 import { MapperUtil } from '@/utils';
 import { PermissionDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 
 @Controller('permission')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
+  @ApiResponseNoData({
+    objectName: 'permission',
+    type: 'create'
+  })
   @PCode('PER_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -32,6 +41,7 @@ export class PermissionController {
     return await this.permissionService.create(form);
   }
 
+  @ApiListResponse(PermissionDto, { objectName: 'permission' })
   @PCode('PER_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
@@ -45,6 +55,7 @@ export class PermissionController {
     return response;
   }
 
+  @ApiResponse(PermissionDto, { objectName: 'permission' })
   @PCode('PER_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
@@ -53,6 +64,10 @@ export class PermissionController {
     return MapperUtil.toDto(permission, PermissionDto);
   }
 
+  @ApiResponseNoData({
+    objectName: 'permission',
+    type: 'update'
+  })
   @PCode('PER_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -60,6 +75,10 @@ export class PermissionController {
     return await this.permissionService.update(form);
   }
 
+  @ApiResponseNoData({
+    objectName: 'permission',
+    type: 'delete'
+  })
   @PCode('PER_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

@@ -20,12 +20,18 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { Constant } from '@/constants';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 
 @Controller('translator')
 export class TranslatorController {
   constructor(private readonly contributorService: ContributorService) {}
 
+  @ApiResponseNoData({ objectName: 'translator', type: 'create' })
   @PCode('TRANS_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -36,6 +42,7 @@ export class TranslatorController {
     );
   }
 
+  @ApiListResponse(ContributorDto, { objectName: 'translator' })
   @Get('list')
   async list(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_TRANSLATOR;
@@ -51,6 +58,7 @@ export class TranslatorController {
     return response;
   }
 
+  @ApiResponse(ContributorDto, { objectName: 'translator' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -63,6 +71,7 @@ export class TranslatorController {
     );
   }
 
+  @ApiListResponse(ContributorDto, { objectName: 'translator' })
   @PCode('TRANS_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
@@ -79,6 +88,7 @@ export class TranslatorController {
     return response;
   }
 
+  @ApiResponse(ContributorDto, { objectName: 'translator' })
   @PCode('TRANS_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
@@ -92,6 +102,7 @@ export class TranslatorController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'translator', type: 'update' })
   @PCode('TRANS_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -102,6 +113,7 @@ export class TranslatorController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'translator', type: 'delete' })
   @PCode('TRANS_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -112,6 +124,9 @@ export class TranslatorController {
     );
   }
 
+  @ApiResponseNoData({
+    message: 'Recover translator successfully'
+  })
   @PCode('TRANS_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')

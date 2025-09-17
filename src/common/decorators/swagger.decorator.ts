@@ -182,7 +182,7 @@ function generateGenericExample(key: string): any {
 
 export function ApiListResponse<TModel extends Type<any>>(
   item: TModel,
-  options?: { objectName?: string }
+  options?: { objectName?: string; message?: string }
 ) {
   let example: any;
 
@@ -201,9 +201,11 @@ export function ApiListResponse<TModel extends Type<any>>(
   return applyDecorators(
     ApiExtraModels(ApiResponseListDto, ApiPaginatedDataDto, item),
     ApiOkResponse({
-      description: options?.objectName
-        ? `Get list ${options.objectName} successfully`
-        : 'Get list successfully',
+      description:
+        options?.message ??
+        (options?.objectName
+          ? `Get list ${options.objectName} successfully`
+          : 'Get list successfully'),
       schema: {
         allOf: [
           { $ref: getSchemaPath(ApiResponseListDto) },
@@ -238,16 +240,18 @@ export function ApiListResponse<TModel extends Type<any>>(
 
 export function ApiResponse<TModel extends Type<any>>(
   model: TModel,
-  options?: { objectName: string }
+  options?: { objectName: string; message?: string }
 ) {
   const example = generateExampleFromDto(model);
 
   return applyDecorators(
     ApiExtraModels(ApiResponseDto, model),
     ApiOkResponse({
-      description: options?.objectName
-        ? `Get ${options.objectName} successfully`
-        : 'Get successfully',
+      description:
+        options?.message ??
+        (options?.objectName
+          ? `Get ${options.objectName} successfully`
+          : 'Get successfully'),
       schema: {
         allOf: [
           { $ref: getSchemaPath(ApiResponseDto) },
@@ -275,7 +279,7 @@ export function ApiResponseNoData(options?: {
   type?: string;
   message?: string;
 }) {
-  let newMessage = 'Success';
+  let newMessage = options?.message || 'Success';
 
   if (options?.objectName && options?.type) {
     switch (options.type) {
