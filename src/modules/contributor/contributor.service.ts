@@ -8,12 +8,15 @@ import {
 } from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class ContributorService {
   constructor(
     @InjectModel(Contributor)
-    private readonly contributorRepository: typeof Contributor
+    private readonly contributorRepository: typeof Contributor,
+
+    private readonly fileService: FileService
   ) {}
 
   async create(form: CreateContributorForm, kind: number) {
@@ -79,6 +82,11 @@ export class ContributorService {
 
   async update(form: UpdateContributorForm, kind: number) {
     const contributor = await this.findByIdAndKind(form.id, kind);
+
+    if (contributor.avatarPath && contributor.avatarPath !== form.avatarPath) {
+      await this.fileService.deleteFile(contributor.avatarPath);
+    }
+
     await contributor.update(form);
     return { message: 'Update contributor successfully' };
   }

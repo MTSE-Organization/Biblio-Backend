@@ -10,6 +10,7 @@ import {
   UpdateDefaultImageForm
 } from './form';
 import { UpdateOrderingForm } from '@/common/forms';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class ProductImageService {
@@ -17,7 +18,9 @@ export class ProductImageService {
     @InjectModel(ProductImage)
     private readonly productImageRepository: typeof ProductImage,
 
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+
+    private readonly fileService: FileService
   ) {}
 
   async create(form: CreateProductImageForm) {
@@ -45,6 +48,7 @@ export class ProductImageService {
 
   async delete(id: bigint) {
     const productImage = await this.findById(id);
+    await this.fileService.deleteFile(productImage.url);
     await productImage.destroy();
     return { message: 'Delete product image successfully' };
   }

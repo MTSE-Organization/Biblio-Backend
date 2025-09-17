@@ -11,6 +11,7 @@ import {
 } from './form';
 import { UpdateOrderingForm } from '@/common/forms';
 import { SlugifyUtil } from '@/utils';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class CategoryService {
@@ -19,7 +20,9 @@ export class CategoryService {
     private readonly categoryRepository: typeof Category,
 
     @Inject(forwardRef(() => ProductService))
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+
+    private readonly fileService: FileService
   ) {}
 
   async create(form: CreateCategoryForm) {
@@ -71,6 +74,10 @@ export class CategoryService {
       category.slug = SlugifyUtil.toSlugify(form.name);
     }
 
+    if (category.imageUrl && category.imageUrl !== data.imageUrl) {
+      await this.fileService.deleteFile(category.imageUrl);
+    }
+
     category.set(data);
 
     await category.save();
@@ -87,6 +94,10 @@ export class CategoryService {
         'Cannot delete category because it is in use by one or more products',
         ErrorCode.CATEGORY_ERROR_IN_USE
       );
+    }
+
+    if (category.imageUrl) {
+      await this.fileService.deleteFile(category.imageUrl);
     }
 
     await category.destroy();

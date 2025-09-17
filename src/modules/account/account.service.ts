@@ -13,6 +13,7 @@ import { UserDetailsDto, UserInfoGoogleDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AccountService {
@@ -21,7 +22,9 @@ export class AccountService {
     private readonly groupService: GroupService,
 
     @Inject(forwardRef(() => CartService))
-    private readonly cartService: CartService
+    private readonly cartService: CartService,
+
+    private readonly fileService: FileService
   ) {}
 
   async findById(id: bigint): Promise<Account> {
@@ -209,6 +212,9 @@ export class AccountService {
       }
       account.phone = data.phone;
     }
+    if (account.avatarPath && data.avatarPath !== account.avatarPath) {
+      await this.fileService.deleteFile(account.avatarPath);
+    }
     account.fullName = data.fullName;
     account.avatarPath = data.avatarPath;
     await account.save();
@@ -225,6 +231,9 @@ export class AccountService {
         'Not allow to delete account',
         ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
       );
+    }
+    if (account.avatarPath) {
+      await this.fileService.deleteFile(account.avatarPath);
     }
     await account.destroy();
     return { message: 'Delete account successfully' };
