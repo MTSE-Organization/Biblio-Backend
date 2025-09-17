@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common';
 import { ProductImageService } from './product-image.service';
 import { JwtAuthGuard, AuthorizationGuard } from '../auth/guards';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import {
@@ -26,6 +31,7 @@ import { ProductImageDto } from './dtos';
 export class ProductImageController {
   constructor(private readonly productImageService: ProductImageService) {}
 
+  @ApiResponseNoData({ objectName: 'product image', type: 'create' })
   @PCode('PRD_IMG_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -33,6 +39,7 @@ export class ProductImageController {
     return await this.productImageService.create(form);
   }
 
+  @ApiListResponse(ProductImageDto, { objectName: 'product image' })
   @PCode('PRD_IMG_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
@@ -48,6 +55,7 @@ export class ProductImageController {
     return response;
   }
 
+  @ApiResponse(ProductImageDto, { objectName: 'product image' })
   @PCode('PRD_IMG_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
@@ -56,6 +64,7 @@ export class ProductImageController {
     return MapperUtil.toDto(productImage, ProductImageDto);
   }
 
+  @ApiResponseNoData({ objectName: 'product image', type: 'delete' })
   @PCode('PRD_IMG_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -63,6 +72,7 @@ export class ProductImageController {
     return await this.productImageService.delete(id);
   }
 
+  @ApiResponseNoData({ objectName: 'product image', type: 'update' })
   @PCode('PRD_IMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')
@@ -70,6 +80,7 @@ export class ProductImageController {
     return await this.productImageService.updateOrdering(form);
   }
 
+  @ApiResponseNoData({ message: 'Set default product image successfully' })
   @PCode('PRD_IMG_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('set-default')

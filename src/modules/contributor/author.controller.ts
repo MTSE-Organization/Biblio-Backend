@@ -20,12 +20,18 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { Constant } from '@/constants';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 
 @Controller('author')
 export class AuthorController {
   constructor(private readonly contributorService: ContributorService) {}
 
+  @ApiResponseNoData({ objectName: 'author', type: 'create' })
   @PCode('AUTH_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -36,6 +42,7 @@ export class AuthorController {
     );
   }
 
+  @ApiListResponse(ContributorDto, { objectName: 'author' })
   @Get('list')
   async list(@Query() form: FilterContributorForm) {
     form.kind = Constant.CONTRIBUTOR_KIND_AUTHOR;
@@ -51,6 +58,7 @@ export class AuthorController {
     return response;
   }
 
+  @ApiListResponse(ContributorDto, { objectName: 'author' })
   @PCode('AUTH_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
@@ -67,6 +75,7 @@ export class AuthorController {
     return response;
   }
 
+  @ApiResponse(ContributorDto, { objectName: 'author' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -79,6 +88,7 @@ export class AuthorController {
     );
   }
 
+  @ApiResponse(ContributorDto, { objectName: 'author' })
   @PCode('AUTH_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
@@ -92,6 +102,7 @@ export class AuthorController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'author', type: 'update' })
   @PCode('AUTH_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -102,6 +113,7 @@ export class AuthorController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'author', type: 'delete' })
   @PCode('AUTH_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -112,6 +124,9 @@ export class AuthorController {
     );
   }
 
+  @ApiResponseNoData({
+    message: 'Recover author successfully'
+  })
   @PCode('AUTH_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')

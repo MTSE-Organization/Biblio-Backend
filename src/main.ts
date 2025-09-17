@@ -42,8 +42,20 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('biblio')
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/docs', app, documentFactory);
+  const document = SwaggerModule.createDocument(app, config);
+  document.tags = (document.tags || []).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+  document.paths = Object.keys(document.paths)
+    .sort()
+    .reduce(
+      (acc, key) => {
+        acc[key] = document.paths[key];
+        return acc;
+      },
+      {} as typeof document.paths
+    );
+  SwaggerModule.setup('api/v1/docs', app, document);
 
   // config server
   logger.log(`Server running on port: ${port}`);
