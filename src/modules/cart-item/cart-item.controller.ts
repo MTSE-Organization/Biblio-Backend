@@ -9,12 +9,13 @@ import {
 import { CartItemService } from './cart-item.service';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { UpdateCartItemForm } from './forms';
-import { PCode } from '@/common/decorators';
+import { ApiResponseNoData, PCode } from '@/common/decorators';
 
 @Controller('cart-item')
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
 
+  @ApiResponseNoData({ objectName: 'cart item', type: 'update' })
   @PCode('CART_I_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -22,6 +23,7 @@ export class CartItemController {
     return await this.cartItemService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'cart item', type: 'delete' })
   @PCode('CART_I_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

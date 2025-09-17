@@ -18,7 +18,12 @@ import {
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { ProductVariantAutoCompleteDto, ProductVariantDto } from './dtos';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { Constant } from '@/constants';
 
@@ -26,6 +31,7 @@ import { Constant } from '@/constants';
 export class ProductVariantController {
   constructor(private readonly productVariantService: ProductVariantService) {}
 
+  @ApiResponseNoData({ objectName: 'product variant', type: 'create' })
   @PCode('PRD_V_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -33,6 +39,9 @@ export class ProductVariantController {
     return await this.productVariantService.create(form);
   }
 
+  @ApiListResponse(ProductVariantAutoCompleteDto, {
+    objectName: 'product variant'
+  })
   @Get('list')
   async list(@Query() form: FilterProductVariantForm) {
     form.status = Constant.STATUS_ACTIVE;
@@ -51,6 +60,7 @@ export class ProductVariantController {
     return response;
   }
 
+  @ApiResponse(ProductVariantDto, { objectName: 'product variant' })
   @PCode('PRD_V_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
@@ -61,6 +71,9 @@ export class ProductVariantController {
     );
   }
 
+  @ApiListResponse(ProductVariantAutoCompleteDto, {
+    objectName: 'product variant'
+  })
   @PCode('PRD_V_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
@@ -80,6 +93,7 @@ export class ProductVariantController {
     return response;
   }
 
+  @ApiResponse(ProductVariantDto, { objectName: 'product variant' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -91,6 +105,7 @@ export class ProductVariantController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'product variant', type: 'update' })
   @PCode('PRD_V_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -98,6 +113,7 @@ export class ProductVariantController {
     return await this.productVariantService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'product variant', type: 'delete' })
   @PCode('PRD_V_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')

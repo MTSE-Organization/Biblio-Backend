@@ -15,13 +15,18 @@ import path from 'path';
 import * as fs from 'fs';
 import { NotFoundException } from '@/common/exceptions';
 import { FileRenameInterceptor } from '@/common/interceptors/file.interceptor';
-import { PCode } from '@/common/decorators';
+import { ApiResponse, PCode } from '@/common/decorators';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
+import { FileDto } from '@/modules/file/dtos/file.dto';
 
 @Controller('file')
 export class FileController {
   constructor(private readonly configService: ConfigService) {}
 
+  @ApiResponse(FileDto, {
+    objectName: 'file',
+    message: 'Upload file successfully'
+  })
   @PCode('FILE_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('upload')

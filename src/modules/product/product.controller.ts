@@ -20,13 +20,19 @@ import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ProductMapper } from './product.mapper';
-import { ApiListResponse, PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { Constant } from '@/constants';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @ApiResponseNoData({ objectName: 'product', type: 'create' })
   @PCode('PRD_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -50,6 +56,7 @@ export class ProductController {
     return response;
   }
 
+  @ApiResponse(ProductDto, { objectName: 'product' })
   @PCode('PRD_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
@@ -60,6 +67,7 @@ export class ProductController {
     );
   }
 
+  @ApiResponseNoData({ objectName: 'product', type: 'update' })
   @PCode('PRD_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -67,6 +75,7 @@ export class ProductController {
     return await this.productService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'product', type: 'delete' })
   @PCode('PRD_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -74,6 +83,7 @@ export class ProductController {
     return await this.productService.delete(id);
   }
 
+  @ApiResponse(ProductDto, { objectName: 'product' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(
@@ -82,6 +92,7 @@ export class ProductController {
     );
   }
 
+  @ApiListResponse(ProductDto, { objectName: 'product' })
   @Get('list')
   async list(@Query() form: FilterProductForm) {
     form.status = Constant.STATUS_ACTIVE;
@@ -96,6 +107,9 @@ export class ProductController {
     return response;
   }
 
+  @ApiListResponse(ProductDto, {
+    objectName: 'latest product'
+  })
   @Get('latest')
   async getLatest() {
     return {
@@ -106,6 +120,9 @@ export class ProductController {
     };
   }
 
+  @ApiListResponse(ProductDto, {
+    objectName: 'best seller product'
+  })
   @Get('best-seller')
   async getBestSeller() {
     return {
@@ -116,6 +133,9 @@ export class ProductController {
     };
   }
 
+  @ApiListResponse(ProductDto, {
+    objectName: 'top discount product'
+  })
   @Get('top-discount')
   async getTopDiscount() {
     return {

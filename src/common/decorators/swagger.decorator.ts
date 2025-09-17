@@ -182,7 +182,7 @@ function generateGenericExample(key: string): any {
 
 export function ApiListResponse<TModel extends Type<any>>(
   item: TModel,
-  options?: { objectName?: string }
+  options?: { objectName?: string; message?: string }
 ) {
   let example: any;
 
@@ -201,9 +201,11 @@ export function ApiListResponse<TModel extends Type<any>>(
   return applyDecorators(
     ApiExtraModels(ApiResponseListDto, ApiPaginatedDataDto, item),
     ApiOkResponse({
-      description: options?.objectName
-        ? `Get list ${options.objectName} successfully`
-        : 'Get list successfully',
+      description:
+        options?.message ??
+        (options?.objectName
+          ? `Get list ${options.objectName} successfully`
+          : 'Get list successfully'),
       schema: {
         allOf: [
           { $ref: getSchemaPath(ApiResponseListDto) },
@@ -238,16 +240,18 @@ export function ApiListResponse<TModel extends Type<any>>(
 
 export function ApiResponse<TModel extends Type<any>>(
   model: TModel,
-  options?: { objectName: string }
+  options?: { objectName: string; message?: string }
 ) {
   const example = generateExampleFromDto(model);
 
   return applyDecorators(
     ApiExtraModels(ApiResponseDto, model),
     ApiOkResponse({
-      description: options?.objectName
-        ? `Get ${options.objectName} successfully`
-        : 'Get successfully',
+      description:
+        options?.message ??
+        (options?.objectName
+          ? `Get ${options.objectName} successfully`
+          : 'Get successfully'),
       schema: {
         allOf: [
           { $ref: getSchemaPath(ApiResponseDto) },
@@ -272,23 +276,24 @@ export function ApiResponse<TModel extends Type<any>>(
 
 export function ApiResponseNoData(options?: {
   objectName?: string;
-  type: 'create' | 'update' | 'delete' | 'update-ordering';
+  type?: string;
+  message?: string;
 }) {
-  let message = 'Success';
+  let newMessage = options?.message || 'Success';
 
   if (options?.objectName && options?.type) {
     switch (options.type) {
       case 'create':
-        message = `Create ${options.objectName} successfully`;
+        newMessage = `Create ${options.objectName} successfully`;
         break;
       case 'update':
-        message = `Update ${options.objectName} successfully`;
+        newMessage = `Update ${options.objectName} successfully`;
         break;
       case 'delete':
-        message = `Delete ${options.objectName} successfully`;
+        newMessage = `Delete ${options.objectName} successfully`;
         break;
       case 'update-ordering':
-        message = `Update ordering ${options.objectName} successfully`;
+        newMessage = `Update ordering ${options.objectName} successfully`;
         break;
     }
   }
@@ -296,13 +301,13 @@ export function ApiResponseNoData(options?: {
   return applyDecorators(
     ApiExtraModels(ApiResponseNoDataDto),
     ApiOkResponse({
-      description: message,
+      description: newMessage,
       schema: {
         allOf: [
           { $ref: getSchemaPath(ApiResponseNoDataDto) },
           {
             properties: {
-              message: { example: message }
+              message: { example: newMessage }
             },
             required: ['result', 'message', 'date', 'path', 'takenTime']
           }
