@@ -15,7 +15,7 @@ import {
   FilterContributorForm,
   UpdateContributorForm
 } from './forms';
-import { ContributorDto } from './dtos';
+import { ContributorAutoCompleteDto, ContributorDto } from './dtos';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
@@ -132,5 +132,19 @@ export class AuthorController {
   @Put('recover/:id')
   async recover(@Param('id') id: bigint) {
     return await this.contributorService.recover(id);
+  }
+
+  @ApiListResponse(ContributorAutoCompleteDto, { objectName: 'author' })
+  @UseGuards(JwtAuthGuard)
+  @Get('auto-complete')
+  async autoComplete(@Query() form: FilterContributorForm) {
+    form.kind = Constant.CONTRIBUTOR_KIND_AUTHOR;
+    form.status = Constant.STATUS_ACTIVE;
+    const { contributors, count } = await this.contributorService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(contributors, ContributorAutoCompleteDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
   }
 }
