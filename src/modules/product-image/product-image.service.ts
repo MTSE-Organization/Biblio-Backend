@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { ProductImage } from '@/models';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ProductService } from '../product/product.service';
@@ -11,6 +11,7 @@ import {
 } from './form';
 import { UpdateOrderingForm } from '@/common/forms';
 import { FileService } from '../file/file.service';
+import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class ProductImageService {
@@ -20,7 +21,10 @@ export class ProductImageService {
 
     private readonly productService: ProductService,
 
-    private readonly fileService: FileService
+    private readonly fileService: FileService,
+
+    @InjectConnection()
+    private readonly sequelize: Sequelize
   ) {}
 
   async create(form: CreateProductImageForm) {
@@ -120,27 +124,26 @@ export class ProductImageService {
 
   async updateDefault(form: UpdateDefaultImageForm) {
     const { id } = form;
+    const productImage = await this.findById(id);
 
-    const productImage = await this.findById(form.id);
-    console.log(productImage);
-
-    const productImages = await this.productImageRepository.findAll({
-      where: { productId: productImage.productId }
-    });
-
-    if (!productImages || productImages.length === 0) {
-      throw new NotFoundException(
-        'No images found for this product',
-        ErrorCode.PRODUCT_IMAGE_ERROR_NOT_FOUND
+    const transaction = await this.sequelize.transaction();
+    try {
+      await this.productImageRepository.update(
+        { isDefault: false },
+        { where: { productId: productImage.productId }, transaction }
       );
-    }
 
-    for (const image of productImages) {
-      image.isDefault = image.id.toString() === id.toString();
-      await image.save();
-    }
+      await this.productImageRepository.update(
+        { isDefault: true },
+        { where: { id }, transaction }
+      );
 
-    return { message: 'Updated default product image successfully' };
+      await transaction.commit();
+      return { message: 'Set default product image successfully' };
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   }
 
   private async clearDefaultImage(productId: bigint) {
