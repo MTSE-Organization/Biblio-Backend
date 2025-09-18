@@ -89,6 +89,9 @@ export class ProductService {
           required: false,
           limit: 1,
           separate: true
+        },
+        {
+          model: Publisher
         }
       ]
     });
