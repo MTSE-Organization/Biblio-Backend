@@ -115,4 +115,17 @@ export class PublisherController {
   async recover(@Param('id') id: bigint) {
     return await this.publisherService.recover(id);
   }
+
+  @ApiListResponse(PublisherAutoCompleteDto, { objectName: 'publisher' })
+  @UseGuards(JwtAuthGuard)
+  @Get('auto-complete')
+  async autoComplete(@Query() form: FilterPublisherForm) {
+    form.status = Constant.STATUS_ACTIVE;
+    const { publishers, count } = await this.publisherService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(publishers, PublisherAutoCompleteDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+  }
 }

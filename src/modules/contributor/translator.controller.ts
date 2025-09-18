@@ -133,4 +133,18 @@ export class TranslatorController {
   async recover(@Param('id') id: bigint) {
     return await this.contributorService.recover(id);
   }
+
+  @ApiListResponse(ContributorAutoCompleteDto, { objectName: 'translator' })
+  @UseGuards(JwtAuthGuard)
+  @Get('auto-complete')
+  async autoComplete(@Query() form: FilterContributorForm) {
+    form.kind = Constant.CONTRIBUTOR_KIND_TRANSLATOR;
+    form.status = Constant.STATUS_ACTIVE;
+    const { contributors, count } = await this.contributorService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(contributors, ContributorAutoCompleteDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+  }
 }
