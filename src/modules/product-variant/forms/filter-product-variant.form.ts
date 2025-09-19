@@ -19,6 +19,7 @@ export class FilterProductVariantForm extends PaginationForm {
   @BigIntDecorator('productId')
   productId: bigint;
 
+  @Type(() => Number)
   @NumberDecorator('status')
   status?: number;
 
