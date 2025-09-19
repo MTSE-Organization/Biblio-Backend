@@ -25,12 +25,18 @@ export class AddressService {
 
     await this.accountService.findById(data.accountId);
 
-    if (form.isDefault) {
-      const count = await this.addressRepository.count({
-        where: { accountId }
-      });
-      if (count === 0) {
+    const count = await this.addressRepository.count({
+      where: { accountId }
+    });
+
+    if (count === 0) {
+      data.isDefault = true;
+    } else {
+      if (form.isDefault) {
+        await this.resetDefault(accountId);
         data.isDefault = true;
+      } else {
+        data.isDefault = false;
       }
     }
 
@@ -57,18 +63,24 @@ export class AddressService {
 
     await this.accountService.findById(address.accountId);
 
-    if (!form.isDefault && address.isDefault) {
-      const count = await this.addressRepository.count({
-        where: { accountId }
-      });
+    const count = await this.addressRepository.count({
+      where: { accountId }
+    });
 
-      if (count > 1) {
+    if (count === 1) {
+      form.isDefault = true;
+    } else {
+      if (form.isDefault) {
+        await this.resetDefault(accountId);
+      } else if (address.isDefault) {
         const otherAddress = await this.addressRepository.findOne({
           where: { accountId, id: { [Op.ne]: form.id } }
         });
 
         if (otherAddress) {
           await otherAddress.update({ isDefault: true });
+        } else {
+          form.isDefault = true;
         }
       }
     }
@@ -116,7 +128,7 @@ export class AddressService {
       where: { accountId }
     });
     if (remainingCount === 0) {
-      return { message: 'Last address deleted' };
+      return { message: 'Address deleted successfully' };
     }
 
     return { message: 'Address deleted successfully' };
