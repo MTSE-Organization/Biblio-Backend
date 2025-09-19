@@ -65,8 +65,7 @@ export class ProductImageService {
     const { rows, count } = await this.productImageRepository.findAndCountAll({
       where: form.getFilter(),
       limit: limit,
-      offset: offset,
-      order: [['ordering', 'ASC']]
+      offset: offset
     });
     return { productImages: rows, count: count };
   }
@@ -103,7 +102,8 @@ export class ProductImageService {
     }
 
     for (const image of productImages) {
-      const newOrdering = orderingMap.get(image.id) as number;
+      const newOrdering = orderingMap.get(BigInt(image.id)) as number;
+
       image.ordering = newOrdering;
       await image.save();
     }
