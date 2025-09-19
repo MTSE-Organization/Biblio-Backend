@@ -20,7 +20,7 @@ import { PCode } from '@/common/decorators';
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
-  @PCode('COUPON_CREATE')
+  @PCode('CP_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateCouponForm) {
@@ -42,21 +42,21 @@ export class CouponController {
     return MapperUtil.toDto(await this.couponService.findById(id), CouponDto);
   }
 
-  @PCode('COUPON_UPDATE')
+  @PCode('CP_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateCouponForm) {
     return await this.couponService.update(form);
   }
 
-  @PCode('COUPON_DELETE')
+  @PCode('CP_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
     return await this.couponService.delete(id);
   }
 
-  @PCode('COUPON_RECOVER')
+  @PCode('CP_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')
   async recover(@Param('id') id: bigint) {

@@ -28,7 +28,13 @@ export const Constant = {
   // Gender
   GENDER_MALE: 1,
   GENDER_FEMALE: 2,
-  GENDER_OTHER: 3
+  GENDER_OTHER: 3,
+
+  // Coupoun
+  COUPON_DISCOUNT_KIND: 1,
+  COUPON_FREESHIP_KIND: 2,
+  COUPON_FIXED_TYPE: 1,
+  COUPON_PERCENTAGE_TYPE: 2
 } as const;
 
 export const fileFolders = {
