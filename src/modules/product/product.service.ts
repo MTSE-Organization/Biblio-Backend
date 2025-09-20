@@ -181,6 +181,7 @@ export class ProductService {
 
   async findLatest(limit: number = 8) {
     return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['createdDate', 'DESC']],
       include: [{ model: Category }]
@@ -189,7 +190,7 @@ export class ProductService {
 
   async findBestSeller(limit: number = 6) {
     return this.productRepository.findAll({
-      where: { isFeatured: true },
+      where: { isFeatured: true, status: Constant.STATUS_ACTIVE },
       limit,
       order: [['quantity', 'DESC']],
       include: [{ model: Category }]
@@ -198,6 +199,7 @@ export class ProductService {
 
   async findTopDiscount(limit: number = 4) {
     return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['price', 'DESC']],
       include: [{ model: Category }]
