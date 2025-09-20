@@ -9,6 +9,7 @@ import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { AccountService } from '@/modules/account/account.service';
 import { Address } from '@/models';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AddressService {
@@ -24,8 +25,19 @@ export class AddressService {
 
     await this.accountService.findById(data.accountId);
 
-    if (form.isDefault) {
-      await this.resetDefault(data.accountId);
+    const count = await this.addressRepository.count({
+      where: { accountId }
+    });
+
+    if (count === 0) {
+      data.isDefault = true;
+    } else {
+      if (form.isDefault) {
+        await this.resetDefault(accountId);
+        data.isDefault = true;
+      } else {
+        data.isDefault = false;
+      }
     }
 
     await this.addressRepository.create(data);
@@ -51,8 +63,26 @@ export class AddressService {
 
     await this.accountService.findById(address.accountId);
 
-    if (form.isDefault) {
-      await this.resetDefault(address.accountId);
+    const count = await this.addressRepository.count({
+      where: { accountId }
+    });
+
+    if (count === 1) {
+      form.isDefault = true;
+    } else {
+      if (form.isDefault) {
+        await this.resetDefault(accountId);
+      } else if (address.isDefault) {
+        const otherAddress = await this.addressRepository.findOne({
+          where: { accountId, id: { [Op.ne]: form.id } }
+        });
+
+        if (otherAddress) {
+          await otherAddress.update({ isDefault: true });
+        } else {
+          form.isDefault = true;
+        }
+      }
     }
 
     await address.update(form);
@@ -61,6 +91,7 @@ export class AddressService {
 
   async delete(id: bigint, accountId: bigint) {
     const address = await this.addressRepository.findByPk(id);
+
     if (!address) {
       throw new NotFoundException(
         'Address not found',
@@ -75,7 +106,31 @@ export class AddressService {
       );
     }
 
+    if (address.isDefault) {
+      const count = await this.addressRepository.count({
+        where: { accountId }
+      });
+
+      if (count > 1) {
+        const otherAddress = await this.addressRepository.findOne({
+          where: { accountId, id: { [Op.ne]: id } }
+        });
+
+        if (otherAddress) {
+          await otherAddress.update({ isDefault: true });
+        }
+      }
+    }
+
     await address.destroy();
+
+    const remainingCount = await this.addressRepository.count({
+      where: { accountId }
+    });
+    if (remainingCount === 0) {
+      return { message: 'Address deleted successfully' };
+    }
+
     return { message: 'Address deleted successfully' };
   }
 
