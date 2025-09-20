@@ -2,6 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -20,6 +21,8 @@ export * from './pcode.decorator';
 export * from './product-variant-condition.decorator';
 export * from './product-variant-format.decorator';
 export * from './swagger.decorator';
+export * from './order-status.decorator';
+export * from './payment-method.decorator';
 
 export const StringDecorator = (name: string, required: boolean = false) => {
   return applyDecorators(
@@ -119,8 +122,12 @@ class IsBigIntArray implements ValidatorConstraintInterface {
   }
 }
 
-export const BigIntArrayDecorator = (name: string, required = false) => {
-  return applyDecorators(
+export const BigIntArrayDecorator = (
+  name: string,
+  required = false,
+  allowEmpty = true
+) => {
+  const decorators = [
     ApiProperty({
       required,
       type: [String],
@@ -138,7 +145,13 @@ export const BigIntArrayDecorator = (name: string, required = false) => {
     Validate(IsBigIntArray, {
       message: `Each element of ${name} must be a valid integer`
     })
-  );
+  ];
+
+  if (!allowEmpty) {
+    decorators.push(ArrayMinSize(1, { message: `${name} cannot empty` }));
+  }
+
+  return applyDecorators(...decorators);
 };
 
 export const DateDecorator = (name: string, required: boolean = false) => {

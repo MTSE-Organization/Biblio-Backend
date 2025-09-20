@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CartItem } from '@/models';
+import { Cart, CartItem, Product, ProductVariant } from '@/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { AddItemForm } from '../cart/forms';
 import { UpdateCartItemForm } from './forms';
 import { ErrorCode } from '@/constants';
 import { ProductVariantService } from '../product-variant/product-variant.service';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class CartItemService {
@@ -51,9 +52,29 @@ export class CartItemService {
     return cartItem;
   }
 
+  async findByIdsAndAccount(ids: bigint[], accountId: bigint) {
+    return await this.cartItemRepository.findAll({
+      where: { id: ids },
+      include: [
+        {
+          model: Cart,
+          where: { accountId: accountId }
+        },
+        { model: ProductVariant, include: [{ model: Product }] }
+      ]
+    });
+  }
+
   async findByCartAndProduct(cartId: bigint, variantId: bigint) {
     return await this.cartItemRepository.findOne({
       where: { cartId: cartId, productVariantId: variantId }
+    });
+  }
+
+  async deleteMany(ids: bigint[], transaction?: Transaction) {
+    await this.cartItemRepository.destroy({
+      where: { id: ids },
+      transaction
     });
   }
 }

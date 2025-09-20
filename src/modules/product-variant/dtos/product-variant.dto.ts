@@ -15,7 +15,7 @@ export class ProductVariantDto {
   quantity: number;
 
   @Expose()
-  modifiedPrice: number;
+  modifiedPrice: string;
 
   @Expose()
   imageUrl: string;

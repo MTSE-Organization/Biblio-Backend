@@ -28,8 +28,8 @@ export class Product extends Auditable {
   @Column({ allowNull: false, type: DataType.TEXT })
   declare description: string;
 
-  @Column({ allowNull: false, type: DataType.FLOAT })
-  declare price: number;
+  @Column({ allowNull: false, type: DataType.DECIMAL(10, 2) })
+  declare price: string;
 
   @Column({ allowNull: false, type: DataType.DATE })
   declare releaseDate: Date;

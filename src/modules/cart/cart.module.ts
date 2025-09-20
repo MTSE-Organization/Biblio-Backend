@@ -5,6 +5,7 @@ import { AccountModule } from '../account/account.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Cart } from '@/models/cart.model';
 import { CartItemModule } from '../cart-item/cart-item.module';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   controllers: [CartController],
@@ -13,7 +14,8 @@ import { CartItemModule } from '../cart-item/cart-item.module';
   imports: [
     SequelizeModule.forFeature([Cart]),
     forwardRef(() => AccountModule),
-    CartItemModule
+    CartItemModule,
+    OrderModule
   ]
 })
 export class CartModule {}

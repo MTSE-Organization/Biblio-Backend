@@ -91,6 +91,13 @@ export class ProductVariantService {
     return { productVariants: rows, count };
   }
 
+  async findByIds(ids: bigint[]): Promise<ProductVariant[]> {
+    return this.productVariantRepository.findAll({
+      where: { id: ids, status: Constant.STATUS_ACTIVE },
+      include: [{ model: Product }]
+    });
+  }
+
   async update(form: UpdateProductVariantForm) {
     const { id, ...data } = form;
     const productVariant = await this.findById(id);

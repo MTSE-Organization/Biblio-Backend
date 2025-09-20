@@ -4,7 +4,7 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { UserDetailsDto } from '../auth/dtos';
 import { MapperUtil } from '@/utils';
 import { CartDto } from './dtos';
-import { AddItemForm } from './forms';
+import { AddItemForm, CheckoutForm } from './forms';
 import { ApiResponse, ApiResponseNoData, PCode } from '@/common/decorators';
 
 @Controller('cart')
@@ -28,5 +28,16 @@ export class CartController {
   async addItem(@Req() req, @Body() form: AddItemForm) {
     const user: UserDetailsDto = req.user;
     return await this.cartService.addItem(form, user.id);
+  }
+
+  @ApiResponseNoData({
+    objectName: 'cart',
+    type: 'create'
+  })
+  // @PCode('CART_CKT')
+  @UseGuards(JwtAuthGuard)
+  @Post('checkout')
+  checkout(@Req() req, @Body() form: CheckoutForm) {
+    return this.cartService.checkout(form, req.user.id);
   }
 }

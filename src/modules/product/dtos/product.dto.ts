@@ -21,7 +21,7 @@ export class ProductDto {
   description: string;
 
   @Expose()
-  price: number;
+  price: string;
 
   @Expose()
   releaseDate: Date;

@@ -22,8 +22,8 @@ export class ProductVariant extends Auditable {
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare quantity: number;
 
-  @Column({ type: DataType.FLOAT, defaultValue: 0 })
-  declare modifiedPrice: number;
+  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  declare modifiedPrice: string;
 
   @Column({ type: DataType.STRING })
   declare imageUrl: string;
