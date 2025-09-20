@@ -75,6 +75,14 @@ export class ProductController {
     return await this.productService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'product', type: 'update' })
+  @PCode('PRD_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover/:id')
+  async recover(@Param('id') id: bigint) {
+    return await this.productService.recover(id);
+  }
+
   @ApiResponseNoData({ objectName: 'product', type: 'delete' })
   @PCode('PRD_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)

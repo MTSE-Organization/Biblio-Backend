@@ -6,7 +6,7 @@ import {
   FilterProductForm,
   UpdateProductForm
 } from './forms';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Category, Contributor, ProductImage, Publisher } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
@@ -68,6 +68,17 @@ export class ProductService {
       await this.contributorService.findByIds(contributorsIds);
     await product.$set('contributors', contributors);
     return { message: 'Update product successfully' };
+  }
+
+  async recover(id: bigint) {
+    const product = await this.findById(id);
+    if (!product)
+      throw new BadRequestException(
+        'Product not found',
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
+      );
+    await product.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover product successfully' };
   }
 
   async findAll(

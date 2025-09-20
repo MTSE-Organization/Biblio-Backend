@@ -113,6 +113,14 @@ export class ProductVariantController {
     return await this.productVariantService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'product variant', type: 'update' })
+  @PCode('PRD_V_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover/:id')
+  async recover(@Param('id') id: bigint) {
+    return await this.productVariantService.recover(id);
+  }
+
   @ApiResponseNoData({ objectName: 'product variant', type: 'delete' })
   @PCode('PRD_V_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
