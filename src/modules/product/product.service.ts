@@ -184,7 +184,15 @@ export class ProductService {
       where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['createdDate', 'DESC']],
-      include: [{ model: Category }, { model: ProductImage }]
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          }
+        }
+      ]
     });
   }
 
@@ -202,7 +210,15 @@ export class ProductService {
       where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['price', 'DESC']],
-      include: [{ model: Category }, { model: ProductImage }]
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          }
+        }
+      ]
     });
   }
 }
