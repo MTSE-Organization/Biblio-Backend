@@ -43,7 +43,13 @@ export const Constant = {
 
   // Payment method
   PAYMENT_METHOD_COD: 1,
-  PAYMENT_METHOD_VNPAY: 2
+  PAYMENT_METHOD_VNPAY: 2,
+
+  // Coupoun
+  COUPON_DISCOUNT_KIND: 1,
+  COUPON_FREESHIP_KIND: 2,
+  COUPON_FIXED_TYPE: 1,
+  COUPON_PERCENTAGE_TYPE: 2
 } as const;
 
 export const fileFolders = {

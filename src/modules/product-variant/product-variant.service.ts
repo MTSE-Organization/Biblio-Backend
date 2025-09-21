@@ -115,6 +115,17 @@ export class ProductVariantService {
     return { message: 'Update product variant successfully' };
   }
 
+  async recover(id: bigint) {
+    const productVariant = await this.findById(id);
+    if (!productVariant)
+      throw new BadRequestException(
+        'Product not found',
+        ErrorCode.PRODUCT_VARIANT_ERROR_NOT_FOUND
+      );
+    await productVariant.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover product variant successfully' };
+  }
+
   async delete(id: bigint) {
     const productVariant = await this.findById(id);
     await productVariant.update({ status: Constant.STATUS_DELETED });

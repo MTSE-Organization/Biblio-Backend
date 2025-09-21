@@ -6,7 +6,7 @@ import {
   FilterProductForm,
   UpdateProductForm
 } from './forms';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Category, Contributor, ProductImage, Publisher } from '@/models';
 import { CategoryService } from '../category/category.service';
 import { SlugifyUtil } from '@/utils';
@@ -68,6 +68,17 @@ export class ProductService {
       await this.contributorService.findByIds(contributorsIds);
     await product.$set('contributors', contributors);
     return { message: 'Update product successfully' };
+  }
+
+  async recover(id: bigint) {
+    const product = await this.findById(id);
+    if (!product)
+      throw new BadRequestException(
+        'Product not found',
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
+      );
+    await product.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover product successfully' };
   }
 
   async findAll(
@@ -169,15 +180,24 @@ export class ProductService {
 
   async findLatest(limit: number = 8) {
     return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['createdDate', 'DESC']],
-      include: [{ model: Category }]
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          }
+        }
+      ]
     });
   }
 
   async findBestSeller(limit: number = 6) {
     return this.productRepository.findAll({
-      where: { isFeatured: true },
+      where: { isFeatured: true, status: Constant.STATUS_ACTIVE },
       limit,
       order: [['quantity', 'DESC']],
       include: [{ model: Category }]
@@ -186,9 +206,18 @@ export class ProductService {
 
   async findTopDiscount(limit: number = 4) {
     return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
       limit,
       order: [['price', 'DESC']],
-      include: [{ model: Category }]
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          }
+        }
+      ]
     });
   }
 }
