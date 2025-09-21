@@ -65,14 +65,4 @@ export class CouponController {
   async delete(@Param('id') id: bigint) {
     return await this.couponService.delete(id);
   }
-
-  @ApiResponseNoData({
-    message: 'Recover coupon successfully'
-  })
-  @PCode('CP_U')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Put('recover/:id')
-  async recover(@Param('id') id: bigint) {
-    return await this.couponService.recover(id);
-  }
 }

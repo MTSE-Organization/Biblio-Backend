@@ -59,12 +59,6 @@ export class CouponService {
     return { message: 'Delete coupon successfully' };
   }
 
-  async recover(id: bigint) {
-    const coupon = await this.findById(id);
-    await coupon.update({ status: Constant.STATUS_ACTIVE });
-    return { message: 'Recover coupon successfully' };
-  }
-
   async checkCodeExists(code: string, excludeId?: bigint): Promise<void> {
     const where: any = { code };
     if (excludeId) {
@@ -74,7 +68,7 @@ export class CouponService {
     if (existingCoupon) {
       throw new NotFoundException(
         'Coupon code already exists',
-        ErrorCode.COUPON_CODE_ALREADY_EXISTS
+        ErrorCode.COUPON_ERROR_CODE_EXISTED
       );
     }
   }
