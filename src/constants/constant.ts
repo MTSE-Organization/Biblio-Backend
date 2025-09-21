@@ -31,10 +31,10 @@ export const Constant = {
   GENDER_OTHER: 3,
 
   // Coupoun
-  COUPON_DISCOUNT_KIND: 1,
-  COUPON_FREESHIP_KIND: 2,
-  COUPON_FIXED_TYPE: 1,
-  COUPON_PERCENTAGE_TYPE: 2
+  COUPON_KIND_DISCOUNT: 1,
+  COUPON_KIND_FREESHIP: 2,
+  COUPON_TYPE_FIXED: 1,
+  COUPON_TYPE_PERCENTAGE: 2
 } as const;
 
 export const fileFolders = {

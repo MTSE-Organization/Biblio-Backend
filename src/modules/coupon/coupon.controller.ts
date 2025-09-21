@@ -14,12 +14,18 @@ import { CreateCouponForm, FilterCouponForm, UpdateCouponForm } from './forms';
 import { CouponAutoCompleteDto, CouponDto } from './dtos';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { MapperUtil } from '@/utils';
-import { PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 
 @Controller('coupon')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
+  @ApiResponseNoData({ objectName: 'coupon', type: 'create' })
   @PCode('CP_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
@@ -27,6 +33,7 @@ export class CouponController {
     return await this.couponService.create(form);
   }
 
+  @ApiListResponse(CouponAutoCompleteDto, { objectName: 'coupon' })
   @Get('list')
   async list(@Query() form: FilterCouponForm) {
     const { coupons, count } = await this.couponService.findAll(form);
@@ -37,11 +44,13 @@ export class CouponController {
     };
   }
 
+  @ApiResponse(CouponDto, { objectName: 'coupon' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
     return MapperUtil.toDto(await this.couponService.findById(id), CouponDto);
   }
 
+  @ApiResponseNoData({ objectName: 'coupon', type: 'update' })
   @PCode('CP_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
@@ -49,6 +58,7 @@ export class CouponController {
     return await this.couponService.update(form);
   }
 
+  @ApiResponseNoData({ objectName: 'coupon', type: 'delete' })
   @PCode('CP_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
@@ -56,6 +66,9 @@ export class CouponController {
     return await this.couponService.delete(id);
   }
 
+  @ApiResponseNoData({
+    message: 'Recover coupon successfully'
+  })
   @PCode('CP_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')

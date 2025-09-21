@@ -5,8 +5,29 @@ export class CouponAutoCompleteDto {
   id: bigint;
 
   @Expose()
+  code: string;
+
+  @Expose()
+  kind: number;
+
+  @Expose()
   name: string;
 
   @Expose()
-  code: string;
+  type: number;
+
+  @Expose()
+  value: number;
+
+  @Expose()
+  minOrderAmount: number;
+
+  @Expose()
+  quantity: number;
+
+  @Expose()
+  validFrom: Date;
+
+  @Expose()
+  validTo: Date;
 }

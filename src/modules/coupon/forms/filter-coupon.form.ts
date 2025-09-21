@@ -1,5 +1,6 @@
 import { NumberDecorator, StringDecorator } from '@/common/decorators';
 import { PaginationForm } from '@/common/forms'; // Lớp phân trang
+import { Type } from 'class-transformer';
 import { Op } from 'sequelize';
 
 export class FilterCouponForm extends PaginationForm {
@@ -9,11 +10,13 @@ export class FilterCouponForm extends PaginationForm {
   @StringDecorator('name')
   name?: string;
 
+  @Type(() => Number)
   @NumberDecorator('kind')
-  kind?: number;
+  kind: number;
 
+  @Type(() => Number)
   @NumberDecorator('type')
-  type?: number;
+  type: number;
 
   getFilter(): Record<string, any> {
     const where: Record<string, any> = {};
