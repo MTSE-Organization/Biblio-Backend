@@ -21,11 +21,11 @@ export class Coupon extends Auditable {
   @Column({ type: DataType.INTEGER, allowNull: false })
   declare type: number; // 1: fixed, 2: percentage
 
-  @Column({ type: DataType.FLOAT, defaultValue: 0 })
-  declare value: number;
+  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  declare value: string;
 
-  @Column({ type: DataType.FLOAT, defaultValue: 0 })
-  declare minOrderAmount: number;
+  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  declare minOrderAmount: string;
 
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare quantity: number;

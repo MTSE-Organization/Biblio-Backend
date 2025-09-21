@@ -55,14 +55,14 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(
         'Address not found',
-        ErrorCode.ADDRESS_NOT_FOUND
+        ErrorCode.ADDRESS_ERROR_NOT_FOUND
       );
     }
 
     if (address.accountId !== accountId) {
       throw new BadRequestException(
         'Address invalid',
-        ErrorCode.ADDRESS_INVALID
+        ErrorCode.ADDRESS_ERROR_INVALID
       );
     }
 
@@ -100,14 +100,14 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(
         'Address not found',
-        ErrorCode.ADDRESS_NOT_FOUND
+        ErrorCode.ADDRESS_ERROR_NOT_FOUND
       );
     }
 
     if (address.accountId !== accountId) {
       throw new BadRequestException(
         'Address invalid',
-        ErrorCode.ADDRESS_INVALID
+        ErrorCode.ADDRESS_ERROR_INVALID
       );
     }
 
@@ -163,14 +163,14 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(
         'Address not found',
-        ErrorCode.ADDRESS_NOT_FOUND
+        ErrorCode.ADDRESS_ERROR_NOT_FOUND
       );
     }
 
     if (address.accountId !== accountId) {
       throw new BadRequestException(
         'Address invalid',
-        ErrorCode.ADDRESS_INVALID
+        ErrorCode.ADDRESS_ERROR_INVALID
       );
     }
 
@@ -193,14 +193,14 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(
         'Address not found',
-        ErrorCode.ADDRESS_NOT_FOUND
+        ErrorCode.ADDRESS_ERROR_NOT_FOUND
       );
     }
 
     if (address.accountId !== accountId) {
       throw new BadRequestException(
         'Address invalid',
-        ErrorCode.ADDRESS_INVALID
+        ErrorCode.ADDRESS_ERROR_INVALID
       );
     }
 
@@ -215,7 +215,7 @@ export class AddressService {
     if (!address) {
       throw new NotFoundException(
         'Adress not found',
-        ErrorCode.ADDRESS_NOT_FOUND
+        ErrorCode.ADDRESS_ERROR_NOT_FOUND
       );
     }
 
