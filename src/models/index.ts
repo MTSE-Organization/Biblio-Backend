@@ -15,3 +15,7 @@ export { ProductVariant } from './product-variant.model';
 export { Product } from './product.model';
 export { Publisher } from './publisher.model';
 export { Review } from './review.model';
+export { Order } from './order.model';
+export { OrderItem } from './order-item.model';
+export { OrderStatus } from './order-status.model';
+export { OrderCoupon } from './order-coupon.model';

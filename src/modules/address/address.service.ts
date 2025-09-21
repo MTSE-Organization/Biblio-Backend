@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateAddressForm,
@@ -16,7 +21,7 @@ export class AddressService {
   constructor(
     @InjectModel(Address)
     private readonly addressRepository: typeof Address,
-
+    @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService
   ) {}
 
@@ -196,6 +201,21 @@ export class AddressService {
       throw new BadRequestException(
         'Address invalid',
         ErrorCode.ADDRESS_INVALID
+      );
+    }
+
+    return address;
+  }
+
+  async findByAccountIdAndDefault(accountId: bigint): Promise<Address> {
+    const address = await this.addressRepository.findOne({
+      where: { accountId, isDefault: true }
+    });
+
+    if (!address) {
+      throw new NotFoundException(
+        'Adress not found',
+        ErrorCode.ADDRESS_NOT_FOUND
       );
     }
 

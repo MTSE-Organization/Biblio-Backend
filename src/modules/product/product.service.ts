@@ -112,7 +112,6 @@ export class ProductService {
 
   async findById(id: bigint): Promise<Product> {
     const product = await this.productRepository.findByPk(id);
-    console.log(product?.contributors);
 
     if (!product) {
       throw new NotFoundException(

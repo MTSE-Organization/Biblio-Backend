@@ -18,7 +18,7 @@ export class ProductAutoCompleteDto {
   category?: CategoryAutoCompleteDto;
 
   @Expose()
-  price: number;
+  price: string;
 
   @Expose()
   quantity: number;

@@ -14,7 +14,7 @@ export class ProductVariantAutoCompleteDto {
   quantity: number;
 
   @Expose()
-  modifiedPrice: number;
+  modifiedPrice: string;
 
   @Expose()
   imageUrl: string;

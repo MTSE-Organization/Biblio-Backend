@@ -8,6 +8,10 @@ import {
   Coupon,
   Group,
   GroupPermission,
+  Order,
+  OrderCoupon,
+  OrderItem,
+  OrderStatus,
   Permission,
   PermissionGroup,
   Product,
@@ -49,7 +53,11 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
       ProductVariant,
       Address,
       Review,
-      Coupon
+      Coupon,
+      Order,
+      OrderItem,
+      OrderStatus,
+      OrderCoupon
     ],
     define: {
       underscored: true,

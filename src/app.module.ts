@@ -32,6 +32,7 @@ import { ProductVariantModule } from './modules/product-variant/product-variant.
 import { AddressModule } from './modules/address/address.module';
 import { ReviewModule } from './modules/review/review.module';
 import { CouponModule } from './modules/coupon/coupon.module';
+import { OrderModule } from './modules/order/order.module';
 //#endregion
 
 @Module({
@@ -59,7 +60,8 @@ import { CouponModule } from './modules/coupon/coupon.module';
     ProductVariantModule,
     AddressModule,
     ReviewModule,
-    CouponModule
+    CouponModule,
+    OrderModule
   ]
 })
 export class AppModule implements NestModule {
