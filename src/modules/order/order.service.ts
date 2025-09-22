@@ -24,6 +24,7 @@ import { Sequelize, Transaction } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
+import { CreateOrderDto } from './dtos';
 
 @Injectable()
 export class OrderService {
@@ -70,8 +71,9 @@ export class OrderService {
         { total: await this.calculateTotal(order, t) },
         { transaction: t }
       );
-
-      return { message: 'Create order successfully', orderId: order.id };
+      const dto = new CreateOrderDto();
+      dto.orderId = order.id;
+      return { message: 'Create order successfully', data: dto };
     });
   }
 
@@ -116,7 +118,9 @@ export class OrderService {
         { total: await this.calculateTotal(order, t) },
         { transaction: t }
       );
-      return { message: 'Create order successfully', orderId: order.id };
+      const dto = new CreateOrderDto();
+      dto.orderId = order.id;
+      return { message: 'Create order successfully', data: dto };
     });
   }
 

@@ -3,7 +3,7 @@ import { Expose, Type } from 'class-transformer';
 
 export class OrderItemDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   orderId: bigint;
