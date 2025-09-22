@@ -9,6 +9,7 @@ import { AccountModule } from '../account/account.module';
 import { AddressModule } from '../address/address.module';
 import { ProductVariantModule } from '../product-variant/product-variant.module';
 import { CartItemModule } from '../cart-item/cart-item.module';
+import { CouponModule } from '../coupon/coupon.module';
 
 @Module({
   controllers: [OrderController],
@@ -18,7 +19,8 @@ import { CartItemModule } from '../cart-item/cart-item.module';
     forwardRef(() => AccountModule),
     AddressModule,
     ProductVariantModule,
-    CartItemModule
+    CartItemModule,
+    CouponModule
   ],
   exports: [OrderService]
 })

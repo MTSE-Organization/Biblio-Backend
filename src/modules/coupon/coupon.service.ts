@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Coupon } from '@/models/coupon.model';
 import { CreateCouponForm, FilterCouponForm, UpdateCouponForm } from './forms';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
+import { Order, OrderCoupon } from '@/models';
 
 @Injectable()
 export class CouponService {
@@ -71,5 +73,67 @@ export class CouponService {
         ErrorCode.COUPON_ERROR_CODE_EXISTED
       );
     }
+  }
+
+  async findByIds(ids: bigint[]): Promise<Coupon[]> {
+    const coupons = await this.couponRepository.findAll({
+      where: { id: ids }
+    });
+    return coupons;
+  }
+
+  async findByOrderId(
+    orderId: bigint,
+    transaction?: Transaction
+  ): Promise<Coupon[]> {
+    return await this.couponRepository.findAll({
+      include: [
+        {
+          model: Order,
+          where: { id: orderId }
+        }
+      ],
+      transaction
+    });
+  }
+
+  checkValid(coupons: Coupon[]) {
+    if (coupons.length > 2) {
+      return false;
+    }
+    const now = new Date();
+    const kinds = new Set<number>();
+    for (const coupon of coupons) {
+      if (
+        coupon.validFrom > now ||
+        coupon.validTo < now ||
+        coupon.status !== Constant.STATUS_ACTIVE ||
+        coupon.quantity <= 0
+      ) {
+        return false;
+      }
+      if (kinds.has(coupon.kind)) {
+        return false;
+      }
+      kinds.add(coupon.kind);
+    }
+    return true;
+  }
+
+  async decreaseQuantity(coupons: Coupon[], t?: Transaction) {
+    const ids = coupons.map((c) => {
+      if (c.quantity <= 0) {
+        throw new BadRequestException(
+          `Coupon ${c.code} invalid`,
+          ErrorCode.COUPON_ERROR_INVALID
+        );
+      }
+      return c.id;
+    });
+
+    await this.couponRepository.update(
+      { quantity: Sequelize.literal('quantity - 1') },
+      { where: { id: ids }, transaction: t }
+    );
   }
 }

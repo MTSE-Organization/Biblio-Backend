@@ -89,7 +89,6 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateCategoryForm) {
-    console.log(form);
     return await this.categoryService.update(form);
   }
 

@@ -20,4 +20,7 @@ export class OrderItemDto {
 
   @Expose()
   discount: number;
+
+  @Expose()
+  total: string;
 }

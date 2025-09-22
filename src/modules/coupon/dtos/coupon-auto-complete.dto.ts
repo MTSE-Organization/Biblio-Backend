@@ -17,10 +17,10 @@ export class CouponAutoCompleteDto {
   type: number;
 
   @Expose()
-  value: number;
+  value: string;
 
   @Expose()
-  minOrderAmount: number;
+  minOrderAmount: string;
 
   @Expose()
   quantity: number;

@@ -20,8 +20,10 @@ import { AddressService } from '../address/address.service';
 import { Constant, ErrorCode } from '@/constants';
 import { OrderItemService } from './order-item.service';
 import { OrderStatusService } from './order-status.service';
-import { Sequelize } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
+import { CouponService } from '../coupon/coupon.service';
+import bigDecimal from 'js-big-decimal';
 
 @Injectable()
 export class OrderService {
@@ -33,6 +35,7 @@ export class OrderService {
     @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService,
     private readonly addressService: AddressService,
+    private readonly couponService: CouponService,
     @InjectConnection() private readonly sequelize: Sequelize
   ) {}
 
@@ -44,7 +47,8 @@ export class OrderService {
       const order = await Order.create(
         {
           accountId,
-          addressId: address.id
+          addressId: address.id,
+          deliveryFee: '30000'
         },
         { transaction: t }
       );
@@ -60,6 +64,11 @@ export class OrderService {
         Constant.ORDER_STATUS_WAITING,
         order.id,
         t
+      );
+
+      await order.update(
+        { total: await this.calculateTotal(order, t) },
+        { transaction: t }
       );
 
       return { message: 'Create order successfully', orderId: order.id };
@@ -79,21 +88,33 @@ export class OrderService {
           form.accountId
         );
       }
-      // get coupon
-
+      const coupons = await this.couponService.findByIds(form.couponIds);
+      if (!this.couponService.checkValid(coupons)) {
+        throw new BadRequestException(
+          'Coupon is not valid',
+          ErrorCode.COUPON_ERROR_INVALID
+        );
+      }
       const order = await this.orderRepository.create(
         {
           accountId: form.accountId,
-          addressId: address.id
+          addressId: address.id,
+          deliveryFee: '30000'
         },
         { transaction: t }
       );
-      await this.orderItemService.createMany(form.cartItems, order.id, t);
-
-      await this.orderStatusService.create(
-        Constant.ORDER_STATUS_WAITING,
-        order.id,
-        t
+      await Promise.all([
+        order.$set('coupons', coupons, { transaction: t }),
+        this.orderItemService.createMany(form.cartItems, order.id, t),
+        this.orderStatusService.create(
+          Constant.ORDER_STATUS_WAITING,
+          order.id,
+          t
+        )
+      ]);
+      await order.update(
+        { total: await this.calculateTotal(order, t) },
+        { transaction: t }
       );
       return { message: 'Create order successfully', orderId: order.id };
     });
@@ -122,6 +143,18 @@ export class OrderService {
         await this.addressService.findById(form.addressId, accountId);
         order.addressId = form.addressId;
       }
+      //coupon
+      const coupons = await this.couponService.findByIds(form.couponIds);
+      if (!this.couponService.checkValid(coupons)) {
+        throw new BadRequestException(
+          'Coupon is not valid',
+          ErrorCode.COUPON_ERROR_INVALID
+        );
+      }
+      await Promise.all([
+        order.$set('coupons', coupons, { transaction: t }),
+        this.couponService.decreaseQuantity(coupons, t)
+      ]);
       // update information
       order.paymentMethod = form.paymentMethod;
       order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
@@ -141,6 +174,7 @@ export class OrderService {
         );
       }
       await this.orderItemService.processOrderItems(order.id, t);
+      order.total = await this.calculateTotal(order, t);
       await order.save({ transaction: t });
       return { message: 'Place order successfully' };
     });
@@ -229,5 +263,32 @@ export class OrderService {
       await order.save()
     ]);
     return { message: 'Update status successfully' };
+  }
+
+  async calculateTotal(
+    order: Order,
+    transaction?: Transaction
+  ): Promise<string> {
+    const [orderItems, coupons] = await Promise.all([
+      this.orderItemService.findByOrderId(order.id, transaction),
+      this.couponService.findByOrderId(order.id, transaction)
+    ]);
+    let total = order.deliveryFee ?? '0';
+    for (const item of orderItems) {
+      total = bigDecimal.add(total, item.total);
+    }
+
+    for (const coupon of coupons) {
+      if (coupon.type === Constant.COUPON_TYPE_FIXED) {
+        total = bigDecimal.subtract(total, coupon.value);
+      } else if (coupon.type === Constant.COUPON_TYPE_PERCENTAGE) {
+        const discountAmount = bigDecimal.divide(
+          bigDecimal.multiply(total, coupon.value),
+          100
+        );
+        total = bigDecimal.subtract(total, discountAmount);
+      }
+    }
+    return bigDecimal.compareTo(total, '0') < 0 ? '0' : total;
   }
 }
