@@ -46,7 +46,7 @@ export class Product extends Auditable {
   @Column({ type: DataType.TEXT })
   declare metaData: string;
 
-  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
   declare discount: number;
 
   @ForeignKey(() => Category)
