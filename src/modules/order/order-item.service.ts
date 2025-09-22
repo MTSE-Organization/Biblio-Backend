@@ -33,15 +33,22 @@ export class OrderItemService {
         ErrorCode.PRODUCT_VARIANT_ERROR_OUT_OF_STOCK
       );
     }
+    const price = bigDecimal.add(
+      productVariant.product.price,
+      productVariant.modifiedPrice
+    );
+    const discount = productVariant.product.discount;
+    const total = bigDecimal.multiply(
+      price,
+      bigDecimal.divide(bigDecimal.subtract(100, discount), 100)
+    );
     const item = {
       orderId: orderId,
       productVariantId: productVariantId,
       quantity: quantity,
-      price: bigDecimal.add(
-        productVariant.product.price,
-        productVariant.modifiedPrice
-      ),
-      discount: productVariant.product.discount
+      price: price,
+      discount: discount,
+      total: bigDecimal.multiply(total, quantity)
     };
     await this.orderItemRepository.create(item, { transaction });
   }
@@ -51,17 +58,26 @@ export class OrderItemService {
     orderId: bigint,
     transaction: Transaction
   ) {
-    const items = cartItems.map((cartItem) => ({
-      orderId: orderId,
-      productVariantId: cartItem.productVariantId,
-      quantity: cartItem.quantity,
-      price: bigDecimal.add(
+    const items = cartItems.map((cartItem) => {
+      const itemPrice = bigDecimal.add(
         cartItem.productVariant.product.price,
         cartItem.productVariant.modifiedPrice
-      ),
-      discount: cartItem.productVariant.product.discount,
-      cartItemId: cartItem.id
-    }));
+      );
+      const discount = cartItem.productVariant.product.discount;
+      const finalPrice = bigDecimal.multiply(
+        itemPrice,
+        bigDecimal.divide(bigDecimal.subtract(100, discount), 100)
+      );
+      return {
+        orderId: orderId,
+        productVariantId: cartItem.productVariantId,
+        quantity: cartItem.quantity,
+        price: itemPrice,
+        discount: discount,
+        total: bigDecimal.multiply(finalPrice, cartItem.quantity),
+        cartItemId: cartItem.id
+      };
+    });
     await this.orderItemRepository.bulkCreate(items, {
       individualHooks: true,
       transaction
@@ -102,5 +118,12 @@ export class OrderItemService {
     if (cartItemIds.length > 0) {
       await this.cartItemService.deleteMany(cartItemIds, transaction);
     }
+  }
+
+  async findByOrderId(orderId: bigint, transaction?: Transaction) {
+    return await this.orderItemRepository.findAll({
+      where: { orderId: BigInt(orderId) },
+      transaction
+    });
   }
 }

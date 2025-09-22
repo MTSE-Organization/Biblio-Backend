@@ -3,6 +3,6 @@ import { CartItem } from '@/models';
 export class CreateOrderFromCartForm {
   cartItems: CartItem[];
   addressId: bigint;
-  couponId: bigint[];
+  couponIds: bigint[];
   accountId: bigint;
 }

@@ -7,6 +7,7 @@ import { Coupon } from '@/models/coupon.model';
 @Module({
   controllers: [CouponController],
   providers: [CouponService],
-  imports: [SequelizeModule.forFeature([Coupon])]
+  imports: [SequelizeModule.forFeature([Coupon])],
+  exports: [CouponService]
 })
 export class CouponModule {}

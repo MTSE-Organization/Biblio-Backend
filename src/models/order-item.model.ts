@@ -39,4 +39,7 @@ export class OrderItem extends Auditable {
 
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare discount: number;
+
+  @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+  declare total: string;
 }

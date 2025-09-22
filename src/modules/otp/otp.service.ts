@@ -12,13 +12,10 @@ export class OtpService {
 
   async storeOtp(email: string, otp: string): Promise<void> {
     await this.cacheManager.set(email, otp, 5 * 60 * 1000); // 5 minutes
-    const cachedOtp = await this.cacheManager.get(email);
-    console.log({ email, cachedOtp, otp });
   }
 
   async verifyOtp(email: string, otp: string): Promise<boolean> {
     const cachedOtp = await this.cacheManager.get(email);
-    console.log({ email, cachedOtp, otp });
     if (cachedOtp !== otp) {
       return false;
     }

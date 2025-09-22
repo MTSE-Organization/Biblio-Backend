@@ -2,7 +2,7 @@ import { AddressDto } from '@/modules/address/dtos';
 import { Expose, Type } from 'class-transformer';
 import { OrderItemDto } from './order-item.dto';
 import { OrderStatusDto } from './order-status.dto';
-import { Coupon } from '@/models';
+import { CouponAutoCompleteDto } from '@/modules/coupon/dtos';
 
 export class OrderDto {
   @Expose()
@@ -33,12 +33,18 @@ export class OrderDto {
   address: AddressDto;
 
   @Expose()
+  @Type(() => CouponAutoCompleteDto)
+  coupons: CouponAutoCompleteDto[];
+
+  @Expose()
+  deliveryFee: string;
+
+  @Expose()
+  total: string;
+
+  @Expose()
   createdDate: Date;
 
   @Expose()
   modifiedDate: Date;
-
-  @Expose()
-  @Type(() => Coupon)
-  coupons: Coupon[];
 }

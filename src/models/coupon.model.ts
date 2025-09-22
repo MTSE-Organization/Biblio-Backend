@@ -1,5 +1,7 @@
-import { Column, DataType, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, DataType, Table } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
+import { Order } from './order.model';
+import { OrderCoupon } from './order-coupon.model';
 
 @Table({
   tableName: 'db_coupon',
@@ -35,4 +37,7 @@ export class Coupon extends Auditable {
 
   @Column({ type: DataType.DATE })
   declare validTo: Date;
+
+  @BelongsToMany(() => Order, () => OrderCoupon)
+  declare orders: Order[];
 }

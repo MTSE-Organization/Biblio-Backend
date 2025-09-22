@@ -20,10 +20,10 @@ export class CouponDto {
   type: number;
 
   @Expose()
-  value: number;
+  value: string;
 
   @Expose()
-  minOrderAmount: number;
+  minOrderAmount: string;
 
   @Expose()
   quantity: number;
