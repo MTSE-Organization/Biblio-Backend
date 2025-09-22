@@ -3,7 +3,7 @@ import { OrderItemDto } from './order-item.dto';
 
 export class OrderAutoCompleteDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   accountId: bigint;

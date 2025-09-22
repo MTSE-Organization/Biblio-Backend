@@ -9,8 +9,13 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { ApiResponseNoData } from '@/common/decorators';
-import { JwtAuthGuard } from '../auth/guards';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
+import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import {
   CreateOrderForm,
   FilterOrderForm,
@@ -18,29 +23,30 @@ import {
   UpdateStatusForm
 } from './forms';
 import { MapperUtil } from '@/utils';
-import { OrderAutoCompleteDto, OrderDto } from './dtos';
+import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiResponseNoData({
-    objectName: 'order',
-    type: 'create'
-  })
-  // @PCode('GR_C')
+  @ApiResponse(CreateOrderDto, { objectName: 'order' })
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Req() req, @Body() form: CreateOrderForm) {
     return await this.orderService.create(form, req.user.id);
   }
 
+  @ApiResponseNoData({
+    objectName: 'order',
+    message: 'Place order successfully'
+  })
   @UseGuards(JwtAuthGuard)
   @Post('place')
   async place(@Req() req, @Body() form: PlaceOrderForm) {
     return await this.orderService.placeOrder(form, req.user.id);
   }
 
+  @ApiResponse(OrderDto, { objectName: 'order' })
   @Get('get/:id')
   @UseGuards(JwtAuthGuard)
   async get(@Req() req, @Param('id') id: bigint) {
@@ -50,12 +56,15 @@ export class OrderController {
     );
   }
 
+  @ApiResponse(OrderDto, { objectName: 'order' })
   @Get('private/get/:id')
-  @UseGuards(JwtAuthGuard)
+  @PCode('ORD_V')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   async adminGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(await this.orderService.findById(id), OrderDto);
   }
 
+  @ApiListResponse(OrderAutoCompleteDto, { objectName: 'order' })
   @Get('list')
   @UseGuards(JwtAuthGuard)
   async list(@Req() req, @Body() form: FilterOrderForm) {
@@ -68,8 +77,10 @@ export class OrderController {
     };
   }
 
+  @ApiListResponse(OrderAutoCompleteDto, { objectName: 'order' })
   @Get('private/list')
-  @UseGuards(JwtAuthGuard)
+  @PCode('ORD_L')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   async adminlist(@Body() form: FilterOrderForm) {
     const { orders, count } = await this.orderService.findAll(form);
     return {
@@ -79,8 +90,10 @@ export class OrderController {
     };
   }
 
+  @ApiResponseNoData({ objectName: 'order', type: 'update' })
   @Put('update-status')
-  @UseGuards(JwtAuthGuard)
+  @PCode('ORD_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   async updateStatus(@Body() form: UpdateStatusForm) {
     return await this.orderService.updateStatus(form);
   }

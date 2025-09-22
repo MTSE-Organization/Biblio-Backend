@@ -6,7 +6,7 @@ import { CouponAutoCompleteDto } from '@/modules/coupon/dtos';
 
 export class OrderDto {
   @Expose()
-  id: number;
+  id: bigint;
 
   @Expose()
   accountId: bigint;

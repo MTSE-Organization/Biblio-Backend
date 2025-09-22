@@ -6,6 +6,7 @@ import { MapperUtil } from '@/utils';
 import { CartDto } from './dtos';
 import { AddItemForm, CheckoutForm } from './forms';
 import { ApiResponse, ApiResponseNoData, PCode } from '@/common/decorators';
+import { CreateOrderDto } from '../order/dtos';
 
 @Controller('cart')
 export class CartController {
@@ -30,11 +31,7 @@ export class CartController {
     return await this.cartService.addItem(form, user.id);
   }
 
-  @ApiResponseNoData({
-    objectName: 'cart',
-    type: 'create'
-  })
-  // @PCode('CART_CKT')
+  @ApiResponse(CreateOrderDto, { objectName: 'cart' })
   @UseGuards(JwtAuthGuard)
   @Post('checkout')
   checkout(@Req() req, @Body() form: CheckoutForm) {
