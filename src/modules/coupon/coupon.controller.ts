@@ -44,9 +44,30 @@ export class CouponController {
     };
   }
 
+  @ApiListResponse(CouponDto, { objectName: 'coupon' })
+  @PCode('CP_L')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('private/list')
+  async adminList(@Query() form: FilterCouponForm) {
+    const { coupons, count } = await this.couponService.findAll(form);
+    return {
+      content: MapperUtil.toDtoList(coupons, CouponDto),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+  }
+
   @ApiResponse(CouponDto, { objectName: 'coupon' })
   @Get('get/:id')
   async get(@Param('id') id: bigint) {
+    return MapperUtil.toDto(await this.couponService.findById(id), CouponDto);
+  }
+
+  @ApiResponse(CouponDto, { objectName: 'coupon' })
+  @PCode('CL_V')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('private/get/:id')
+  async adminGet(@Param('id') id: bigint) {
     return MapperUtil.toDto(await this.couponService.findById(id), CouponDto);
   }
 
@@ -56,6 +77,14 @@ export class CouponController {
   @Put('update')
   async update(@Body() form: UpdateCouponForm) {
     return await this.couponService.update(form);
+  }
+
+  @ApiResponseNoData({ message: 'Recover coupon successfully' })
+  @PCode('CP_U')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Put('recover')
+  async recover(@Param('id') id: bigint) {
+    return await this.couponService.recover(id);
   }
 
   @ApiResponseNoData({ objectName: 'coupon', type: 'delete' })
