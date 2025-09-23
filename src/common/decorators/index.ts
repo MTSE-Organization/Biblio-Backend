@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsDate,
   IsEmail,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -32,6 +33,20 @@ export const StringDecorator = (name: string, required: boolean = false) => {
       description: `${name} field`
     }),
     IsString({ message: `${name} must be a string` }),
+    ...(required
+      ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
+      : [IsOptional()])
+  );
+};
+
+export const IntDecorator = (name: string, required: boolean = false) => {
+  return applyDecorators(
+    ApiProperty({
+      required: required,
+      type: Number,
+      description: `${name} field`
+    }),
+    IsInt({ message: `${name} must be an integer` }),
     ...(required
       ? [IsNotEmpty({ message: `${name} cannot be null or empty` })]
       : [IsOptional()])

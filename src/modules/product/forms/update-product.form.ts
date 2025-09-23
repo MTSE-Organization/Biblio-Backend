@@ -3,10 +3,11 @@ import {
   BigIntDecorator,
   BooleanDecorator,
   DateDecorator,
+  IntDecorator,
   NumberDecorator,
   StringDecorator
 } from '@/common/decorators';
-import { Min } from 'class-validator';
+import { Max, Min } from 'class-validator';
 
 export class UpdateProductForm {
   @BigIntDecorator('id', true)
@@ -25,7 +26,7 @@ export class UpdateProductForm {
   @DateDecorator('releaseDate', true)
   releaseDate: Date;
 
-  @NumberDecorator('ageRating')
+  @IntDecorator('ageRating')
   ageRating: number;
 
   @StringDecorator('string')
@@ -37,8 +38,9 @@ export class UpdateProductForm {
   @StringDecorator('metaData')
   metaData: string;
 
-  @NumberDecorator('discount')
+  @IntDecorator('discount')
   @Min(0)
+  @Max(100)
   discount: number;
 
   @BigIntDecorator('categoryId', true)
