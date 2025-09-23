@@ -82,7 +82,7 @@ export class CouponController {
   @ApiResponseNoData({ message: 'Recover coupon successfully' })
   @PCode('CP_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  @Put('recover')
+  @Put('recover/:id')
   async recover(@Param('id') id: bigint) {
     return await this.couponService.recover(id);
   }

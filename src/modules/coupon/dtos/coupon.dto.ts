@@ -33,4 +33,7 @@ export class CouponDto {
 
   @Expose()
   validTo: Date;
+
+  @Expose()
+  status: number;
 }
