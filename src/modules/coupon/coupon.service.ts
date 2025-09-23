@@ -55,6 +55,17 @@ export class CouponService {
     return { message: 'Update coupon successfully' };
   }
 
+  async recover(id: bigint) {
+    const coupon = await this.findById(id);
+    if (!coupon)
+      throw new BadRequestException(
+        'Coupon not found',
+        ErrorCode.COUPON_ERROR_NOT_FOUND
+      );
+    await coupon.update({ status: Constant.STATUS_ACTIVE });
+    return { message: 'Recover coupon successfully' };
+  }
+
   async delete(id: bigint) {
     const coupon = await this.findById(id);
     await coupon.update({ status: Constant.STATUS_DELETED });

@@ -151,9 +151,11 @@ export function ApiResponse<TModel extends NestJsType<any>>(
                 example
               },
               message: {
-                example: options?.objectName
-                  ? `Get ${options.objectName} successfully`
-                  : 'Get successfully'
+                example:
+                  options?.message ??
+                  (options?.objectName
+                    ? `Get ${options.objectName} successfully`
+                    : 'Get successfully')
               }
             }
           }
