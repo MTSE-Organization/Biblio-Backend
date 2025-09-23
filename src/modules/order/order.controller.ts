@@ -85,7 +85,7 @@ export class OrderController {
   @Get('private/list')
   @PCode('ORD_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  async adminlist(@Query() form: FilterOrderForm) {
+  async adminList(@Query() form: FilterOrderForm) {
     const { orders, count } = await this.orderService.findAll(form);
     return {
       content: MapperUtil.toDtoList(orders, OrderAutoCompleteDto),
