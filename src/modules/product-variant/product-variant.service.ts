@@ -107,13 +107,6 @@ export class ProductVariantService {
   async update(form: UpdateProductVariantForm) {
     const { id, ...data } = form;
     const productVariant = await this.findById(id);
-    console.log(
-      '🚀 ~ ProductVariantService ~ update ~ productVariant:',
-      productVariant.format,
-      productVariant.condition,
-      form.format,
-      form.condition
-    );
     if (
       (productVariant.condition !== form.condition ||
         productVariant.format !== form.format) &&
