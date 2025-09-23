@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards
 } from '@nestjs/common';
@@ -29,7 +30,10 @@ import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiResponse(CreateOrderDto, { objectName: 'order' })
+  @ApiResponse(CreateOrderDto, {
+    objectName: 'order',
+    message: 'Create order successfully'
+  })
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Req() req, @Body() form: CreateOrderForm) {
@@ -67,7 +71,7 @@ export class OrderController {
   @ApiListResponse(OrderAutoCompleteDto, { objectName: 'order' })
   @Get('list')
   @UseGuards(JwtAuthGuard)
-  async list(@Req() req, @Body() form: FilterOrderForm) {
+  async list(@Req() req, @Query() form: FilterOrderForm) {
     form.accountId = req.user.id;
     const { orders, count } = await this.orderService.findAll(form);
     return {
@@ -81,7 +85,7 @@ export class OrderController {
   @Get('private/list')
   @PCode('ORD_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  async adminlist(@Body() form: FilterOrderForm) {
+  async adminlist(@Query() form: FilterOrderForm) {
     const { orders, count } = await this.orderService.findAll(form);
     return {
       content: MapperUtil.toDtoList(orders, OrderAutoCompleteDto),

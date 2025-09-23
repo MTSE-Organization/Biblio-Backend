@@ -33,6 +33,7 @@ import { AddressModule } from './modules/address/address.module';
 import { ReviewModule } from './modules/review/review.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
+import { ScheduleModule } from '@nestjs/schedule';
 //#endregion
 
 @Module({
@@ -42,6 +43,7 @@ import { OrderModule } from './modules/order/order.module';
     JwtModule.registerAsync(jwtConfig),
     CacheModule.registerAsync(cacheConfig),
     MailerModule.forRootAsync(mailConfig),
+    ScheduleModule.forRoot(),
     AuthModule,
     AccountModule,
     GroupModule,
