@@ -112,7 +112,8 @@ export class ProductVariantService {
         productVariant.format !== form.format) &&
       (await this.existsByConditionAndFormat({
         condition: form.condition,
-        format: form.format
+        format: form.format,
+        productId: productVariant.productId
       }))
     ) {
       throw new BadRequestException(
@@ -146,12 +147,12 @@ export class ProductVariantService {
     format,
     productId
   }: {
-    productId?: bigint;
+    productId: bigint;
     condition: number;
     format: number;
   }): Promise<boolean> {
     const count = await this.productVariantRepository.count({
-      where: { condition, format, productId: productId ?? null }
+      where: { condition, format, productId }
     });
     return count > 0;
   }
