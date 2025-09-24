@@ -50,5 +50,5 @@ export class UpdateProductForm {
   publisherId: bigint;
 
   @BigIntArrayDecorator('contributorsIds', true)
-  contributorsIds: [bigint];
+  contributorIds: [bigint];
 }

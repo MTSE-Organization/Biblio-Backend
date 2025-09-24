@@ -30,7 +30,7 @@ export class ProductService {
   ) {}
 
   async create(form: CreateProductForm) {
-    const { contributorsIds, ...rest } = form;
+    const { contributorIds, ...rest } = form;
     await Promise.all([
       this.categoryService.findById(rest.categoryId),
       this.publisherService.findById(rest.publisherId)
@@ -40,7 +40,7 @@ export class ProductService {
     const data = { slug: slug, ...rest };
     const product = await this.productRepository.create(data);
     const contributors =
-      await this.contributorService.findByIds(contributorsIds);
+      await this.contributorService.findByIds(contributorIds);
     await product.$set('contributors', contributors);
     return { message: 'Create product successfully' };
   }
@@ -62,10 +62,10 @@ export class ProductService {
       await this.publisherService.findById(form.publisherId);
     }
     const slug = SlugifyUtil.toSlugify(form.name);
-    const { categoryId, contributorsIds, ...data } = form;
+    const { contributorIds, ...data } = form;
     await product.update({ slug, ...data });
     const contributors =
-      await this.contributorService.findByIds(contributorsIds);
+      await this.contributorService.findByIds(contributorIds);
     await product.$set('contributors', contributors);
     return { message: 'Update product successfully' };
   }
