@@ -1,9 +1,16 @@
-import { NumberDecorator, StringDecorator } from '@/common/decorators';
-import { PaginationForm } from '@/common/forms'; // Lớp phân trang
+import {
+  BigIntDecorator,
+  NumberDecorator,
+  StringDecorator
+} from '@/common/decorators';
+import { PaginationForm } from '@/common/forms';
 import { Type } from 'class-transformer';
 import { Op } from 'sequelize';
 
 export class FilterCouponForm extends PaginationForm {
+  @BigIntDecorator('id')
+  id: bigint;
+
   @StringDecorator('code')
   code?: string;
 
@@ -29,6 +36,8 @@ export class FilterCouponForm extends PaginationForm {
     if (this.kind) where.kind = this.kind;
     if (this.type) where.type = this.type;
     if (this.status) where.status = this.status;
+    if (this.id) where.id = this.id;
+
     return where;
   }
 }
