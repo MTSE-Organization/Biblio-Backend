@@ -153,4 +153,17 @@ export class ProductController {
       )
     };
   }
+
+  @ApiResponse(ProductDto, {
+    objectName: 'featured product'
+  })
+  @Get('feature')
+  async getFeatureList() {
+    return {
+      content: MapperUtil.toDtoList(
+        await this.productService.findByFeatured(),
+        ProductDto
+      )
+    };
+  }
 }
