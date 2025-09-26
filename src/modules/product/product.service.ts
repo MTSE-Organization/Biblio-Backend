@@ -220,4 +220,18 @@ export class ProductService {
       ]
     });
   }
+
+  async findByFeatured() {
+    return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE, isFeatured: true },
+      include: [
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          }
+        }
+      ]
+    });
+  }
 }

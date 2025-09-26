@@ -13,6 +13,7 @@ import { Request, Response } from 'express';
 export class AllExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionFilter.name);
   catch(exception: any, host: ArgumentsHost) {
+    console.log('🚀 ~ AllExceptionFilter ~ catch ~ exception:', exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -47,7 +48,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       }
     } else {
       status = HttpStatus.BAD_REQUEST;
-      message = 'An error just happened in system';
+      message = `An error just happened in system: ${exception}`;
     }
     this.logger.error(exception);
     const res: ApiResponse<any> = {
