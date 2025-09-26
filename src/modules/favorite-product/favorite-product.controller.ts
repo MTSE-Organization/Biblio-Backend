@@ -16,6 +16,7 @@ import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filt
 import { ResponseListDto } from '@/common/interfaces';
 import { FavoriteProductDto } from '@/modules/favorite-product/dto/favorite-product.dto';
 import { MapperUtil } from '@/utils';
+import { ApiListResponse, ApiResponseNoData } from '@/common/decorators';
 
 @Controller('favorite-product')
 export class FavoriteProductController {
@@ -23,6 +24,7 @@ export class FavoriteProductController {
     private readonly favoriteProductService: FavoriteProductService
   ) {}
 
+  @ApiListResponse(FavoriteProductDto, { objectName: 'favorite product' })
   @UseGuards(JwtAuthGuard)
   @Get('list')
   async listFavoriteProducts(
@@ -38,36 +40,24 @@ export class FavoriteProductController {
       totalPages: Math.ceil(count / form.size)
     };
 
-    return {
-      data: response,
-      message: 'Get list favorite product successfully'
-    };
+    return response;
   }
 
+  @ApiResponseNoData({ objectName: 'favorite product', type: 'create' })
   @UseGuards(JwtAuthGuard)
-  @Post('add')
-  async addFavoriteProduct(
-    @Body() addForm: FavoriteProductForm,
-    @Req() req: any
-  ) {
-    const accountId = req.user.id;
-    return this.favoriteProductService.add({
-      ...addForm,
-      accountId
-    });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':productId')
-  async deleteFavoriteProduct(
+  @Post('create')
+  async createFavoriteProduct(
     @Body() form: FavoriteProductForm,
     @Req() req: any
   ) {
     const accountId = req.user.id;
-    return this.favoriteProductService.delete(
-      accountId,
-      form.productId,
-      form.productVariantId
-    );
+    return this.favoriteProductService.create(accountId, form);
+  }
+
+  @ApiResponseNoData({ objectName: 'favorite product', type: 'delete' })
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete/:id')
+  async deleteFavoriteProduct(@Param('id') id: bigint) {
+    return this.favoriteProductService.delete(id);
   }
 }

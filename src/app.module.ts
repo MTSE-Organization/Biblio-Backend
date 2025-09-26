@@ -35,6 +35,7 @@ import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FavoriteProductModule } from './modules/favorite-product/favorite-product.module';
+import { ViewedProductModule } from './modules/viewed-product/viewed-product.module';
 //#endregion
 
 @Module({
@@ -65,7 +66,8 @@ import { FavoriteProductModule } from './modules/favorite-product/favorite-produ
     ReviewModule,
     CouponModule,
     OrderModule,
-    FavoriteProductModule
+    FavoriteProductModule,
+    ViewedProductModule
   ]
 })
 export class AppModule implements NestModule {

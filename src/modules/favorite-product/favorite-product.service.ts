@@ -40,14 +40,14 @@ export class FavoriteProductService {
     return { favoriteProducts: rows, count };
   }
 
-  async add(form: FavoriteProductForm) {
+  async create(accountId: bigint, form: FavoriteProductForm) {
     await this.productService.findById(form.productId);
 
     await this.productVariantService.findById(form.productVariantId);
 
     const favorite = await this.favoriteProductRepository.findOne({
       where: {
-        accountId: form.accountId,
+        accountId: accountId,
         productId: form.productId,
         productVariantId: form.productVariantId
       }
@@ -63,18 +63,16 @@ export class FavoriteProductService {
     await this.favoriteProductRepository.create({
       productId: form.productId,
       productVariantId: form.productVariantId,
-      accountId: form.accountId
+      accountId: accountId
     });
 
-    return { message: 'Add favorite product successfully' };
+    return { message: 'Create favorite product successfully' };
   }
 
-  async delete(accountId: bigint, productId: bigint, productVariantId: bigint) {
+  async delete(id: bigint) {
     const favorite = await this.favoriteProductRepository.findOne({
       where: {
-        accountId,
-        productId,
-        productVariantId
+        id
       }
     });
 

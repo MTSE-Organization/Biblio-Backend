@@ -13,7 +13,6 @@ import { Request, Response } from 'express';
 export class AllExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionFilter.name);
   catch(exception: any, host: ArgumentsHost) {
-    console.log('🚀 ~ AllExceptionFilter ~ catch ~ exception:', exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

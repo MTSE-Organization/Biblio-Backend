@@ -22,6 +22,7 @@ import {
   Review
 } from '@/models';
 import { FavoriteProduct } from '@/models/favorite-product.model';
+import { ViewedProduct } from '@/models/viewed-product.model';
 import { ConfigService } from '@nestjs/config';
 import { SequelizeModuleAsyncOptions } from '@nestjs/sequelize';
 import { Dialect } from 'sequelize/lib/sequelize';
@@ -59,7 +60,8 @@ export const sequelizeConfig: SequelizeModuleAsyncOptions = {
       OrderItem,
       OrderStatus,
       OrderCoupon,
-      FavoriteProduct
+      FavoriteProduct,
+      ViewedProduct
     ],
     define: {
       underscored: true,

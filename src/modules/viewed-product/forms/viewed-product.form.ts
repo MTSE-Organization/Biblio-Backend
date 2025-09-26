@@ -1,9 +1,6 @@
 import { BigIntDecorator } from '@/common/decorators';
 
-export class FavoriteProductForm {
+export class ViewedProductForm {
   @BigIntDecorator('productId', true)
   productId: bigint;
-
-  @BigIntDecorator('productVariantId', true)
-  productVariantId: bigint;
 }
