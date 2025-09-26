@@ -18,7 +18,6 @@ import {
   PCode
 } from '@/common/decorators';
 import { MapperUtil } from '@/utils';
-import { ResponseListDto } from '@/common/interfaces';
 import {
   CreateCategoryForm,
   FilterCategoryForm,
@@ -27,24 +26,55 @@ import {
 import { CategoryAutoCompleteDto, CategoryDto } from './dtos';
 import { UpdateOrderingForm } from '@/common/forms';
 import { Constant } from '@/constants';
+import { RedisService } from '../redis/redis.service';
+import { Category } from '@/models';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly redisService: RedisService
+  ) {}
 
   @ApiResponseNoData({ objectName: 'category', type: 'create' })
   @PCode('CAT_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Body() form: CreateCategoryForm) {
-    return await this.categoryService.create(form);
+    const result = await this.categoryService.create(form);
+    await this.redisService.deleteByPrefix('category:list:');
+    return result;
   }
 
   @ApiListResponse(CategoryDto, { objectName: 'category' })
   @Get('list')
   async list(@Query() form: FilterCategoryForm) {
     form.status = Constant.STATUS_ACTIVE;
+
+    const cacheKey = `category:list:${JSON.stringify(form)}`;
+    const cached = await this.redisService.get<{
+      categories: Category[];
+      count: number;
+    }>(cacheKey);
+
+    // cache hit
+    if (cached) {
+      await this.redisService.set(cacheKey, cached, 5 * 60); // refresh TTL
+      return {
+        content: MapperUtil.toDtoList(cached.categories, CategoryDto),
+        totalElements: cached.count,
+        totalPages: Math.ceil(cached.count / form.size),
+        fromCache: true
+      };
+    }
+
+    // cache miss
     const { categories, count } = await this.categoryService.findAll(form);
+    await this.redisService.set(
+      cacheKey,
+      { categories, count },
+      5 * 60 * 1000 // 5 minutes
+    );
     return {
       content: MapperUtil.toDtoList(categories, CategoryDto),
       totalElements: count,
@@ -89,7 +119,9 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Body() form: UpdateCategoryForm) {
-    return await this.categoryService.update(form);
+    const result = await this.categoryService.update(form);
+    await this.redisService.deleteByPrefix('category:list:');
+    return result;
   }
 
   @ApiResponseNoData({ objectName: 'category', type: 'delete' })
@@ -97,7 +129,9 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: bigint) {
-    return await this.categoryService.delete(id);
+    const result = await this.categoryService.delete(id);
+    await this.redisService.deleteByPrefix('category:list:');
+    return result;
   }
 
   @ApiListResponse(CategoryAutoCompleteDto, { objectName: 'category' })
@@ -117,7 +151,9 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update-ordering')
   async updateOrdering(@Body() form: UpdateOrderingForm[]) {
-    return await this.categoryService.updateOrdering(form);
+    const result = await this.categoryService.updateOrdering(form);
+    await this.redisService.deleteByPrefix('category:list:');
+    return result;
   }
 
   @ApiResponseNoData({
@@ -127,6 +163,8 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('recover/:id')
   async recover(@Param('id') id: bigint) {
-    return await this.categoryService.recover(id);
+    const result = await this.categoryService.recover(id);
+    await this.redisService.deleteByPrefix('category:list:');
+    return result;
   }
 }
