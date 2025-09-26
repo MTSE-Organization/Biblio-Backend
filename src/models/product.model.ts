@@ -13,6 +13,7 @@ import { ProductImage } from './product-image.model';
 import { Publisher } from './publisher.model';
 import { Contributor } from './contributor.model';
 import { ProductContributor } from './product-contributor.model';
+import { FavoriteProduct } from '@/models/favorite-product.model';
 
 @Table({
   tableName: 'db_product',
@@ -68,4 +69,7 @@ export class Product extends Auditable {
 
   @BelongsToMany(() => Contributor, () => ProductContributor)
   declare contributors: Contributor[];
+
+  @HasMany(() => FavoriteProduct)
+  declare favorites: FavoriteProduct[];
 }

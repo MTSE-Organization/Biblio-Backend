@@ -3,10 +3,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Product } from './product.model';
+import { FavoriteProduct } from '@/models/favorite-product.model';
 
 @Table({
   tableName: 'db_product_variant',
@@ -34,4 +36,7 @@ export class ProductVariant extends Auditable {
 
   @BelongsTo(() => Product)
   declare product: Product;
+
+  @HasMany(() => FavoriteProduct)
+  declare favorites: FavoriteProduct[];
 }
