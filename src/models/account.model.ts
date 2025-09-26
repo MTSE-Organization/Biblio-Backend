@@ -3,10 +3,13 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Group } from './group.model';
+import { FavoriteProduct } from '@/models/favorite-product.model';
+import { ViewedProduct } from '@/models/viewed-product.model';
 
 @Table({
   tableName: 'db_account',
@@ -43,4 +46,10 @@ export class Account extends Auditable {
 
   @BelongsTo(() => Group)
   declare group: Group;
+
+  @HasMany(() => FavoriteProduct)
+  declare favorites: FavoriteProduct[];
+
+  @HasMany(() => ViewedProduct)
+  declare viewedProducts: ViewedProduct[];
 }
