@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FavoriteProduct } from '@/models/favorite-product.model';
 import { FavoriteProductForm } from '@/modules/favorite-product/forms/favorite-product.form';
-import { Account, Product, ProductVariant } from '@/models';
+import { Account, Product } from '@/models';
 import { ProductService } from '@/modules/product/product.service';
-import { ProductVariantService } from '@/modules/product-variant/product-variant.service';
 import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filter-favorite-product.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
@@ -14,8 +13,7 @@ export class FavoriteProductService {
   constructor(
     @InjectModel(FavoriteProduct)
     private readonly favoriteProductRepository: typeof FavoriteProduct,
-    private readonly productService: ProductService,
-    private readonly productVariantService: ProductVariantService
+    private readonly productService: ProductService
   ) {}
 
   async findAll(accountId: bigint, query: FilterFavoriteProductForm) {
