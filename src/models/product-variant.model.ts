@@ -36,7 +36,4 @@ export class ProductVariant extends Auditable {
 
   @BelongsTo(() => Product)
   declare product: Product;
-
-  @HasMany(() => FavoriteProduct)
-  declare favorites: FavoriteProduct[];
 }

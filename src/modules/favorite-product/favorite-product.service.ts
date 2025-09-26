@@ -31,9 +31,6 @@ export class FavoriteProductService {
           {
             model: Product
           },
-          {
-            model: ProductVariant
-          },
           { model: Account }
         ]
       });
@@ -43,13 +40,10 @@ export class FavoriteProductService {
   async create(accountId: bigint, form: FavoriteProductForm) {
     await this.productService.findById(form.productId);
 
-    await this.productVariantService.findById(form.productVariantId);
-
     const favorite = await this.favoriteProductRepository.findOne({
       where: {
         accountId: accountId,
-        productId: form.productId,
-        productVariantId: form.productVariantId
+        productId: form.productId
       }
     });
 
@@ -62,7 +56,6 @@ export class FavoriteProductService {
 
     await this.favoriteProductRepository.create({
       productId: form.productId,
-      productVariantId: form.productVariantId,
       accountId: accountId
     });
 

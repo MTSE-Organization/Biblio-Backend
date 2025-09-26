@@ -25,14 +25,6 @@ module.exports = {
           key: 'id'
         }
       },
-      product_variant_id: {
-        type: Sequelize.BIGINT,
-        allowNull: false,
-        references: {
-          model: 'db_product_variant',
-          key: 'id'
-        }
-      },
       created_date: {
         type: Sequelize.DATE
       },
