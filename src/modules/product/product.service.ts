@@ -189,7 +189,10 @@ export class ProductService {
           model: ProductImage,
           where: {
             [Op.or]: [{ isDefault: true }, { ordering: 0 }]
-          }
+          },
+          required: false,
+          limit: 1,
+          separate: true
         }
       ]
     });
@@ -215,23 +218,43 @@ export class ProductService {
           model: ProductImage,
           where: {
             [Op.or]: [{ isDefault: true }, { ordering: 0 }]
-          }
+          },
+          required: false,
+          limit: 1,
+          separate: true
         }
       ]
     });
   }
 
-  async findByFeatured() {
-    return this.productRepository.findAll({
-      where: { status: Constant.STATUS_ACTIVE, isFeatured: true },
+  async findByCategory(
+    productId: bigint,
+    limit: number = 8
+  ): Promise<{ products: Product[]; count: number }> {
+    const product = await this.findByIdAndStatus(productId);
+
+    const { rows, count } = await this.productRepository.findAndCountAll({
+      where: {
+        categoryId: product.categoryId,
+        status: Constant.STATUS_ACTIVE,
+        id: { [Op.ne]: product.id }
+      },
+      limit,
+      order: [['createdDate', 'DESC']],
       include: [
+        { model: Category },
         {
           model: ProductImage,
           where: {
             [Op.or]: [{ isDefault: true }, { ordering: 0 }]
-          }
+          },
+          required: false,
+          limit: 1,
+          separate: true
         }
       ]
     });
+
+    return { products: rows, count };
   }
 }
