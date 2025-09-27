@@ -115,55 +115,57 @@ export class ProductController {
     return response;
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'latest product'
   })
   @Get('latest')
   async getLatest() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findLatest(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findLatest()
       )
     };
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'best seller product'
   })
   @Get('best-seller')
   async getBestSeller() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findBestSeller(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findBestSeller()
       )
     };
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'top discount product'
   })
   @Get('top-discount')
   async getTopDiscount() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findTopDiscount(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findTopDiscount()
       )
     };
   }
 
-  @ApiResponse(ProductDto, {
-    objectName: 'featured product'
+  @ApiListResponse(ProductAutoCompleteDto, {
+    objectName: 'related product'
   })
-  @Get('feature')
-  async getFeatureList() {
-    return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findByFeatured(),
-        ProductDto
-      )
+  @Get('related/category/:id')
+  async getListByCategory(
+    @Param('id') id: bigint,
+    @Query() form: FilterProductForm
+  ) {
+    const { products, count } = await this.productService.findByCategory(id);
+    const response: ResponseListDto<ProductAutoCompleteDto[]> = {
+      content: ProductMapper.toAutoCompleteDtoList(products),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
     };
+
+    return response;
   }
 }
