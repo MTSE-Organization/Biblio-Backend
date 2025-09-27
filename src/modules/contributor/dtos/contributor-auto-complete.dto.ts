@@ -8,6 +8,9 @@ export class ContributorAutoCompleteDto {
   name: string;
 
   @Expose()
+  bio: string;
+
+  @Expose()
   avatarPath: string;
 
   @Expose()
