@@ -208,7 +208,7 @@ export class ProductService {
     return this.productRepository.findAll({
       where: { status: Constant.STATUS_ACTIVE },
       limit,
-      order: [['price', 'DESC']],
+      order: [['discount', 'DESC']],
       include: [
         { model: Category },
         {
