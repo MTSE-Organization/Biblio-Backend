@@ -1,4 +1,4 @@
-import { Product } from '@/models';
+import { Product, ProductImage } from '@/models';
 import { ViewedProduct } from '@/models/viewed-product.model';
 import { ProductService } from '@/modules/product/product.service';
 import { ViewedProductForm } from '@/modules/viewed-product/forms/viewed-product.form';
@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BadRequestException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ViewedProductService {
@@ -19,42 +20,55 @@ export class ViewedProductService {
 
   async findAll(accountId: bigint, query: FilterViewedProductForm) {
     const { limit, offset } = query.getPagination();
+
     const { rows, count } = await this.viewedProductRepository.findAndCountAll({
-      limit: limit,
-      offset: offset,
+      limit,
+      offset,
       where: { accountId },
       order: [['viewedAt', 'DESC']],
       include: [
         {
-          model: Product
+          model: Product,
+          include: [
+            {
+              model: ProductImage,
+              where: {
+                [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+              },
+              required: false,
+              limit: 1,
+              separate: true
+            }
+          ]
         }
       ]
     });
+
     return { viewedProducts: rows, count };
   }
 
   async create(accountId: bigint, form: ViewedProductForm) {
-    await this.productService.findById(form.productId);
+    const product = await this.productService.findById(form.productId);
 
     const viewedProduct = await this.viewedProductRepository.findOne({
-      where: {
-        accountId: accountId,
-        productId: form.productId
-      }
+      where: { accountId, productId: form.productId }
     });
+
     if (viewedProduct) {
       await viewedProduct.update({
-        viewedAt: Date.now(),
+        viewedAt: new Date(),
         viewCount: Number(viewedProduct.viewCount) + 1
       });
     } else {
       await this.viewedProductRepository.create({
-        accountId: accountId,
+        accountId,
         productId: form.productId,
-        viewedAt: Date.now(),
+        viewedAt: new Date(),
         viewCount: 1
       });
     }
+
+    await product.increment('totalViews', { by: 1 });
 
     return { message: 'Create viewed product successfully' };
   }

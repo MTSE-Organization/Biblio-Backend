@@ -30,5 +30,8 @@ export class ProductAutoCompleteDto {
   discount: number;
 
   @Expose()
+  totalViews: number;
+
+  @Expose()
   status: number;
 }

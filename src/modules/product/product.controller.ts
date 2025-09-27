@@ -152,6 +152,18 @@ export class ProductController {
   }
 
   @ApiListResponse(ProductAutoCompleteDto, {
+    objectName: 'top view product'
+  })
+  @Get('top-views')
+  async getTopView() {
+    return {
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findTopView()
+      )
+    };
+  }
+
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'related product'
   })
   @Get('related/category/:id')

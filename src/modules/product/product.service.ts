@@ -207,6 +207,26 @@ export class ProductService {
     });
   }
 
+  async findTopView(limit: number = 8) {
+    return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
+      limit,
+      order: [['totalViews', 'DESC']],
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
+      ]
+    });
+  }
+
   async findTopDiscount(limit: number = 4) {
     return this.productRepository.findAll({
       where: { status: Constant.STATUS_ACTIVE },

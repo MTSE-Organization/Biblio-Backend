@@ -1,4 +1,4 @@
-import { ProductDto } from '@/modules/product/dtos';
+import { ProductAutoCompleteDto, ProductDto } from '@/modules/product/dtos';
 import { Expose, Type } from 'class-transformer';
 
 export class ViewedProductDto {
@@ -6,8 +6,8 @@ export class ViewedProductDto {
   id: bigint;
 
   @Expose()
-  @Type(() => ProductDto)
-  product: ProductDto;
+  @Type(() => ProductAutoCompleteDto)
+  product: ProductAutoCompleteDto;
 
   @Expose()
   viewedAt: Date;
