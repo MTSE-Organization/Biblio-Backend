@@ -58,6 +58,9 @@ export class ProductDto {
   contributors: ContributorAutoCompleteDto[];
 
   @Expose()
+  totalViews: number;
+
+  @Expose()
   createdDate: Date;
 
   @Expose()
