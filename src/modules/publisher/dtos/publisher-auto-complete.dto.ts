@@ -8,6 +8,9 @@ export class PublisherAutoCompleteDto {
   name: string;
 
   @Expose()
+  description: string;
+
+  @Expose()
   logoPath?: string;
 
   @Expose()
