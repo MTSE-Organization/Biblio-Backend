@@ -32,7 +32,6 @@ export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @ApiResponseNoData({ objectName: 'address', type: 'create' })
-  @PCode('ADDR_C')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('create')
   async create(@Req() req: any, @Body() form: CreateAddressForm) {
@@ -41,7 +40,6 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'update' })
-  @PCode('ADDR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('update')
   async update(@Req() req: any, @Body() form: UpdateAddressForm) {
@@ -50,7 +48,6 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'delete' })
-  @PCode('ADDR_D')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   async delete(@Req() req: any, @Param('id') id: bigint) {
@@ -59,7 +56,6 @@ export class AddressController {
   }
 
   @ApiListResponse(AddressDto, { objectName: 'address' })
-  @PCode('ADDR_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('list')
   async list(@Req() req: any, @Query() form: FilterAddressForm) {
@@ -75,7 +71,6 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'update' })
-  @PCode('ADDR_U')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Put('set-default/:id')
   async setDefault(@Req() req: any, @Param('id') id: bigint) {
@@ -84,7 +79,6 @@ export class AddressController {
   }
 
   @ApiResponse(AddressDto, { objectName: 'address' })
-  @PCode('ADDR_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('get/:id')
   async get(@Req() req: any, @Param('id') id: bigint) {
