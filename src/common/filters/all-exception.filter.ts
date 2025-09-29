@@ -47,7 +47,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       }
     } else {
       status = HttpStatus.BAD_REQUEST;
-      message = 'An error just happened in system';
+      message = `An error just happened in system: ${exception}`;
     }
     this.logger.error(exception);
     const res: ApiResponse<any> = {

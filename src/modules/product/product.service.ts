@@ -47,7 +47,7 @@ export class ProductService {
     const data = { slug: slug, ...rest };
     const product = await this.productRepository.create(data);
     const contributors =
-      await this.contributorService.findByIds(contributorsIds);
+      await this.contributorService.findByIds(contributorIds);
     await product.$set('contributors', contributors);
 
     // build doc product
@@ -83,10 +83,10 @@ export class ProductService {
       await this.publisherService.findById(form.publisherId);
     }
     const slug = SlugifyUtil.toSlugify(form.name);
-    const { categoryId, contributorsIds, ...data } = form;
+    const { contributorIds, ...data } = form;
     await product.update({ slug, ...data });
     const contributors =
-      await this.contributorService.findByIds(contributorsIds);
+      await this.contributorService.findByIds(contributorIds);
     await product.$set('contributors', contributors);
 
     // build doc product
@@ -248,7 +248,10 @@ export class ProductService {
           model: ProductImage,
           where: {
             [Op.or]: [{ isDefault: true }, { ordering: 0 }]
-          }
+          },
+          required: false,
+          limit: 1,
+          separate: true
         }
       ]
     });
@@ -263,21 +266,75 @@ export class ProductService {
     });
   }
 
-  async findTopDiscount(limit: number = 4) {
+  async findTopView(limit: number = 8) {
     return this.productRepository.findAll({
       where: { status: Constant.STATUS_ACTIVE },
       limit,
-      order: [['price', 'DESC']],
+      order: [['totalViews', 'DESC']],
       include: [
         { model: Category },
         {
           model: ProductImage,
           where: {
             [Op.or]: [{ isDefault: true }, { ordering: 0 }]
-          }
+          },
+          required: false,
+          limit: 1,
+          separate: true
         }
       ]
     });
+  }
+
+  async findTopDiscount(limit: number = 4) {
+    return this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
+      limit,
+      order: [['discount', 'DESC']],
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
+      ]
+    });
+  }
+
+  async findByCategory(
+    productId: bigint,
+    limit: number = 8
+  ): Promise<{ products: Product[]; count: number }> {
+    const product = await this.findByIdAndStatus(productId);
+
+    const { rows, count } = await this.productRepository.findAndCountAll({
+      where: {
+        categoryId: product.categoryId,
+        status: Constant.STATUS_ACTIVE,
+        id: { [Op.ne]: product.id }
+      },
+      limit,
+      order: [['createdDate', 'DESC']],
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
+      ]
+    });
+
+    return { products: rows, count };
   }
 
   async syncData() {

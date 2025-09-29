@@ -32,8 +32,7 @@ export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @ApiResponseNoData({ objectName: 'address', type: 'create' })
-  @PCode('ADDR_C')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Req() req: any, @Body() form: CreateAddressForm) {
     const user: UserDetailsDto = req.user;
@@ -41,8 +40,7 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'update' })
-  @PCode('ADDR_U')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Put('update')
   async update(@Req() req: any, @Body() form: UpdateAddressForm) {
     const user: UserDetailsDto = req.user;
@@ -50,8 +48,7 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'delete' })
-  @PCode('ADDR_D')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async delete(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;
@@ -59,8 +56,7 @@ export class AddressController {
   }
 
   @ApiListResponse(AddressDto, { objectName: 'address' })
-  @PCode('ADDR_L')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('list')
   async list(@Req() req: any, @Query() form: FilterAddressForm) {
     const { addresses, count } = await this.addressService.findAll(
@@ -75,8 +71,7 @@ export class AddressController {
   }
 
   @ApiResponseNoData({ objectName: 'address', type: 'update' })
-  @PCode('ADDR_U')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Put('set-default/:id')
   async setDefault(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;
@@ -84,8 +79,7 @@ export class AddressController {
   }
 
   @ApiResponse(AddressDto, { objectName: 'address' })
-  @PCode('ADDR_V')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('get/:id')
   async get(@Req() req: any, @Param('id') id: bigint) {
     const user: UserDetailsDto = req.user;

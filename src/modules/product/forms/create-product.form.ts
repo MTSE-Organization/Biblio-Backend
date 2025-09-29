@@ -46,6 +46,6 @@ export class CreateProductForm {
   @BigIntDecorator('publisherId', true)
   publisherId: bigint;
 
-  @BigIntArrayDecorator('contributorsIds', true)
-  contributorsIds: [bigint];
+  @BigIntArrayDecorator('contributorIds', true)
+  contributorIds: [bigint];
 }

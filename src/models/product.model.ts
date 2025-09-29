@@ -13,6 +13,8 @@ import { ProductImage } from './product-image.model';
 import { Publisher } from './publisher.model';
 import { Contributor } from './contributor.model';
 import { ProductContributor } from './product-contributor.model';
+import { FavoriteProduct } from '@/models/favorite-product.model';
+import { ViewedProduct } from '@/models/viewed-product.model';
 
 @Table({
   tableName: 'db_product',
@@ -49,6 +51,9 @@ export class Product extends Auditable {
   @Column({ type: DataType.INTEGER, defaultValue: 0 })
   declare discount: number;
 
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  declare totalViews: number;
+
   @ForeignKey(() => Category)
   @Column({ allowNull: false, type: DataType.BIGINT })
   declare categoryId: bigint;
@@ -68,4 +73,10 @@ export class Product extends Auditable {
 
   @BelongsToMany(() => Contributor, () => ProductContributor)
   declare contributors: Contributor[];
+
+  @HasMany(() => FavoriteProduct)
+  declare favorites: FavoriteProduct[];
+
+  @HasMany(() => ViewedProduct)
+  declare viewedProducts: ViewedProduct[];
 }

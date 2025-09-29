@@ -21,7 +21,13 @@ export class ProductVariantService {
 
   async create(form: CreateProductVariantForm) {
     await this.productService.findById(form.productId);
-    if (await this.existsByConditionAndFormat(form.condition, form.format)) {
+    if (
+      await this.existsByConditionAndFormat({
+        condition: form.condition,
+        format: form.format,
+        productId: form.productId
+      })
+    ) {
       throw new BadRequestException(
         'Product variant existed',
         ErrorCode.PRODUCT_VARIANT_ERROR_EXISTED
@@ -104,7 +110,11 @@ export class ProductVariantService {
     if (
       (productVariant.condition !== form.condition ||
         productVariant.format !== form.format) &&
-      (await this.existsByConditionAndFormat(form.condition, form.format))
+      (await this.existsByConditionAndFormat({
+        condition: form.condition,
+        format: form.format,
+        productId: productVariant.productId
+      }))
     ) {
       throw new BadRequestException(
         'Product variant existed',
@@ -132,12 +142,17 @@ export class ProductVariantService {
     return { message: 'Delete product variant successfully' };
   }
 
-  async existsByConditionAndFormat(
-    condition: number,
-    format: number
-  ): Promise<boolean> {
+  async existsByConditionAndFormat({
+    condition,
+    format,
+    productId
+  }: {
+    productId: bigint;
+    condition: number;
+    format: number;
+  }): Promise<boolean> {
     const count = await this.productVariantRepository.count({
-      where: { condition, format }
+      where: { condition, format, productId }
     });
     return count > 0;
   }

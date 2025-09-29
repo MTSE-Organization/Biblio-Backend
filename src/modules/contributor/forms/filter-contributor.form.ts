@@ -1,10 +1,17 @@
 import { PaginationForm } from '@/common/forms';
-import { StringDecorator, NumberDecorator } from '@/common/decorators';
+import {
+  StringDecorator,
+  NumberDecorator,
+  BigIntDecorator
+} from '@/common/decorators';
 import { Op } from 'sequelize';
 import { StringUtil } from '@/utils';
 import { Type } from 'class-transformer';
 
 export class FilterContributorForm extends PaginationForm {
+  @BigIntDecorator('id')
+  id: bigint;
+
   @StringDecorator('name')
   name?: string;
 
@@ -21,6 +28,7 @@ export class FilterContributorForm extends PaginationForm {
       where.name = { [Op.like]: `%${this.name}%` };
     if (this.kind !== undefined) where.kind = this.kind;
     if (this.status) where.status = this.status;
+    if (this.id) where.id = this.id;
 
     return where;
   }

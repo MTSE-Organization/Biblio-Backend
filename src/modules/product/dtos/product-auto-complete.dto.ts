@@ -21,7 +21,16 @@ export class ProductAutoCompleteDto {
   price: string;
 
   @Expose()
+  slug: string;
+
+  @Expose()
+  quantity: number;
+
+  @Expose()
   discount: number;
+
+  @Expose()
+  totalViews: number;
 
   @Expose()
   status: number;

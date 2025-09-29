@@ -116,48 +116,75 @@ export class ProductController {
     return response;
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'latest product'
   })
   @Get('latest')
   async getLatest() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findLatest(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findLatest()
       )
     };
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'best seller product'
   })
   @Get('best-seller')
   async getBestSeller() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findBestSeller(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findBestSeller()
       )
     };
   }
 
-  @ApiListResponse(ProductDto, {
+  @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'top discount product'
   })
   @Get('top-discount')
   async getTopDiscount() {
     return {
-      content: MapperUtil.toDtoList(
-        await this.productService.findTopDiscount(),
-        ProductDto
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findTopDiscount()
+      )
+    };
+  }
+      
+  @ApiListResponse(ProductAutoCompleteDto, {
+    objectName: 'top view product'
+  })
+  @Get('top-views')
+  async getTopView() {
+    return {
+      content: ProductMapper.toAutoCompleteDtoList(
+        await this.productService.findTopView()
       )
     };
   }
 
+  @ApiListResponse(ProductAutoCompleteDto, {
+    objectName: 'related product'
+  })
+  @Get('related/category/:id')
+  async getListByCategory(
+    @Param('id') id: bigint,
+    @Query() form: FilterProductForm
+  ) {
+    const { products, count } = await this.productService.findByCategory(id);
+    const response: ResponseListDto<ProductAutoCompleteDto[]> = {
+      content: ProductMapper.toAutoCompleteDtoList(products),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+
+    return response;
+  }
+    
   @ApiResponseNoData({
-    objectName: 'product',
-    message: 'Sync data product successfully'
+  objectName: 'product',
+  message: 'Sync data product successfully'
   })
   @Get('sync-data')
   async syncData() {

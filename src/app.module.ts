@@ -34,6 +34,8 @@ import { ReviewModule } from './modules/review/review.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FavoriteProductModule } from './modules/favorite-product/favorite-product.module';
+import { ViewedProductModule } from './modules/viewed-product/viewed-product.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
 //#endregion
@@ -66,6 +68,8 @@ import { ElasticSearchModule } from './modules/elastic-search/elastic-search.mod
     ReviewModule,
     CouponModule,
     OrderModule,
+    FavoriteProductModule,
+    ViewedProductModule,
     RedisModule,
     ElasticSearchModule
   ]
