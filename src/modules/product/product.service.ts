@@ -37,7 +37,7 @@ export class ProductService {
   ) {}
 
   async create(form: CreateProductForm) {
-    const { contributorsIds, ...rest } = form;
+    const { contributorIds, ...rest } = form;
     const [category, publisher] = await Promise.all([
       this.categoryService.findById(rest.categoryId),
       this.publisherService.findById(rest.publisherId)

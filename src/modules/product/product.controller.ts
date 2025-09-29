@@ -16,7 +16,7 @@ import {
   SearchProductForm,
   UpdateProductForm
 } from './forms';
-import { ProductAutoCompleteDto, ProductDto } from './dtos';
+import { ProductAutoCompleteDto, ProductDocDto, ProductDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
@@ -151,7 +151,7 @@ export class ProductController {
       )
     };
   }
-      
+
   @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'top view product'
   })
@@ -181,16 +181,19 @@ export class ProductController {
 
     return response;
   }
-    
+
   @ApiResponseNoData({
-  objectName: 'product',
-  message: 'Sync data product successfully'
+    objectName: 'product',
+    message: 'Sync data product successfully'
   })
   @Get('sync-data')
   async syncData() {
     return await this.productService.syncData();
   }
 
+  @ApiListResponse(ProductDocDto, {
+    objectName: 'search'
+  })
   @Get('search')
   async search(@Query() form: SearchProductForm) {
     const { hits, count } = await this.productService.search(form);
