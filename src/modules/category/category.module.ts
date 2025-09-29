@@ -5,6 +5,7 @@ import { CategoryController } from './category.controller';
 import { Category } from '@/models';
 import { ProductModule } from '../product/product.module';
 import { FileModule } from '../file/file.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   controllers: [CategoryController],
@@ -12,7 +13,8 @@ import { FileModule } from '../file/file.module';
   imports: [
     SequelizeModule.forFeature([Category]),
     forwardRef(() => ProductModule),
-    FileModule
+    FileModule,
+    RedisModule
   ],
   exports: [CategoryService]
 })

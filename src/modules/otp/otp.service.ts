@@ -1,25 +1,24 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import type { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class OtpService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(private readonly redisService: RedisService) {}
 
   generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6 digits
   }
 
   async storeOtp(email: string, otp: string): Promise<void> {
-    await this.cacheManager.set(email, otp, 5 * 60 * 1000); // 5 minutes
+    await this.redisService.set(email, otp, 5 * 60); // 5 minutes
   }
 
   async verifyOtp(email: string, otp: string): Promise<boolean> {
-    const cachedOtp = await this.cacheManager.get(email);
+    const cachedOtp = await this.redisService.get(email);
     if (cachedOtp !== otp) {
       return false;
     }
-    await this.cacheManager.del(email);
+    await this.redisService.delete(email);
     return true;
   }
 }

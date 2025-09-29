@@ -36,6 +36,8 @@ import { OrderModule } from './modules/order/order.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FavoriteProductModule } from './modules/favorite-product/favorite-product.module';
 import { ViewedProductModule } from './modules/viewed-product/viewed-product.module';
+import { RedisModule } from './modules/redis/redis.module';
+import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
 //#endregion
 
 @Module({
@@ -67,7 +69,9 @@ import { ViewedProductModule } from './modules/viewed-product/viewed-product.mod
     CouponModule,
     OrderModule,
     FavoriteProductModule,
-    ViewedProductModule
+    ViewedProductModule,
+    RedisModule,
+    ElasticSearchModule
   ]
 })
 export class AppModule implements NestModule {

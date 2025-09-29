@@ -13,6 +13,7 @@ import { ProductService } from './product.service';
 import {
   CreateProductForm,
   FilterProductForm,
+  SearchProductForm,
   UpdateProductForm
 } from './forms';
 import { ProductAutoCompleteDto, ProductDto } from './dtos';
@@ -150,7 +151,7 @@ export class ProductController {
       )
     };
   }
-
+      
   @ApiListResponse(ProductAutoCompleteDto, {
     objectName: 'top view product'
   })
@@ -174,6 +175,28 @@ export class ProductController {
     const { products, count } = await this.productService.findByCategory(id);
     const response: ResponseListDto<ProductAutoCompleteDto[]> = {
       content: ProductMapper.toAutoCompleteDtoList(products),
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+
+    return response;
+  }
+    
+  @ApiResponseNoData({
+  objectName: 'product',
+  message: 'Sync data product successfully'
+  })
+  @Get('sync-data')
+  async syncData() {
+    return await this.productService.syncData();
+  }
+
+  @Get('search')
+  async search(@Query() form: SearchProductForm) {
+    const { hits, count } = await this.productService.search(form);
+
+    const response: ResponseListDto<any[]> = {
+      content: hits,
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
