@@ -29,6 +29,7 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "8",
     "@keyv/redis": "^5.1.1",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.1",

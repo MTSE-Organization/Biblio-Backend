@@ -21,9 +21,6 @@ export class ProductAutoCompleteDto {
   price: string;
 
   @Expose()
-  quantity: number;
-
-  @Expose()
   discount: number;
 
   @Expose()

@@ -13,6 +13,7 @@ import { ProductService } from './product.service';
 import {
   CreateProductForm,
   FilterProductForm,
+  SearchProductForm,
   UpdateProductForm
 } from './forms';
 import { ProductAutoCompleteDto, ProductDto } from './dtos';
@@ -152,5 +153,27 @@ export class ProductController {
         ProductDto
       )
     };
+  }
+
+  @ApiResponseNoData({
+    objectName: 'product',
+    message: 'Sync data product successfully'
+  })
+  @Get('sync-data')
+  async syncData() {
+    return await this.productService.syncData();
+  }
+
+  @Get('search')
+  async search(@Query() form: SearchProductForm) {
+    const { hits, count } = await this.productService.search(form);
+
+    const response: ResponseListDto<any[]> = {
+      content: hits,
+      totalElements: count,
+      totalPages: Math.ceil(count / form.size)
+    };
+
+    return response;
   }
 }

@@ -35,6 +35,7 @@ import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from './modules/redis/redis.module';
+import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
 //#endregion
 
 @Module({
@@ -65,7 +66,8 @@ import { RedisModule } from './modules/redis/redis.module';
     ReviewModule,
     CouponModule,
     OrderModule,
-    RedisModule
+    RedisModule,
+    ElasticSearchModule
   ]
 })
 export class AppModule implements NestModule {

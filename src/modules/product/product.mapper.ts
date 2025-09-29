@@ -1,5 +1,5 @@
 import { Product } from '@/models/product.model';
-import { ProductAutoCompleteDto, ProductDto } from './dtos';
+import { ProductAutoCompleteDto, ProductDocDto, ProductDto } from './dtos';
 import { MapperUtil } from '@/utils';
 
 export class ProductMapper {
@@ -19,5 +19,17 @@ export class ProductMapper {
 
   static toAutoCompleteDtoList(products: Product[]): ProductAutoCompleteDto[] {
     return products.map((p) => this.toAutoCompleteDto(p));
+  }
+
+  static toDocDto(product: Product): ProductDocDto {
+    const plain = (product as any).get?.({ plain: true }) ?? product;
+    plain.price = parseFloat(plain.price);
+
+    plain.imageUrl =
+      plain.images && plain.images.length > 0
+        ? (plain.images[0].url ?? null)
+        : null;
+
+    return MapperUtil.toDto(plain, ProductDocDto);
   }
 }

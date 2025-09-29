@@ -4,16 +4,21 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateProductForm,
   FilterProductForm,
+  SearchProductForm,
   UpdateProductForm
 } from './forms';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Category, Contributor, ProductImage, Publisher } from '@/models';
 import { CategoryService } from '../category/category.service';
-import { SlugifyUtil } from '@/utils';
-import { Constant, ErrorCode } from '@/constants';
+import { MapperUtil, SlugifyUtil } from '@/utils';
+import { Constant, ElasticConstant, ErrorCode } from '@/constants';
 import { PublisherService } from '../publisher/publisher.service';
 import { ContributorService } from '../contributor/contributor.service';
 import { Op } from 'sequelize';
+import { ElasticSearchService } from '../elastic-search/elastic-search.service';
+import { ProductMapping } from '../elastic-search/mappings/product.mapping';
+import { ProductMapper } from './product.mapper';
+import { CategoryDocDto } from '../category/dtos';
 
 @Injectable()
 export class ProductService {
@@ -26,12 +31,14 @@ export class ProductService {
 
     private readonly publisherService: PublisherService,
 
-    private readonly contributorService: ContributorService
+    private readonly contributorService: ContributorService,
+
+    private readonly elasticSearchService: ElasticSearchService
   ) {}
 
   async create(form: CreateProductForm) {
     const { contributorsIds, ...rest } = form;
-    await Promise.all([
+    const [category, publisher] = await Promise.all([
       this.categoryService.findById(rest.categoryId),
       this.publisherService.findById(rest.publisherId)
     ]);
@@ -42,6 +49,19 @@ export class ProductService {
     const contributors =
       await this.contributorService.findByIds(contributorsIds);
     await product.$set('contributors', contributors);
+
+    // build doc product
+    const categoryDoc = MapperUtil.toDto(category, CategoryDocDto);
+    const doc = ProductMapper.toDocDto(product);
+    doc.category = categoryDoc;
+
+    // insert to es
+    await this.elasticSearchService.createIndex(
+      ElasticConstant.PRODUCT_INDEX,
+      ProductMapping
+    );
+    await this.elasticSearchService.insert(ElasticConstant.PRODUCT_INDEX, doc);
+
     return { message: 'Create product successfully' };
   }
 
@@ -54,8 +74,9 @@ export class ProductService {
 
   async update(form: UpdateProductForm) {
     const product = await this.findById(form.id);
+    let category: Category | undefined;
     if (product.categoryId !== form.categoryId) {
-      await this.categoryService.findById(form.categoryId);
+      category = await this.categoryService.findById(form.categoryId);
       product.categoryId = form.categoryId;
     }
     if (product.publisherId !== form.publisherId) {
@@ -67,17 +88,44 @@ export class ProductService {
     const contributors =
       await this.contributorService.findByIds(contributorsIds);
     await product.$set('contributors', contributors);
+
+    // build doc product
+    const doc = ProductMapper.toDocDto(product);
+    if (category) {
+      doc.category = MapperUtil.toDto(category, CategoryDocDto);
+    }
+    // update to es
+    await this.elasticSearchService.createIndex(
+      ElasticConstant.PRODUCT_INDEX,
+      ProductMapping
+    );
+    await this.elasticSearchService.update(
+      ElasticConstant.PRODUCT_INDEX,
+      product.id.toString(),
+      doc
+    );
+
     return { message: 'Update product successfully' };
   }
 
   async recover(id: bigint) {
-    const product = await this.findById(id);
+    const product = await this.findByIdAndStatus(id, Constant.STATUS_DELETED);
     if (!product)
       throw new BadRequestException(
         'Product not found',
         ErrorCode.PRODUCT_ERROR_NOT_FOUND
       );
     await product.update({ status: Constant.STATUS_ACTIVE });
+
+    // build doc product
+    const doc = ProductMapper.toDocDto(product);
+
+    // insert to es
+    await this.elasticSearchService.createIndex(
+      ElasticConstant.PRODUCT_INDEX,
+      ProductMapping
+    );
+    await this.elasticSearchService.insert(ElasticConstant.PRODUCT_INDEX, doc);
     return { message: 'Recover product successfully' };
   }
 
@@ -157,8 +205,15 @@ export class ProductService {
       where: { id, status },
       include: [
         { model: Category },
-        { model: ProductImage },
-        { model: Publisher }
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
       ]
     });
 
@@ -175,6 +230,10 @@ export class ProductService {
   async delete(id: bigint) {
     const product = await this.findById(id);
     await product.update({ status: Constant.STATUS_DELETED });
+    await this.elasticSearchService.delete(
+      ElasticConstant.PRODUCT_INDEX,
+      product.id.toString()
+    );
     return { message: 'Delete product successfully' };
   }
 
@@ -218,6 +277,89 @@ export class ProductService {
           }
         }
       ]
+    });
+  }
+
+  async syncData() {
+    const products = await this.productRepository.findAll({
+      where: { status: Constant.STATUS_ACTIVE },
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
+      ]
+    });
+
+    const docs = products.map((p) => ProductMapper.toDocDto(p));
+
+    await this.elasticSearchService.createIndex(
+      ElasticConstant.PRODUCT_INDEX,
+      ProductMapping
+    );
+
+    await this.elasticSearchService.bulkInsert(
+      ElasticConstant.PRODUCT_INDEX,
+      docs
+    );
+
+    return { message: 'Sync data product successfully' };
+  }
+
+  async search(form: SearchProductForm) {
+    const must: any[] = [];
+    const filter: any[] = [];
+
+    if (form.keyword) {
+      must.push({
+        multi_match: {
+          query: form.keyword,
+          fields: ['name^2', 'category.name'],
+          fuzziness: 'AUTO'
+        }
+      });
+    }
+
+    if (form.minPrice || form.maxPrice) {
+      const range: any = {};
+      if (form.minPrice) range.gte = form.minPrice;
+      if (form.maxPrice) range.lte = form.maxPrice;
+      filter.push({ range: { price: range } });
+    }
+
+    if (form.ageRating) {
+      filter.push({ term: { ageRating: form.ageRating } });
+    }
+    if (form.language) {
+      filter.push({ term: { language: form.language } });
+    }
+    if (form.categoryId) {
+      filter.push({ term: { 'category.id': form.categoryId } });
+    }
+
+    const sort: any[] = [];
+    if (form.sortBy) {
+      sort.push({ [form.sortBy]: { order: form.sortOrder || 'asc' } });
+    }
+
+    const { limit, offset } = form.getPagination();
+
+    return await this.elasticSearchService.search('db_book_product', {
+      query: {
+        bool: {
+          must: must.length > 0 ? must : [{ match_all: {} }],
+          filter
+        }
+      },
+      sort,
+      from: offset,
+      size: limit
     });
   }
 }

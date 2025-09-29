@@ -3,7 +3,7 @@ import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { ProductImage } from '@/models';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ProductService } from '../product/product.service';
-import { ErrorCode } from '@/constants';
+import { ElasticConstant, ErrorCode } from '@/constants';
 import {
   CreateProductImageForm,
   FilterProductImageForm,
@@ -12,6 +12,8 @@ import {
 import { UpdateOrderingForm } from '@/common/forms';
 import { FileService } from '../file/file.service';
 import { Sequelize } from 'sequelize';
+import { ElasticSearchService } from '../elastic-search/elastic-search.service';
+import { ProductMapping } from '../elastic-search/mappings/product.mapping';
 
 @Injectable()
 export class ProductImageService {
@@ -24,7 +26,9 @@ export class ProductImageService {
     private readonly fileService: FileService,
 
     @InjectConnection()
-    private readonly sequelize: Sequelize
+    private readonly sequelize: Sequelize,
+
+    private readonly elasticSearchService: ElasticSearchService
   ) {}
 
   async create(form: CreateProductImageForm) {
@@ -47,6 +51,21 @@ export class ProductImageService {
       ordering: nextOrdering
     });
 
+    if (productImage.isDefault) {
+      // build doc product
+      const doc = { imageUrl: productImage.url };
+      // update to es
+      await this.elasticSearchService.createIndex(
+        ElasticConstant.PRODUCT_INDEX,
+        ProductMapping
+      );
+      await this.elasticSearchService.update(
+        ElasticConstant.PRODUCT_INDEX,
+        form.productId.toString(),
+        doc
+      );
+    }
+
     return { message: 'Create product image successfully' };
   }
 
@@ -54,6 +73,23 @@ export class ProductImageService {
     const productImage = await this.findById(id);
     await this.fileService.deleteFile(productImage.url);
     await productImage.destroy();
+    // chon lai cai default
+
+    if (productImage.isDefault) {
+      // build doc product
+      const doc = { imageUrl: null };
+      // update to es
+      await this.elasticSearchService.createIndex(
+        ElasticConstant.PRODUCT_INDEX,
+        ProductMapping
+      );
+      await this.elasticSearchService.update(
+        ElasticConstant.PRODUCT_INDEX,
+        productImage.productId.toString(),
+        doc
+      );
+    }
+
     return { message: 'Delete product image successfully' };
   }
 
@@ -139,6 +175,20 @@ export class ProductImageService {
       );
 
       await transaction.commit();
+
+      // build doc product
+      const doc = { imageUrl: productImage.url };
+      // update to es
+      await this.elasticSearchService.createIndex(
+        ElasticConstant.PRODUCT_INDEX,
+        ProductMapping
+      );
+      await this.elasticSearchService.update(
+        ElasticConstant.PRODUCT_INDEX,
+        productImage.productId.toString(),
+        doc
+      );
+
       return { message: 'Set default product image successfully' };
     } catch (err) {
       await transaction.rollback();
