@@ -187,6 +187,8 @@ export class ProductController {
     message: 'Sync data product successfully'
   })
   @Get('sync-data')
+  @PCode('PRD_S_D')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
   async syncData() {
     return await this.productService.syncData();
   }
