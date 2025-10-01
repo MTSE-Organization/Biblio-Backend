@@ -29,8 +29,6 @@ docker compose up -d
 
 ```bash
 yarn dev
-yarn db:migrate
-yarn db:seed
 ```
 
 ### 5. Run database migration
