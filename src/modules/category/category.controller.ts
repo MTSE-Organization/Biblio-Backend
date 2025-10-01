@@ -59,12 +59,11 @@ export class CategoryController {
 
     // cache hit
     if (cached) {
-      await this.redisService.set(cacheKey, cached, 5 * 60); // refresh TTL
+      await this.redisService.set(cacheKey, cached, 5 * 60 * 1000); // refresh TTL
       return {
         content: MapperUtil.toDtoList(cached.categories, CategoryDto),
         totalElements: cached.count,
-        totalPages: Math.ceil(cached.count / form.size),
-        fromCache: true
+        totalPages: Math.ceil(cached.count / form.size)
       };
     }
 
