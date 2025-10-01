@@ -28,8 +28,8 @@ export class ElasticSearchService {
     }
 
     const body = docs.flatMap((doc) => [
-      { index: { _index: index, _id: String(doc.id) } },
-      { doc, doc_as_upsert: true }
+      { update: { _index: index, _id: String(doc.id) } },
+      { doc: doc, doc_as_upsert: true }
     ]);
 
     const result = await this.client.bulk({ refresh: true, body });
