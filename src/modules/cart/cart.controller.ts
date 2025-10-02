@@ -31,7 +31,10 @@ export class CartController {
     return await this.cartService.addItem(form, user.id);
   }
 
-  @ApiResponse(CreateOrderDto, { objectName: 'cart' })
+  @ApiResponse(CreateOrderDto, {
+    objectName: 'cart',
+    message: 'Create checkout successfully'
+  })
   @UseGuards(JwtAuthGuard)
   @Post('checkout')
   checkout(@Req() req, @Body() form: CheckoutForm) {
