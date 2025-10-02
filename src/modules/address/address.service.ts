@@ -15,15 +15,38 @@ import { ErrorCode } from '@/constants/error-code.constant';
 import { AccountService } from '@/modules/account/account.service';
 import { Address } from '@/models';
 import { Op } from 'sequelize';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AddressService {
+  private readonly token: string;
+  private readonly openApi: string;
+  private readonly shippingFeeEndpoint: string;
+  private readonly pickAddress: string;
+  private readonly pickStreet: string;
+  private readonly pickDistrict: string;
+  private readonly pickProvince: string;
+
   constructor(
     @InjectModel(Address)
     private readonly addressRepository: typeof Address,
     @Inject(forwardRef(() => AccountService))
-    private readonly accountService: AccountService
-  ) {}
+    private readonly accountService: AccountService,
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService
+  ) {
+    this.token = this.configService.get<string>('TOKEN')!;
+    this.openApi = this.configService.get<string>('OPEN_API')!;
+    this.shippingFeeEndpoint = this.configService.get<string>(
+      'SHIPPING_FEE_ENDPOINT'
+    )!;
+    this.pickAddress = this.configService.get<string>('PICK_ADDRESS')!;
+    this.pickStreet = this.configService.get<string>('PICK_STREET')!;
+    this.pickDistrict = this.configService.get<string>('PICK_DISTRICT')!;
+    this.pickProvince = this.configService.get<string>('PICK_PROVINCE')!;
+  }
 
   async create(form: CreateAddressForm, accountId: bigint) {
     const data = { ...form, accountId };
@@ -220,5 +243,63 @@ export class AddressService {
     }
 
     return address;
+  }
+
+  async calculateShippingFee(
+    address: Address,
+    weight: number = 1000
+  ): Promise<number> {
+    const params = {
+      pick_address: this.pickAddress,
+      pick_street: this.pickStreet,
+      pick_district: this.pickDistrict,
+      pick_province: this.pickProvince,
+      address: address.detail,
+      ward: address.ward,
+      district: address.district,
+      province: address.city,
+      weight
+    };
+
+    const headers = {
+      Token: this.token
+    };
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get<Record<string, any>>(
+          this.openApi + this.shippingFeeEndpoint,
+          {
+            headers,
+            params
+          }
+        )
+      );
+
+      const body = response.data;
+      console.log(body);
+      console.log(body?.fee?.options?.shipMoney);
+
+      if (!body?.fee?.options?.shipMoney) {
+        throw new BadRequestException('Failed to calculate shipping fee');
+      }
+
+      return body?.fee?.options?.shipMoney as number;
+    } catch (err) {
+      if (err.response) {
+        console.error('Shipping fee request failed:', {
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+      } else {
+        console.error('Shipping fee unknown error:', err);
+      }
+
+      throw new BadRequestException(
+        'Shipping fee request failed: ' +
+          (err.response?.data?.message || err.message)
+      );
+    }
   }
 }

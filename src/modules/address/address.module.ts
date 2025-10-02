@@ -4,6 +4,7 @@ import { AddressController } from './address.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Address } from '@/models';
 import { AccountModule } from '../account/account.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   controllers: [AddressController],
@@ -11,7 +12,8 @@ import { AccountModule } from '../account/account.module';
   exports: [AddressService],
   imports: [
     SequelizeModule.forFeature([Address]),
-    forwardRef(() => AccountModule)
+    forwardRef(() => AccountModule),
+    HttpModule
   ]
 })
 export class AddressModule {}

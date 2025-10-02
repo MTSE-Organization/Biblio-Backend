@@ -15,7 +15,7 @@ export class UpdateAddressForm {
   @StringDecorator('city', true)
   city: string;
 
-  @StringDecorator('district')
+  @StringDecorator('district', true)
   district: string;
 
   @StringDecorator('ward')

@@ -1,7 +1,6 @@
 import {
   StringDecorator,
   NumberDecorator,
-  BigIntDecorator,
   BooleanDecorator
 } from '@/common/decorators';
 
@@ -12,7 +11,7 @@ export class CreateAddressForm {
   @StringDecorator('city', true)
   city: string;
 
-  @StringDecorator('district')
+  @StringDecorator('district', true)
   district: string;
 
   @StringDecorator('ward')

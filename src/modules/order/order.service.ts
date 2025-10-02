@@ -79,6 +79,7 @@ export class OrderService {
 
   async createFromCart(form: CreateOrderFromCartForm) {
     return await this.sequelize.transaction(async (t) => {
+      // get address
       let address: Address;
       if (form.addressId) {
         address = await this.addressService.findById(
@@ -86,10 +87,13 @@ export class OrderService {
           form.accountId
         );
       } else {
+        // get address default
         address = await this.addressService.findByAccountIdAndDefault(
           form.accountId
         );
       }
+
+      // check coupons
       const coupons = await this.couponService.findByIds(form.couponIds);
       if (!this.couponService.checkValid(coupons)) {
         throw new BadRequestException(
@@ -97,6 +101,8 @@ export class OrderService {
           ErrorCode.COUPON_ERROR_INVALID
         );
       }
+
+      // creeate order
       const order = await this.orderRepository.create(
         {
           accountId: form.accountId,
@@ -105,6 +111,8 @@ export class OrderService {
         },
         { transaction: t }
       );
+
+      // create orderItems and orderStatus
       await Promise.all([
         order.$set('coupons', coupons, { transaction: t }),
         this.orderItemService.createMany(form.cartItems, order.id, t),
@@ -114,10 +122,18 @@ export class OrderService {
           t
         )
       ]);
+
+      // update deliveryFee
+      const weight = await this.orderItemService.calculateTotalWeight(order.id);
+      order.deliveryFee = (
+        await this.addressService.calculateShippingFee(address, weight)
+      ).toString();
+
       await order.update(
         { total: await this.calculateTotal(order, t) },
         { transaction: t }
       );
+
       const dto = new CreateOrderDto();
       dto.orderId = order.id;
       return { message: 'Create order successfully', data: dto };
@@ -144,7 +160,14 @@ export class OrderService {
       }
       // update address
       if (order.addressId !== form.addressId) {
-        await this.addressService.findById(form.addressId, accountId);
+        const [address, weight] = await Promise.all([
+          await this.addressService.findById(form.addressId, accountId),
+          await this.orderItemService.calculateTotalWeight(order.id)
+        ]);
+
+        order.deliveryFee = (
+          await this.addressService.calculateShippingFee(address, weight)
+        ).toString();
         order.addressId = form.addressId;
       }
       //coupon
@@ -294,5 +317,34 @@ export class OrderService {
       }
     }
     return bigDecimal.compareTo(total, '0') < 0 ? '0' : total;
+  }
+
+  async cancel(id: bigint, accountId: bigint) {
+    return await this.sequelize.transaction(async (t) => {
+      const order = await this.findByIdAndAccount(id, accountId);
+      if (
+        order.currentStatus !== Constant.ORDER_STATUS_WAITING &&
+        order.currentStatus !== Constant.ORDER_STATUS_WAITING_CONFIRMATION &&
+        order.currentStatus !== Constant.ORDER_STATUS_CONFIRMED &&
+        order.currentStatus !== Constant.ORDER_STATUS_PACKING
+      ) {
+        throw new BadRequestException(
+          'Status is not valid',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+      }
+
+      order.currentStatus = Constant.ORDER_STATUS_CANCELED;
+      await Promise.all([
+        this.orderStatusService.create(
+          Constant.ORDER_STATUS_CANCELED,
+          order.id,
+          t
+        ),
+        this.orderItemService.processCancelOrderItems(order.id, t),
+        await order.save({ transaction: t })
+      ]);
+      return { message: 'Cannel order successfully' };
+    });
   }
 }

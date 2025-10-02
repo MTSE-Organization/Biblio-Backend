@@ -1,4 +1,4 @@
-import { CartItem, OrderItem, ProductVariant } from '@/models';
+import { CartItem, OrderItem, Product, ProductVariant } from '@/models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductVariantService } from '../product-variant/product-variant.service';
@@ -7,6 +7,7 @@ import { BadRequestException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
 import { Transaction } from 'sequelize';
 import { CartItemService } from '../cart-item/cart-item.service';
+import { ProductMetaData } from '../product/types';
 
 @Injectable()
 export class OrderItemService {
@@ -118,6 +119,49 @@ export class OrderItemService {
     if (cartItemIds.length > 0) {
       await this.cartItemService.deleteMany(cartItemIds, transaction);
     }
+  }
+
+  async processCancelOrderItems(orderId: bigint, transaction?: Transaction) {
+    const orderItems = await this.orderItemRepository.findAll({
+      where: { orderId },
+      include: [{ model: ProductVariant }]
+    });
+
+    for (const orderItem of orderItems) {
+      const productVariant = orderItem.productVariant;
+
+      if (!productVariant) {
+        throw new BadRequestException(
+          `ProductVariant not found for orderItem ${orderItem.id}`
+        );
+      }
+      productVariant.quantity += orderItem.quantity;
+      await productVariant.save({ transaction });
+    }
+  }
+
+  async calculateTotalWeight(orderId: bigint): Promise<number> {
+    const orderItems = await this.orderItemRepository.findAll({
+      where: { orderId },
+      include: [{ model: ProductVariant, include: [{ model: Product }] }]
+    });
+    let totalWeight = 0;
+    for (const orderItem of orderItems) {
+      let metaData: ProductMetaData;
+
+      if (typeof orderItem.productVariant.product.metaData === 'string') {
+        metaData = JSON.parse(
+          orderItem.productVariant.product.metaData
+        ) as ProductMetaData;
+      } else {
+        metaData = orderItem.productVariant.product.metaData as ProductMetaData;
+      }
+
+      if (metaData?.weight) {
+        totalWeight += metaData.weight;
+      }
+    }
+    return totalWeight;
   }
 
   async findByOrderId(orderId: bigint, transaction?: Transaction) {
