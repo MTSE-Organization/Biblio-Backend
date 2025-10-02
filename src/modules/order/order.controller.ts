@@ -101,4 +101,14 @@ export class OrderController {
   async updateStatus(@Body() form: UpdateStatusForm) {
     return await this.orderService.updateStatus(form);
   }
+
+  @ApiResponseNoData({
+    objectName: 'order',
+    message: 'Cannel order successfully'
+  })
+  @Put('cancel/:id')
+  @UseGuards(JwtAuthGuard)
+  async cancel(@Req() req, @Param('id') id: bigint) {
+    return await this.orderService.cancel(id, req.user.id);
+  }
 }
