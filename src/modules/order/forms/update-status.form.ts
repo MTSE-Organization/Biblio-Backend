@@ -1,10 +1,9 @@
-import { BigIntDecorator } from '@/common/decorators';
-import { OrderStatusDecorator } from '@/common/decorators/order-status.decorator';
+import { BigIntDecorator, OrderCmdDecorator } from '@/common/decorators';
 
 export class UpdateStatusForm {
   @BigIntDecorator('id', true)
   id: bigint;
 
-  @OrderStatusDecorator('status', true)
-  status: number;
+  @OrderCmdDecorator('cmd', true)
+  cmd: string;
 }

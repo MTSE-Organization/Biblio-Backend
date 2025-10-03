@@ -111,4 +111,14 @@ export class OrderController {
   async cancel(@Req() req, @Param('id') id: bigint) {
     return await this.orderService.cancel(id, req.user.id);
   }
+
+  @ApiResponseNoData({
+    objectName: 'order',
+    message: 'Complete order successfully'
+  })
+  @Put('complete/:id')
+  @UseGuards(JwtAuthGuard)
+  async complete(@Req() req, @Param('id') id: bigint) {
+    return await this.orderService.complete(id, req.user.id);
+  }
 }

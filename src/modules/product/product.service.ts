@@ -14,7 +14,7 @@ import { MapperUtil, SlugifyUtil } from '@/utils';
 import { Constant, ElasticConstant, ErrorCode } from '@/constants';
 import { PublisherService } from '../publisher/publisher.service';
 import { ContributorService } from '../contributor/contributor.service';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { ElasticSearchService } from '../elastic-search/elastic-search.service';
 import { ProductMapping } from '../elastic-search/mappings/product.mapping';
 import { ProductMapper } from './product.mapper';
@@ -418,5 +418,17 @@ export class ProductService {
       from: offset,
       size: limit
     });
+  }
+
+  async handleTotalSold(
+    productSoldMap: Map<bigint, number>,
+    transaction?: Transaction
+  ) {
+    for (const [productId, soldQty] of productSoldMap.entries()) {
+      await Product.increment(
+        { totalSold: soldQty },
+        { where: { id: productId }, transaction }
+      );
+    }
   }
 }

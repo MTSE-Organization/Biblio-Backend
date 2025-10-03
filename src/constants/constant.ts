@@ -41,6 +41,12 @@ export const Constant = {
   ORDER_STATUS_REQUEST_REFUND: 7,
   ORDER_STATUS_REFUNDED: 8,
 
+  // CMD update status order
+  CMD_CONFIRM_ORDER: 'CMD_CONFIRM_ORDER', // WAITING_CONFIRMATION -> CONFIRMED
+  CMD_START_PACKING: 'CMD_START_PACKING', // CONFIRMED -> PACKING
+  CMD_START_SHIPPING: 'CMD_START_SHIPPING', // PACKING -> SHIPPING
+  CMD_CONFIRM_REFUNDED: 'CMD_CONFIRM_REFUNDED', // REQUEST REFUND -> REFUNDED
+
   // Payment method
   PAYMENT_METHOD_COD: 1,
   PAYMENT_METHOD_VNPAY: 2,
@@ -56,3 +62,23 @@ export const fileFolders = {
   ['1']: 'systems',
   ['2']: 'avatars'
 };
+
+export const OrderTransitions: Record<string, { from: number[]; to: number }> =
+  {
+    [Constant.CMD_CONFIRM_ORDER]: {
+      from: [Constant.ORDER_STATUS_WAITING_CONFIRMATION],
+      to: Constant.ORDER_STATUS_CONFIRMED
+    },
+    [Constant.CMD_START_PACKING]: {
+      from: [Constant.ORDER_STATUS_CONFIRMED],
+      to: Constant.ORDER_STATUS_PACKING
+    },
+    [Constant.CMD_START_SHIPPING]: {
+      from: [Constant.ORDER_STATUS_PACKING],
+      to: Constant.ORDER_STATUS_SHIPPING
+    },
+    [Constant.CMD_CONFIRM_REFUNDED]: {
+      from: [Constant.ORDER_STATUS_REQUEST_REFUND],
+      to: Constant.ORDER_STATUS_REFUNDED
+    }
+  };
