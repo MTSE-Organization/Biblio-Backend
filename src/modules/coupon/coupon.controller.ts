@@ -64,7 +64,7 @@ export class CouponController {
   }
 
   @ApiResponse(CouponDto, { objectName: 'coupon' })
-  @PCode('CL_V')
+  @PCode('CP_V')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/get/:id')
   async adminGet(@Param('id') id: bigint) {

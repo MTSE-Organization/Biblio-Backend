@@ -26,6 +26,10 @@ export class FilterCouponForm extends PaginationForm {
   type: number;
 
   @Type(() => Number)
+  @NumberDecorator('minOrderAmount')
+  minOrderAmount: number;
+
+  @Type(() => Number)
   @NumberDecorator('status')
   status: number;
 
@@ -35,6 +39,8 @@ export class FilterCouponForm extends PaginationForm {
     if (this.name) where.name = { [Op.like]: `%${this.name}%` };
     if (this.kind) where.kind = this.kind;
     if (this.type) where.type = this.type;
+    if (this.minOrderAmount)
+      where.minOrderAmount = { [Op.lt]: this.minOrderAmount };
     if (this.status) where.status = this.status;
     if (this.id) where.id = this.id;
 
