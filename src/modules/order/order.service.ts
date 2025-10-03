@@ -79,20 +79,6 @@ export class OrderService {
 
   async createFromCart(form: CreateOrderFromCartForm) {
     return await this.sequelize.transaction(async (t) => {
-      // get address
-      let address: Address;
-      if (form.addressId) {
-        address = await this.addressService.findById(
-          form.addressId,
-          form.accountId
-        );
-      } else {
-        // get address default
-        address = await this.addressService.findByAccountIdAndDefault(
-          form.accountId
-        );
-      }
-
       // check coupons
       const coupons = await this.couponService.findByIds(form.couponIds);
       if (!this.couponService.checkValid(coupons)) {
@@ -105,9 +91,7 @@ export class OrderService {
       // creeate order
       const order = await this.orderRepository.create(
         {
-          accountId: form.accountId,
-          addressId: address.id,
-          deliveryFee: '30000'
+          accountId: form.accountId
         },
         { transaction: t }
       );
@@ -122,12 +106,6 @@ export class OrderService {
           t
         )
       ]);
-
-      // update deliveryFee
-      const weight = await this.orderItemService.calculateTotalWeight(order.id);
-      order.deliveryFee = (
-        await this.addressService.calculateShippingFee(address, weight)
-      ).toString();
 
       await order.update(
         { total: await this.calculateTotal(order, t) },
@@ -158,18 +136,18 @@ export class OrderService {
           ErrorCode.ORDER_ERROR_NOT_FOUND
         );
       }
-      // update address
-      if (order.addressId !== form.addressId) {
-        const [address, weight] = await Promise.all([
-          await this.addressService.findById(form.addressId, accountId),
-          await this.orderItemService.calculateTotalWeight(order.id)
-        ]);
 
-        order.deliveryFee = (
-          await this.addressService.calculateShippingFee(address, weight)
-        ).toString();
-        order.addressId = form.addressId;
-      }
+      // update address
+      const [address, weight] = await Promise.all([
+        await this.addressService.findById(form.addressId, accountId),
+        await this.orderItemService.calculateTotalWeight(order.id)
+      ]);
+
+      order.deliveryFee = (
+        await this.addressService.calculateShippingFee(address, weight)
+      ).toString();
+      order.addressId = form.addressId;
+
       //coupon
       const coupons = await this.couponService.findByIds(form.couponIds);
       if (!this.couponService.checkValid(coupons)) {
@@ -182,9 +160,11 @@ export class OrderService {
         order.$set('coupons', coupons, { transaction: t }),
         this.couponService.decreaseQuantity(coupons, t)
       ]);
+
       // update information
       order.paymentMethod = form.paymentMethod;
       order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
+
       // payment method cod
       if (form.paymentMethod === Constant.PAYMENT_METHOD_COD) {
         await this.orderStatusService.create(
