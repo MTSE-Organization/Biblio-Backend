@@ -40,7 +40,7 @@ export class FilterCouponForm extends PaginationForm {
     if (this.kind) where.kind = this.kind;
     if (this.type) where.type = this.type;
     if (this.minOrderAmount)
-      where.minOrderAmount = { [Op.gt]: `%${this.minOrderAmount}%` };
+      where.minOrderAmount = { [Op.lt]: this.minOrderAmount };
     if (this.status) where.status = this.status;
     if (this.id) where.id = this.id;
 

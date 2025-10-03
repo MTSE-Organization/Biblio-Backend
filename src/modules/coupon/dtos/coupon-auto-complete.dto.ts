@@ -14,6 +14,9 @@ export class CouponAutoCompleteDto {
   name: string;
 
   @Expose()
+  description: string;
+
+  @Expose()
   type: number;
 
   @Expose()
