@@ -84,7 +84,6 @@ export class CartService {
     }
     return await this.orderService.createFromCart({
       cartItems,
-      addressId: form.addressId,
       couponIds: form.couponIds,
       accountId
     });

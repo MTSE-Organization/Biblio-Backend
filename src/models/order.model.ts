@@ -43,7 +43,7 @@ export class Order extends Auditable {
   declare note: string;
 
   @ForeignKey(() => Address)
-  @Column({ allowNull: false, type: DataType.BIGINT })
+  @Column({ type: DataType.BIGINT })
   declare addressId: bigint;
 
   @BelongsTo(() => Address)
