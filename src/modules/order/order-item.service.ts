@@ -8,6 +8,7 @@ import { ErrorCode } from '@/constants';
 import { Transaction } from 'sequelize';
 import { CartItemService } from '../cart-item/cart-item.service';
 import { ProductMetaData } from '../product/types';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class OrderItemService {
@@ -17,7 +18,9 @@ export class OrderItemService {
 
     private readonly productVariantService: ProductVariantService,
 
-    private readonly cartItemService: CartItemService
+    private readonly cartItemService: CartItemService,
+
+    private readonly productService: ProductService
   ) {}
 
   async createOne(
@@ -121,7 +124,7 @@ export class OrderItemService {
     }
   }
 
-  async processCancelOrderItems(orderId: bigint, transaction?: Transaction) {
+  async handleCancelOrderItems(orderId: bigint, transaction?: Transaction) {
     const orderItems = await this.orderItemRepository.findAll({
       where: { orderId },
       include: [{ model: ProductVariant }]
@@ -138,6 +141,25 @@ export class OrderItemService {
       productVariant.quantity += orderItem.quantity;
       await productVariant.save({ transaction });
     }
+  }
+
+  async handleCompleteOrder(orderId: bigint, transaction?: Transaction) {
+    const orderItems = await this.orderItemRepository.findAll({
+      where: { orderId },
+      include: [{ model: ProductVariant, include: [Product] }]
+    });
+    const productSoldMap = new Map<bigint, number>();
+
+    for (const orderItem of orderItems) {
+      const productVariant = orderItem.productVariant;
+
+      const prevSold = productSoldMap.get(productVariant.productId) || 0;
+      productSoldMap.set(
+        productVariant.productId,
+        prevSold + orderItem.quantity
+      );
+    }
+    await this.productService.handleTotalSold(productSoldMap, transaction);
   }
 
   async calculateTotalWeight(orderId: bigint): Promise<number> {

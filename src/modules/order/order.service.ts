@@ -17,7 +17,7 @@ import {
 } from './forms';
 import { AccountService } from '../account/account.service';
 import { AddressService } from '../address/address.service';
-import { Constant, ErrorCode } from '@/constants';
+import { Constant, ErrorCode, OrderTransitions } from '@/constants';
 import { OrderItemService } from './order-item.service';
 import { OrderStatusService } from './order-status.service';
 import { Sequelize, Transaction } from 'sequelize';
@@ -278,18 +278,24 @@ export class OrderService {
         ErrorCode.ORDER_ERROR_NOT_FOUND
       );
     }
-    if (form.status <= order.currentStatus) {
+    const status = this.getNextStatus(form.cmd, order.currentStatus);
+    order.currentStatus = status;
+    await Promise.all([
+      this.orderStatusService.create(status, order.id),
+      await order.save()
+    ]);
+    return { message: 'Update status successfully' };
+  }
+
+  getNextStatus(cmd: string, currentStatus: number): number {
+    const transition = OrderTransitions[cmd];
+    if (!transition.from.includes(currentStatus)) {
       throw new BadRequestException(
         'Status is not valid',
         ErrorCode.ORDER_ERROR_INVALID_STATUS
       );
     }
-    order.currentStatus = form.status;
-    await Promise.all([
-      this.orderStatusService.create(form.status, order.id),
-      await order.save()
-    ]);
-    return { message: 'Update status successfully' };
+    return transition.to;
   }
 
   async calculateTotal(
@@ -341,10 +347,34 @@ export class OrderService {
           order.id,
           t
         ),
-        this.orderItemService.processCancelOrderItems(order.id, t),
+        this.orderItemService.handleCancelOrderItems(order.id, t),
         await order.save({ transaction: t })
       ]);
       return { message: 'Cannel order successfully' };
+    });
+  }
+
+  async complete(id: bigint, accountId: bigint) {
+    return await this.sequelize.transaction(async (t) => {
+      const order = await this.findByIdAndAccount(id, accountId);
+      if (order.currentStatus !== Constant.ORDER_STATUS_SHIPPING) {
+        throw new BadRequestException(
+          'Status is not valid',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+      }
+
+      order.currentStatus = Constant.ORDER_STATUS_COMPLETE;
+      await Promise.all([
+        this.orderStatusService.create(
+          Constant.ORDER_STATUS_COMPLETE,
+          order.id,
+          t
+        ),
+        this.orderItemService.handleCompleteOrder(order.id, t),
+        await order.save({ transaction: t })
+      ]);
+      return { message: 'Complete order successfully' };
     });
   }
 }

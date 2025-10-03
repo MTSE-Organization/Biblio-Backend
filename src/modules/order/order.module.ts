@@ -11,6 +11,7 @@ import { ProductVariantModule } from '../product-variant/product-variant.module'
 import { CartItemModule } from '../cart-item/cart-item.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { OrderScheduler } from './order.scheduler';
+import { ProductModule } from '../product/product.module';
 
 @Module({
   controllers: [OrderController],
@@ -26,7 +27,8 @@ import { OrderScheduler } from './order.scheduler';
     AddressModule,
     ProductVariantModule,
     CartItemModule,
-    CouponModule
+    CouponModule,
+    ProductModule
   ],
   exports: [OrderService]
 })

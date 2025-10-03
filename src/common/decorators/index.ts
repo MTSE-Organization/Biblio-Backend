@@ -23,6 +23,7 @@ export * from './product-variant-condition.decorator';
 export * from './product-variant-format.decorator';
 export * from './swagger.decorator';
 export * from './order-status.decorator';
+export * from './order-cmd.decorator';
 export * from './payment-method.decorator';
 
 export const StringDecorator = (name: string, required: boolean = false) => {
