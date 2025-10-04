@@ -277,8 +277,6 @@ export class AddressService {
       );
 
       const body = response.data;
-      console.log(body);
-      console.log(body?.fee?.options?.shipMoney);
 
       if (!body?.fee?.options?.shipMoney) {
         throw new BadRequestException('Failed to calculate shipping fee');
