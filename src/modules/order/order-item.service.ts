@@ -63,10 +63,7 @@ export class OrderItemService {
     transaction: Transaction
   ) {
     const items = cartItems.map((cartItem) => {
-      const itemPrice = bigDecimal.add(
-        cartItem.productVariant.product.price,
-        cartItem.productVariant.modifiedPrice
-      );
+      const itemPrice = cartItem.productVariant.modifiedPrice;
       const discount = cartItem.productVariant.product.discount;
       const finalPrice = bigDecimal.multiply(
         itemPrice,
@@ -82,6 +79,7 @@ export class OrderItemService {
         cartItemId: cartItem.id
       };
     });
+    console.log('🚀 ~ OrderItemService ~ createMany ~ items:', items);
     await this.orderItemRepository.bulkCreate(items, {
       individualHooks: true,
       transaction
