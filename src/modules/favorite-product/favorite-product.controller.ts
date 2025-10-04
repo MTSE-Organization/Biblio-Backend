@@ -16,7 +16,12 @@ import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filt
 import { ResponseListDto } from '@/common/interfaces';
 import { FavoriteProductDto } from '@/modules/favorite-product/dto/favorite-product.dto';
 import { MapperUtil } from '@/utils';
-import { ApiListResponse, ApiResponseNoData } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData
+} from '@/common/decorators';
+import { CheckFavoriteProductDto } from '@/modules/favorite-product/dto/check-favorite-product.dto';
 
 @Controller('favorite-product')
 export class FavoriteProductController {
@@ -61,7 +66,7 @@ export class FavoriteProductController {
     return await this.favoriteProductService.delete(id);
   }
 
-  @ApiResponseNoData({
+  @ApiResponse(CheckFavoriteProductDto, {
     objectName: 'favorite product',
     message: 'Check favorite product successfully'
   })
