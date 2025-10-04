@@ -2,7 +2,7 @@ import { ViewedProduct } from '@/models/viewed-product.model';
 import { ViewedProductDto } from '@/modules/viewed-product/dtos/viewed-product.dto';
 import { MapperUtil } from '@/utils';
 
-export class ViewProductMapper {
+export class ViewedProductMapper {
   static toDto(product: ViewedProduct): ViewedProductDto {
     const plain = (product as any).get?.({ plain: true }) ?? product;
 

@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FavoriteProduct } from '@/models/favorite-product.model';
 import { FavoriteProductForm } from '@/modules/favorite-product/forms/favorite-product.form';
-import { Account, Product } from '@/models';
+import { Account, Product, ProductImage } from '@/models';
 import { ProductService } from '@/modules/product/product.service';
 import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filter-favorite-product.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class FavoriteProductService {
@@ -23,11 +24,22 @@ export class FavoriteProductService {
       await this.favoriteProductRepository.findAndCountAll({
         limit: limit,
         offset: offset,
-        where: { accountId },
+        where: { accountId, ...query.getFilter() },
         order: [['createdDate', 'DESC']],
         include: [
           {
-            model: Product
+            model: Product,
+            include: [
+              {
+                model: ProductImage,
+                where: {
+                  [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+                },
+                required: false,
+                limit: 1,
+                separate: true
+              }
+            ]
           },
           { model: Account }
         ]
@@ -77,19 +89,5 @@ export class FavoriteProductService {
     await favorite.destroy();
 
     return { message: 'Delete favorite product successfully' };
-  }
-
-  async checkFavorite(productId: bigint) {
-    await this.productService.findById(productId);
-
-    const product = await this.favoriteProductRepository.findOne({
-      where: {
-        productId
-      }
-    });
-    return {
-      isFavorite: !!product,
-      message: 'Check favorite product successfully '
-    };
   }
 }
