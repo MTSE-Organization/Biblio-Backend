@@ -79,7 +79,6 @@ export class OrderItemService {
         cartItemId: cartItem.id
       };
     });
-    console.log('🚀 ~ OrderItemService ~ createMany ~ items:', items);
     await this.orderItemRepository.bulkCreate(items, {
       individualHooks: true,
       transaction
