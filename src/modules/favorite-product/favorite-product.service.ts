@@ -78,4 +78,15 @@ export class FavoriteProductService {
 
     return { message: 'Delete favorite product successfully' };
   }
+
+  async checkFavorite(productId: bigint) {
+    await this.productService.findById(productId);
+
+    const product = await this.favoriteProductRepository.findOne({
+      where: {
+        productId
+      }
+    });
+    return { isFavorite: !!product };
+  }
 }
