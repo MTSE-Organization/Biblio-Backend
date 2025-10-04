@@ -63,7 +63,10 @@ export class OrderItemService {
     transaction: Transaction
   ) {
     const items = cartItems.map((cartItem) => {
-      const itemPrice = cartItem.productVariant.modifiedPrice;
+      const itemPrice = bigDecimal.add(
+        cartItem.productVariant.product.price,
+        cartItem.productVariant.modifiedPrice
+      );
       const discount = cartItem.productVariant.product.discount;
       const finalPrice = bigDecimal.multiply(
         itemPrice,
