@@ -4,6 +4,7 @@ import {
   Order,
   OrderItem,
   OrderStatus,
+  Product,
   ProductVariant
 } from '@/models';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -188,12 +189,22 @@ export class OrderService {
   }
 
   async findByIdAndAccount(id: bigint, accountId: bigint) {
+    console.log(
+      '🚀 ~ OrderService ~ findByIdAndAccount ~ accountId:',
+      accountId
+    );
+    console.log('🚀 ~ OrderService ~ findByIdAndAccount ~ id:', id);
     const order = await this.orderRepository.findOne({
       where: { id, accountId },
       include: [
         {
           model: OrderItem,
-          include: [{ model: ProductVariant }]
+          include: [
+            {
+              model: ProductVariant,
+              include: [{ model: Product }]
+            }
+          ]
         },
         { model: OrderStatus },
         { model: Address },
