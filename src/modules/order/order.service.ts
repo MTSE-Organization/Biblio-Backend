@@ -189,11 +189,6 @@ export class OrderService {
   }
 
   async findByIdAndAccount(id: bigint, accountId: bigint) {
-    console.log(
-      '🚀 ~ OrderService ~ findByIdAndAccount ~ accountId:',
-      accountId
-    );
-    console.log('🚀 ~ OrderService ~ findByIdAndAccount ~ id:', id);
     const order = await this.orderRepository.findOne({
       where: { id, accountId },
       include: [
