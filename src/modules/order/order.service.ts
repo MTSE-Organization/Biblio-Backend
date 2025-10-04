@@ -292,23 +292,34 @@ export class OrderService {
       this.orderItemService.findByOrderId(order.id, transaction),
       this.couponService.findByOrderId(order.id, transaction)
     ]);
-    let total = order.deliveryFee ?? '0';
+    let subtotal = '0';
     for (const item of orderItems) {
-      total = bigDecimal.add(total, item.total);
+      subtotal = bigDecimal.add(subtotal, item.total);
     }
+    const deliveryFee = order.deliveryFee ?? '0';
+    let total = bigDecimal.add(subtotal, deliveryFee);
 
     for (const coupon of coupons) {
-      if (coupon.type === Constant.COUPON_TYPE_FIXED) {
-        total = bigDecimal.subtract(total, coupon.value);
-      } else if (coupon.type === Constant.COUPON_TYPE_PERCENTAGE) {
-        const discountAmount = bigDecimal.divide(
-          bigDecimal.multiply(total, coupon.value),
-          100
+      if (bigDecimal.compareTo(subtotal, coupon.minOrderAmount ?? '0') < 0) {
+        throw new BadRequestException(
+          'COUPON_ERROR_INVALID',
+          ErrorCode.COUPON_ERROR_INVALID
         );
-        total = bigDecimal.subtract(total, discountAmount);
       }
+      console.log({ kind: coupon.kind });
+
+      const baseAmout =
+        coupon.kind === Constant.COUPON_KIND_DISCOUNT ? subtotal : deliveryFee;
+      const couponAmout = this.couponService.getCouponAmount(
+        baseAmout,
+        coupon.type,
+        coupon.value
+      );
+      console.log({ couponAmout });
+
+      total = bigDecimal.subtract(total, couponAmout);
     }
-    return bigDecimal.compareTo(total, '0') < 0 ? '0' : total;
+    return total;
   }
 
   async cancel(id: bigint, accountId: bigint) {

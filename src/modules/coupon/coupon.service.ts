@@ -6,7 +6,8 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
 import { Op, Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { Order, OrderCoupon } from '@/models';
+import { Order } from '@/models';
+import bigDecimal from 'js-big-decimal';
 
 @Injectable()
 export class CouponService {
@@ -146,5 +147,22 @@ export class CouponService {
       { quantity: Sequelize.literal('quantity - 1') },
       { where: { id: ids }, transaction: t }
     );
+  }
+
+  getCouponAmount(baseAmount: string, type: number, value: string): string {
+    let discount = '0';
+    console.log({ baseAmount });
+
+    if (type === Constant.COUPON_TYPE_FIXED) {
+      discount = value;
+    } else if (type === Constant.COUPON_TYPE_PERCENTAGE) {
+      discount = bigDecimal
+        .divide(bigDecimal.multiply(baseAmount, value), 100)
+        .toString();
+    }
+
+    return bigDecimal.compareTo(discount, baseAmount) > 0
+      ? baseAmount
+      : discount;
   }
 }
