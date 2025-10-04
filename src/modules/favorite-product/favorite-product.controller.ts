@@ -51,13 +51,23 @@ export class FavoriteProductController {
     @Req() req: any
   ) {
     const accountId = req.user.id;
-    return this.favoriteProductService.create(accountId, form);
+    return await this.favoriteProductService.create(accountId, form);
   }
 
   @ApiResponseNoData({ objectName: 'favorite product', type: 'delete' })
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async deleteFavoriteProduct(@Param('id') id: bigint) {
-    return this.favoriteProductService.delete(id);
+    return await this.favoriteProductService.delete(id);
+  }
+
+  @ApiResponseNoData({
+    objectName: 'favorite product',
+    message: 'Check favorite product successfully'
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('check-favorite')
+  async checkFavoriteProduct(@Query('productId') productId: bigint) {
+    return await this.favoriteProductService.checkFavorite(productId);
   }
 }
