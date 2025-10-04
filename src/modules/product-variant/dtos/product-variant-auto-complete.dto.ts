@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { ProductAutoCompleteDto } from '@/modules/product/dtos';
+import { Expose, Type } from 'class-transformer';
 
 export class ProductVariantAutoCompleteDto {
   @Expose()
@@ -20,7 +21,8 @@ export class ProductVariantAutoCompleteDto {
   imageUrl: string;
 
   @Expose()
-  productId: bigint;
+  @Type(() => ProductAutoCompleteDto)
+  product: ProductAutoCompleteDto;
 
   @Expose()
   status: number;
