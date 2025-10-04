@@ -17,7 +17,7 @@ import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { ViewedProductDto } from '@/modules/viewed-product/dtos/viewed-product.dto';
 import { ApiListResponse, ApiResponseNoData } from '@/common/decorators';
-import { ViewProductMapper } from '@/modules/viewed-product/viewed-product.mapper';
+import { ViewedProductMapper } from '@/modules/viewed-product/viewed-product.mapper';
 
 @Controller('viewed-product')
 export class ViewedProductController {
@@ -36,7 +36,7 @@ export class ViewedProductController {
       form
     );
     const response: ResponseListDto<ViewedProductDto[]> = {
-      content: ViewProductMapper.toDtoList(viewedProducts),
+      content: ViewedProductMapper.toDtoList(viewedProducts),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };

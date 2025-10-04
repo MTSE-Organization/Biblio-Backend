@@ -22,6 +22,7 @@ import {
   ApiResponseNoData
 } from '@/common/decorators';
 import { CheckFavoriteProductDto } from '@/modules/favorite-product/dto/check-favorite-product.dto';
+import { FavoriteProductMapper } from '@/modules/favorite-product/favorite-product.mapper';
 
 @Controller('favorite-product')
 export class FavoriteProductController {
@@ -40,7 +41,7 @@ export class FavoriteProductController {
     const { favoriteProducts, count } =
       await this.favoriteProductService.findAll(accountId, form);
     const response: ResponseListDto<FavoriteProductDto[]> = {
-      content: MapperUtil.toDtoList(favoriteProducts, FavoriteProductDto),
+      content: FavoriteProductMapper.toDtoList(favoriteProducts),
       totalElements: count,
       totalPages: Math.ceil(count / form.size)
     };
@@ -64,15 +65,5 @@ export class FavoriteProductController {
   @Delete('delete/:id')
   async deleteFavoriteProduct(@Param('id') id: bigint) {
     return await this.favoriteProductService.delete(id);
-  }
-
-  @ApiResponse(CheckFavoriteProductDto, {
-    objectName: 'favorite product',
-    message: 'Check favorite product successfully'
-  })
-  @UseGuards(JwtAuthGuard)
-  @Get('check-favorite')
-  async checkFavoriteProduct(@Query('productId') productId: bigint) {
-    return await this.favoriteProductService.checkFavorite(productId);
   }
 }

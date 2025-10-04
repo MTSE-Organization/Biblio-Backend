@@ -1,5 +1,5 @@
 import { AccountDto } from '@/modules/account/dtos';
-import { ProductDto } from '@/modules/product/dtos';
+import { ProductAutoCompleteDto, ProductDto } from '@/modules/product/dtos';
 import { Expose, Type } from 'class-transformer';
 
 export class FavoriteProductDto {
@@ -7,8 +7,8 @@ export class FavoriteProductDto {
   id: bigint;
 
   @Expose()
-  @Type(() => ProductDto)
-  product: ProductDto;
+  @Type(() => ProductAutoCompleteDto)
+  product: ProductAutoCompleteDto;
 
   @Expose()
   @Type(() => AccountDto)
