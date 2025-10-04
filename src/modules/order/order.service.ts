@@ -89,7 +89,7 @@ export class OrderService {
         );
       }
 
-      // creeate order
+      // create order
       const order = await this.orderRepository.create(
         {
           accountId: form.accountId
@@ -159,6 +159,7 @@ export class OrderService {
       }
       await Promise.all([
         order.$set('coupons', coupons, { transaction: t }),
+        order.update({ note: form.note }),
         this.couponService.decreaseQuantity(coupons, t)
       ]);
 
@@ -306,18 +307,16 @@ export class OrderService {
           ErrorCode.COUPON_ERROR_INVALID
         );
       }
-      console.log({ kind: coupon.kind });
 
-      const baseAmout =
+      const baseAmount =
         coupon.kind === Constant.COUPON_KIND_DISCOUNT ? subtotal : deliveryFee;
-      const couponAmout = this.couponService.getCouponAmount(
-        baseAmout,
+      const couponAmount = this.couponService.getCouponAmount(
+        baseAmount,
         coupon.type,
         coupon.value
       );
-      console.log({ couponAmout });
 
-      total = bigDecimal.subtract(total, couponAmout);
+      total = bigDecimal.subtract(total, couponAmount);
     }
     return total;
   }
