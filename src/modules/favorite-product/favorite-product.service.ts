@@ -87,6 +87,9 @@ export class FavoriteProductService {
         productId
       }
     });
-    return { isFavorite: !!product };
+    return {
+      isFavorite: !!product,
+      message: 'Check favorite product successfully '
+    };
   }
 }
