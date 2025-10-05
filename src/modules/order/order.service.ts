@@ -249,7 +249,16 @@ export class OrderService {
       include: [
         {
           model: OrderItem,
-          include: [{ model: ProductVariant }]
+          include: [
+            {
+              model: ProductVariant,
+              include: [
+                {
+                  model: Product
+                }
+              ]
+            }
+          ]
         }
       ]
     });
