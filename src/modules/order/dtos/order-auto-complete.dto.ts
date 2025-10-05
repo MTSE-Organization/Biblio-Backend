@@ -14,4 +14,10 @@ export class OrderAutoCompleteDto {
 
   @Expose()
   currentStatus: number;
+
+  @Expose()
+  createdDate: Date;
+
+  @Expose()
+  modifiedDate: Date;
 }
