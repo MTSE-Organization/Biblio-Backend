@@ -24,12 +24,12 @@ import { ProductModule } from '../product/product.module';
   imports: [
     SequelizeModule.forFeature([Order, OrderItem, OrderStatus]),
     forwardRef(() => AccountModule),
-    AddressModule,
+    forwardRef(() => AddressModule),
     ProductVariantModule,
     CartItemModule,
     CouponModule,
     ProductModule
   ],
-  exports: [OrderService]
+  exports: [OrderService, OrderItemService]
 })
 export class OrderModule {}

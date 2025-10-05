@@ -8,7 +8,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateAddressForm,
   UpdateAddressForm,
-  FilterAddressForm
+  FilterAddressForm,
+  GetShippingFeeForm
 } from './forms';
 import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants/error-code.constant';
@@ -18,6 +19,7 @@ import { Op } from 'sequelize';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { OrderItemService } from '../order/order-item.service';
 
 @Injectable()
 export class AddressService {
@@ -35,7 +37,9 @@ export class AddressService {
     @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService,
     private readonly configService: ConfigService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    @Inject(forwardRef(() => OrderItemService))
+    private readonly orderItemService: OrderItemService
   ) {
     this.token = this.configService.get<string>('TOKEN')!;
     this.openApi = this.configService.get<string>('OPEN_API')!;
@@ -243,6 +247,69 @@ export class AddressService {
     }
 
     return address;
+  }
+
+  async getShippingFee(
+    form: GetShippingFeeForm,
+    accountId: bigint
+  ): Promise<number> {
+    const [address, weight] = await Promise.all([
+      this.findById(form.addressId, accountId),
+      this.orderItemService.calculateTotalWeight(form.orderId)
+    ]);
+
+    const params = {
+      pick_address: this.pickAddress,
+      pick_street: this.pickStreet,
+      pick_district: this.pickDistrict,
+      pick_province: this.pickProvince,
+      address: address.detail,
+      ward: address.ward,
+      district: address.district,
+      province: address.city,
+      weight
+    };
+
+    const headers = {
+      Token: this.token
+    };
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get<Record<string, any>>(
+          this.openApi + this.shippingFeeEndpoint,
+          {
+            headers,
+            params
+          }
+        )
+      );
+
+      const body = response.data;
+      console.log(body);
+      console.log(body?.fee?.options?.shipMoney);
+
+      if (!body?.fee?.options?.shipMoney) {
+        throw new BadRequestException('Failed to calculate shipping fee');
+      }
+
+      return body?.fee?.options?.shipMoney as number;
+    } catch (err) {
+      if (err.response) {
+        console.error('Shipping fee request failed:', {
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+      } else {
+        console.error('Shipping fee unknown error:', err);
+      }
+
+      throw new BadRequestException(
+        'Shipping fee request failed: ' +
+          (err.response?.data?.message || err.message)
+      );
+    }
   }
 
   async calculateShippingFee(
