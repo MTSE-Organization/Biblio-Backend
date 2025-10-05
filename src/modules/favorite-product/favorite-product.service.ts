@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FavoriteProduct } from '@/models/favorite-product.model';
 import { FavoriteProductForm } from '@/modules/favorite-product/forms/favorite-product.form';
-import { Account, Product, ProductImage } from '@/models';
+import { Account, Category, Product, ProductImage } from '@/models';
 import { ProductService } from '@/modules/product/product.service';
 import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filter-favorite-product.form';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
@@ -38,10 +38,10 @@ export class FavoriteProductService {
                 required: false,
                 limit: 1,
                 separate: true
-              }
+              },
+              { model: Category }
             ]
-          },
-          { model: Account }
+          }
         ]
       });
     return { favoriteProducts: rows, count };
