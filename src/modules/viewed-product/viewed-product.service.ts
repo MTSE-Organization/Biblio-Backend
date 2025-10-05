@@ -1,4 +1,4 @@
-import { Product, ProductImage } from '@/models';
+import { Category, Product, ProductImage } from '@/models';
 import { ViewedProduct } from '@/models/viewed-product.model';
 import { ProductService } from '@/modules/product/product.service';
 import { ViewedProductForm } from '@/modules/viewed-product/forms/viewed-product.form';
@@ -38,6 +38,9 @@ export class ViewedProductService {
               required: false,
               limit: 1,
               separate: true
+            },
+            {
+              model: Category
             }
           ]
         }
