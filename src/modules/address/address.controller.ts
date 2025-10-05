@@ -14,9 +14,10 @@ import { AddressService } from './address.service';
 import {
   CreateAddressForm,
   UpdateAddressForm,
-  FilterAddressForm
+  FilterAddressForm,
+  GetShippingFeeForm
 } from './forms';
-import { AddressDto } from './dtos';
+import { AddressDto, GetShippingFeeDto } from './dtos';
 import { MapperUtil } from '@/utils';
 import {
   ApiListResponse,
@@ -84,5 +85,19 @@ export class AddressController {
     const user: UserDetailsDto = req.user;
     const address = await this.addressService.findById(id, user.id);
     return MapperUtil.toDto(address, AddressDto);
+  }
+
+  @ApiResponse(GetShippingFeeDto, { objectName: 'address' })
+  @UseGuards(JwtAuthGuard)
+  @Post('shipping-fee')
+  async shippingFee(@Req() req: any, @Body() form: GetShippingFeeForm) {
+    const user: UserDetailsDto = req.user;
+
+    return {
+      data: new GetShippingFeeDto(
+        await this.addressService.getShippingFee(form, user.id)
+      ),
+      message: 'Get shipping fee successfully'
+    };
   }
 }

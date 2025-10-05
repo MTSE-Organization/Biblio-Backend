@@ -36,6 +36,7 @@ export class OrderService {
     private readonly orderStatusService: OrderStatusService,
     @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService,
+    @Inject(forwardRef(() => AddressService))
     private readonly addressService: AddressService,
     private readonly couponService: CouponService,
     @InjectConnection() private readonly sequelize: Sequelize
