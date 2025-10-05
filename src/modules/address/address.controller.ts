@@ -87,7 +87,10 @@ export class AddressController {
     return MapperUtil.toDto(address, AddressDto);
   }
 
-  @ApiResponse(GetShippingFeeDto, { objectName: 'address' })
+  @ApiResponse(GetShippingFeeDto, {
+    objectName: 'address',
+    message: 'Get shipping fee successfully'
+  })
   @UseGuards(JwtAuthGuard)
   @Post('shipping-fee')
   async shippingFee(@Req() req: any, @Body() form: GetShippingFeeForm) {
