@@ -34,4 +34,10 @@ export class ProductAutoCompleteDto {
 
   @Expose()
   status: number;
+
+  @Expose()
+  totalReviews: number;
+
+  @Expose()
+  averageReview: number;
 }
