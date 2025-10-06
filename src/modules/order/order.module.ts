@@ -12,6 +12,8 @@ import { CartItemModule } from '../cart-item/cart-item.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { OrderScheduler } from './order.scheduler';
 import { ProductModule } from '../product/product.module';
+import { VnpayModule } from '@/modules/vnpay/vnpay.module';
+import { VnpayService } from '@/modules/vnpay/vnpay.service';
 
 @Module({
   controllers: [OrderController],
@@ -28,7 +30,8 @@ import { ProductModule } from '../product/product.module';
     ProductVariantModule,
     CartItemModule,
     CouponModule,
-    ProductModule
+    ProductModule,
+    VnpayModule
   ],
   exports: [OrderService, OrderItemService]
 })

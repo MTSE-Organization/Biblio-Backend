@@ -7,6 +7,7 @@ import {
   Put,
   Query,
   Req,
+  Res,
   UseGuards
 } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -25,10 +26,29 @@ import {
 } from './forms';
 import { MapperUtil } from '@/utils';
 import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
+import { VnpayService } from '@/modules/vnpay/vnpay.service';
 
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly vnpayService: VnpayService
+  ) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Post('test-vnpay')
+  testVnpay(@Req() req) {
+    const ipAddr =
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket.remoteAddress;
+    return this.vnpayService.createPaymentUrl(
+      '2790980524502421504',
+      100000,
+      ipAddr
+    );
+  }
 
   @ApiResponse(CreateOrderDto, {
     objectName: 'order',
