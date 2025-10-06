@@ -8,6 +8,7 @@ import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
 import { ProductService } from '@/modules/product/product.service';
 import { ReviewStatsDto } from './dtos';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ReviewService {
@@ -20,8 +21,24 @@ export class ReviewService {
   async findAll(query: FilterReviewForm) {
     const { limit, offset } = query.getPagination();
 
+    const where: any = {};
+
+    if (query.productId) {
+      where.productId = query.productId;
+    }
+
+    if (query.fromDate || query.toDate) {
+      where.createdDate = {};
+      if (query.fromDate) {
+        where.createdDate[Op.gte] = query.fromDate;
+      }
+      if (query.toDate) {
+        where.createdDate[Op.lte] = query.toDate;
+      }
+    }
+
     const { rows, count } = await this.reviewRepository.findAndCountAll({
-      where: query.productId ? { productId: query.productId } : undefined,
+      where,
       limit,
       offset,
       order: [['createdDate', 'DESC']],
@@ -59,7 +76,7 @@ export class ReviewService {
     const productId = review.productId;
 
     await review.destroy();
-    // await this.updateProductReviewStats(productId);
+    await this.updateProductReviewStats(productId);
 
     return { message: 'Delete review successfully' };
   }
