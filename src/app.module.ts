@@ -38,6 +38,7 @@ import { FavoriteProductModule } from './modules/favorite-product/favorite-produ
 import { ViewedProductModule } from './modules/viewed-product/viewed-product.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
+import { RabbitmqModule } from './modules/rabbitmq/rabbitmq.module';
 //#endregion
 
 @Module({
@@ -71,7 +72,8 @@ import { ElasticSearchModule } from './modules/elastic-search/elastic-search.mod
     FavoriteProductModule,
     ViewedProductModule,
     RedisModule,
-    ElasticSearchModule
+    ElasticSearchModule,
+    RabbitmqModule
   ]
 })
 export class AppModule implements NestModule {

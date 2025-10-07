@@ -141,8 +141,8 @@ export class OrderService {
 
       // update address
       const [address, weight] = await Promise.all([
-        await this.addressService.findById(form.addressId, accountId),
-        await this.orderItemService.calculateTotalWeight(order.id)
+        this.addressService.findById(form.addressId, accountId),
+        this.orderItemService.calculateTotalWeight(order.id)
       ]);
 
       order.deliveryFee = (
@@ -279,7 +279,7 @@ export class OrderService {
     order.currentStatus = status;
     await Promise.all([
       this.orderStatusService.create(status, order.id),
-      await order.save()
+      order.save()
     ]);
     return { message: 'Update status successfully' };
   }
@@ -354,7 +354,7 @@ export class OrderService {
           t
         ),
         this.orderItemService.handleCancelOrderItems(order.id, t),
-        await order.save({ transaction: t })
+        order.save({ transaction: t })
       ]);
       return { message: 'Cannel order successfully' };
     });
@@ -378,7 +378,7 @@ export class OrderService {
           t
         ),
         this.orderItemService.handleCompleteOrder(order.id, t),
-        await order.save({ transaction: t })
+        order.save({ transaction: t })
       ]);
       return { message: 'Complete order successfully' };
     });
