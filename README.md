@@ -12,6 +12,7 @@
 - **Sequelize**
 - **Redis**
 - **Elasticsearch**
+- **RabbitMQ**
 
 ## 🚀 LAUNCH APPLICATION:
 
@@ -23,7 +24,7 @@
 docker compose up -d
 ```
 
-### 3. Setup environment variables **.env** from **.env.exaple** theo information in **docker-compose**
+### 3. Setup environment variables **.env** from **.env.example** theo information in **docker-compose**
 
 ### 4. Run the application
 
