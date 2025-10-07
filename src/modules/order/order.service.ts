@@ -166,19 +166,19 @@ export class OrderService {
 
       // update information
       order.paymentMethod = form.paymentMethod;
-      order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
+      order.currentStatus = Constant.ORDER_STATUS_COMPLETE_PAYMENT;
 
       // payment method cod
       if (form.paymentMethod === Constant.PAYMENT_METHOD_COD) {
         await this.orderStatusService.create(
-          Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+          Constant.ORDER_STATUS_COMPLETE_PAYMENT,
           order.id,
           t
         );
       } else {
         // call to VNPAY API
         await this.orderStatusService.create(
-          Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+          Constant.ORDER_STATUS_COMPLETE_PAYMENT,
           order.id,
           t
         );
