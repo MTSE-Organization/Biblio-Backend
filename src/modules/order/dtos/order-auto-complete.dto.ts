@@ -13,6 +13,9 @@ export class OrderAutoCompleteDto {
   orderItems: OrderItemDto[];
 
   @Expose()
+  total: string;
+
+  @Expose()
   currentStatus: number;
 
   @Expose()
