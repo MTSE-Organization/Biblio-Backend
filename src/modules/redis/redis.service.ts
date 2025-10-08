@@ -30,15 +30,30 @@ export class RedisService {
       match: `${prefix}*`,
       count: 100
     });
+    const promises: Promise<number>[] = [];
 
     stream.on('data', (keys: string[]) => {
       if (keys.length) {
-        this.redisClient.del(...keys);
+        promises.push(this.redisClient.del(...keys));
       }
     });
 
-    return new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       stream.on('end', resolve);
+      stream.on('error', reject);
+    });
+    await Promise.all(promises);
+  }
+
+  async getKeysByPrefix(prefix: string): Promise<Set<string>> {
+    const stream = this.redisClient.scanStream({
+      match: `${prefix}*`,
+      count: 100
+    });
+    const keys = new Set<string>();
+    return new Promise((resolve, reject) => {
+      stream.on('data', (batch: string[]) => batch.forEach((k) => keys.add(k)));
+      stream.on('end', () => resolve(keys));
       stream.on('error', reject);
     });
   }

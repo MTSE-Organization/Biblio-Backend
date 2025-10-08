@@ -21,7 +21,18 @@ services:
     networks:
       - book-networks
     restart: unless-stopped
-
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: book-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin@2o23.hcm
+    ports:
+      - '5673:5672'
+      - '15673:15672'
+    networks:
+      - book-networks
+    restart: unless-stopped
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     container_name: book-elasticsearch
@@ -45,6 +56,5 @@ services:
 networks:
   book-networks:
     driver: bridge
-
 # docker compose up -d
 # -d: background mode

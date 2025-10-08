@@ -114,11 +114,8 @@ export class RabbitmqAdminService implements OnModuleInit, OnModuleDestroy {
   }
 
   async createQueueIfNotExist(queueName: string): Promise<void> {
-    const exists = await this.isQueueExist(queueName);
-    if (!exists) {
-      this.logger.log(`-------> Create queue name: ${queueName}`);
-      await this.channel.assertQueue(queueName, { durable: true });
-    }
+    this.logger.log(`-------> Create queue name: ${queueName}`);
+    await this.channel.assertQueue(queueName, { durable: true });
   }
 
   // Gracefully close the RabbitMQ connection and channel

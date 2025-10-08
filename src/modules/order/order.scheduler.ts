@@ -1,6 +1,6 @@
 import { Order, OrderItem, OrderStatus } from '@/models';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Interval } from '@nestjs/schedule';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -22,7 +22,8 @@ export class OrderScheduler {
     @InjectConnection() private readonly sequelize: Sequelize
   ) {}
 
-  @Cron('0 0 0 * * *') // 00:00
+  // @Cron('0 0 0 * * *') // 00:00
+  @Interval('check-pending-orders', 30 * 60 * 1000)
   async checkPendingOrders() {
     this.logger.log('Start clean up pending order');
 
