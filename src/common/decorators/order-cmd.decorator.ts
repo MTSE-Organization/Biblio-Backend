@@ -16,6 +16,7 @@ export const OrderCmdDecorator = (name: string, required: boolean = false) => {
         Constant.CMD_CONFIRM_ORDER,
         Constant.CMD_START_PACKING,
         Constant.CMD_START_SHIPPING,
+        Constant.CMD_DELIVERED,
         Constant.CMD_CONFIRM_REFUNDED
       ],
       {
