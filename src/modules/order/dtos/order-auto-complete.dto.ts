@@ -1,12 +1,14 @@
 import { Expose, Type } from 'class-transformer';
 import { OrderItemDto } from './order-item.dto';
+import { AccountDto } from '@/modules/account/dtos';
 
 export class OrderAutoCompleteDto {
   @Expose()
   id: bigint;
 
   @Expose()
-  accountId: bigint;
+  @Type(() => AccountDto)
+  account: AccountDto;
 
   @Expose()
   @Type(() => OrderItemDto)
@@ -17,6 +19,9 @@ export class OrderAutoCompleteDto {
 
   @Expose()
   currentStatus: number;
+
+  @Expose()
+  paymentMethod: number;
 
   @Expose()
   createdDate: Date;

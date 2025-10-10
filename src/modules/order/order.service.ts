@@ -1,4 +1,5 @@
 import {
+  Account,
   Address,
   Coupon,
   Order,
@@ -166,19 +167,19 @@ export class OrderService {
 
       // update information
       order.paymentMethod = form.paymentMethod;
-      order.currentStatus = Constant.ORDER_STATUS_COMPLETE_PAYMENT;
+      order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
 
       // payment method cod
       if (form.paymentMethod === Constant.PAYMENT_METHOD_COD) {
         await this.orderStatusService.create(
-          Constant.ORDER_STATUS_COMPLETE_PAYMENT,
+          Constant.ORDER_STATUS_WAITING_CONFIRMATION,
           order.id,
           t
         );
       } else {
         // call to VNPAY API
         await this.orderStatusService.create(
-          Constant.ORDER_STATUS_COMPLETE_PAYMENT,
+          Constant.ORDER_STATUS_WAITING_CONFIRMATION,
           order.id,
           t
         );
@@ -222,11 +223,17 @@ export class OrderService {
       include: [
         {
           model: OrderItem,
-          include: [{ model: ProductVariant }]
+          include: [
+            {
+              model: ProductVariant,
+              include: [{ model: Product }]
+            }
+          ]
         },
         { model: OrderStatus },
         { model: Address },
-        { model: Coupon }
+        { model: Coupon },
+        { model: Account }
       ]
     });
     if (!order) {
@@ -260,7 +267,8 @@ export class OrderService {
               ]
             }
           ]
-        }
+        },
+        { model: Account }
       ]
     });
 
@@ -363,17 +371,17 @@ export class OrderService {
   async complete(id: bigint, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_SHIPPING) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
         );
       }
 
-      order.currentStatus = Constant.ORDER_STATUS_COMPLETE;
+      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
       await Promise.all([
         this.orderStatusService.create(
-          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED,
           order.id,
           t
         ),

@@ -3,13 +3,15 @@ import { Expose, Type } from 'class-transformer';
 import { OrderItemDto } from './order-item.dto';
 import { OrderStatusDto } from './order-status.dto';
 import { CouponAutoCompleteDto } from '@/modules/coupon/dtos';
+import { AccountDto } from '@/modules/account/dtos';
 
 export class OrderDto {
   @Expose()
   id: bigint;
 
   @Expose()
-  accountId: bigint;
+  @Type(() => AccountDto)
+  account: AccountDto;
 
   @Expose()
   @Type(() => OrderItemDto)
