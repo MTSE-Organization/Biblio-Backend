@@ -12,8 +12,9 @@ import { CartItemModule } from '../cart-item/cart-item.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { OrderScheduler } from './order.scheduler';
 import { ProductModule } from '../product/product.module';
-import { VnpayModule } from '@/modules/vnpay/vnpay.module';
-import { VnpayService } from '@/modules/vnpay/vnpay.service';
+import { VnpayModule, VnpayService } from 'nestjs-vnpay';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ignoreLogger } from 'vnpay';
 
 @Module({
   controllers: [OrderController],
@@ -31,7 +32,15 @@ import { VnpayService } from '@/modules/vnpay/vnpay.service';
     CartItemModule,
     CouponModule,
     ProductModule,
-    VnpayModule
+    VnpayModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secureSecret: configService.getOrThrow<string>('VNPAY_HASH_SECRET'),
+        tmnCode: configService.getOrThrow<string>('VNPAY_TMN_CODE'),
+        loggerFn: ignoreLogger
+      }),
+      inject: [ConfigService]
+    })
   ],
   exports: [OrderService, OrderItemService]
 })

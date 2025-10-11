@@ -38,7 +38,6 @@ import { FavoriteProductModule } from './modules/favorite-product/favorite-produ
 import { ViewedProductModule } from './modules/viewed-product/viewed-product.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
-import { VnpayModule } from './modules/vnpay/vnpay.module';
 //#endregion
 
 @Module({
@@ -72,8 +71,7 @@ import { VnpayModule } from './modules/vnpay/vnpay.module';
     FavoriteProductModule,
     ViewedProductModule,
     RedisModule,
-    ElasticSearchModule,
-    VnpayModule
+    ElasticSearchModule
   ]
 })
 export class AppModule implements NestModule {

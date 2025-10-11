@@ -26,7 +26,8 @@ import {
 } from './forms';
 import { MapperUtil } from '@/utils';
 import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
-import { VnpayService } from '@/modules/vnpay/vnpay.service';
+import { VnpayService } from 'nestjs-vnpay';
+import { ProductCode } from 'vnpay';
 
 @Controller('order')
 export class OrderController {
@@ -38,16 +39,14 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post('test-vnpay')
   testVnpay(@Req() req) {
-    const ipAddr =
-      req.headers['x-forwarded-for'] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress ||
-      req.connection.socket.remoteAddress;
-    return this.vnpayService.createPaymentUrl(
-      '2790980524502421504',
-      100000,
-      ipAddr
-    );
+    return this.vnpayService.buildPaymentUrl({
+      vnp_Amount: 1000000,
+      vnp_TxnRef: Date.now().toString(),
+      vnp_OrderInfo: 'Thanh toan don hang',
+      vnp_OrderType: ProductCode.Other,
+      vnp_IpAddr: '127.0.0.1',
+      vnp_ReturnUrl: 'http://localhost:8080'
+    });
   }
 
   @ApiResponse(CreateOrderDto, {
