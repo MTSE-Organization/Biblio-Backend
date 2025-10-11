@@ -1,7 +1,7 @@
 import { PaginationForm } from '@/common/forms';
 import { BigIntDecorator } from '@/common/decorators';
 import { Type } from 'class-transformer';
-import { IsDate } from 'class-validator';
+import { IsDate, IsOptional } from 'class-validator';
 
 export class FilterReviewForm extends PaginationForm {
   @BigIntDecorator('productId', false)
@@ -9,9 +9,11 @@ export class FilterReviewForm extends PaginationForm {
 
   @Type(() => Date)
   @IsDate()
+  @IsOptional()
   fromDate?: Date;
 
   @Type(() => Date)
   @IsDate()
+  @IsOptional()
   toDate?: Date;
 }

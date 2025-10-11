@@ -16,12 +16,7 @@ import { FilterReviewForm } from './forms/filter-review.form';
 import { MapperUtil } from '@/utils';
 import { ReviewDto, ReviewStatsDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
-import {
-  ApiListResponse,
-  ApiResponse,
-  ApiResponseNoData,
-  PCode
-} from '@/common/decorators';
+import { ApiListResponse, ApiResponseNoData, PCode } from '@/common/decorators';
 
 @Controller('review')
 export class ReviewController {
@@ -44,7 +39,7 @@ export class ReviewController {
   @PCode('REV_L')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('private/list')
-  async admidList(@Query() form: FilterReviewForm) {
+  async adminList(@Query() form: FilterReviewForm) {
     const { reviews, count } = await this.reviewService.findAll(form);
     const response: ResponseListDto<ReviewDto[]> = {
       content: MapperUtil.toDtoList(reviews, ReviewDto),
@@ -56,9 +51,11 @@ export class ReviewController {
 
   @ApiListResponse(ReviewStatsDto, { objectName: 'reviewStats' })
   @PCode('REV_V')
-  @Get('/summary/:id')
-  async summary(@Param('id') id: bigint) {
-    return await this.reviewService.getReviewStats(id);
+  @Get('/summary/:productId')
+  async summary(@Param('productId') productId: bigint) {
+    return {
+      content: await this.reviewService.getReviewStats(productId)
+    };
   }
 
   @ApiResponseNoData({ objectName: 'review', type: 'create' })
