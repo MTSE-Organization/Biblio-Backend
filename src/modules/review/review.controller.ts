@@ -23,7 +23,6 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @ApiListResponse(ReviewDto, { objectName: 'review' })
-  @PCode('REV_L')
   @Get('list')
   async list(@Query() form: FilterReviewForm) {
     const { reviews, count } = await this.reviewService.findAll(form);
@@ -50,7 +49,6 @@ export class ReviewController {
   }
 
   @ApiListResponse(ReviewStatsDto, { objectName: 'reviewStats' })
-  @PCode('REV_V')
   @Get('/summary/:productId')
   async summary(@Param('productId') productId: bigint) {
     return {
@@ -59,7 +57,6 @@ export class ReviewController {
   }
 
   @ApiResponseNoData({ objectName: 'review', type: 'create' })
-  @PCode('REV_C')
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Req() req: any, @Body() form: ReviewForm) {
@@ -68,7 +65,6 @@ export class ReviewController {
   }
 
   @ApiResponseNoData({ objectName: 'review', type: 'delete' })
-  @PCode('REV_D')
   @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async delete(@Req() req: any, @Param('id') id: bigint) {
