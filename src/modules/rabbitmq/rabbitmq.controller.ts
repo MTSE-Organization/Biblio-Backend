@@ -23,7 +23,7 @@ export class RabbitmqController {
     const promises: Promise<void>[] = [];
     for (const key of keysEmp) {
       // ${keyType}_${userId}_${sessionId}
-      const parts = key.split('_');
+      const parts = key.split(':');
       const userId = parts[1];
       const sessionId = parts[2];
       const data = { userId: userId, sessionId: sessionId, message: form };

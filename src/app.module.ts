@@ -39,6 +39,7 @@ import { ViewedProductModule } from './modules/viewed-product/viewed-product.mod
 import { RedisModule } from './modules/redis/redis.module';
 import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
 import { RabbitmqModule } from './modules/rabbitmq/rabbitmq.module';
+import { NotificationModule } from './modules/notification/notification.module';
 //#endregion
 
 @Module({
@@ -73,7 +74,8 @@ import { RabbitmqModule } from './modules/rabbitmq/rabbitmq.module';
     ViewedProductModule,
     RedisModule,
     ElasticSearchModule,
-    RabbitmqModule
+    RabbitmqModule,
+    NotificationModule
   ]
 })
 export class AppModule implements NestModule {

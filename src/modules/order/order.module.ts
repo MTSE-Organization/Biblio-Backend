@@ -12,6 +12,7 @@ import { CartItemModule } from '../cart-item/cart-item.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { OrderScheduler } from './order.scheduler';
 import { ProductModule } from '../product/product.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   controllers: [OrderController],
@@ -28,7 +29,8 @@ import { ProductModule } from '../product/product.module';
     ProductVariantModule,
     CartItemModule,
     CouponModule,
-    ProductModule
+    ProductModule,
+    NotificationModule
   ],
   exports: [OrderService, OrderItemService]
 })
