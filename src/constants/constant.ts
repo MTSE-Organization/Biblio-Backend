@@ -57,7 +57,11 @@ export const Constant = {
   COUPON_KIND_DISCOUNT: 1,
   COUPON_KIND_FREESHIP: 2,
   COUPON_TYPE_FIXED: 1,
-  COUPON_TYPE_PERCENTAGE: 2
+  COUPON_TYPE_PERCENTAGE: 2,
+
+  // Notification type
+  NOTIFICATION_TYPE_ORDER: 1,
+  NOTIFICATION_TYPE_PRODUCT: 2
 } as const;
 
 export const fileFolders = {

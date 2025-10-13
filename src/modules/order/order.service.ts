@@ -27,6 +27,7 @@ import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
 import { CreateOrderDto } from './dtos';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class OrderService {
@@ -40,6 +41,7 @@ export class OrderService {
     @Inject(forwardRef(() => AddressService))
     private readonly addressService: AddressService,
     private readonly couponService: CouponService,
+    private readonly notificationService: NotificationService,
     @InjectConnection() private readonly sequelize: Sequelize
   ) {}
 
@@ -187,6 +189,9 @@ export class OrderService {
       await this.orderItemService.processOrderItems(order.id, t);
       order.total = await this.calculateTotal(order, t);
       await order.save({ transaction: t });
+
+      // send-noti order employee
+      await this.notificationService.sendPlaceOrder(order);
       return { message: 'Place order successfully' };
     });
   }

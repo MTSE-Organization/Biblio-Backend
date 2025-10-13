@@ -14,6 +14,7 @@ import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
 import { FileService } from '../file/file.service';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AccountService {
@@ -99,6 +100,12 @@ export class AccountService {
           include: [{ model: Permission, through: { attributes: [] } }]
         }
       ]
+    });
+  }
+
+  async findAllByKindIn(kinds: number[]): Promise<Account[]> {
+    return await this.accountRepository.findAll({
+      where: { kind: { [Op.in]: kinds } }
     });
   }
 
