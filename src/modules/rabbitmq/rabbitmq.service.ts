@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RabbitmqAdminService } from './rabbitmq-admin.service';
+import { BaseSendMsgForm } from './forms/base-send-msg.form';
 
 @Injectable()
 export class RabbitmqService {
@@ -8,11 +9,11 @@ export class RabbitmqService {
   async handleSendMsg(
     appName: string,
     queueName: string,
-    data: any,
+    data: string,
     cmd: string,
-    subCmd?: string
+    subCmd: string | null
   ): Promise<void> {
-    const form = { app: appName, cmd: cmd, subCmd: subCmd, data: data };
+    const form = new BaseSendMsgForm(appName, cmd, subCmd, data);
     const message = JSON.stringify(form);
     await this.rabbitMQAdmin.sendMessage(queueName, message);
   }
