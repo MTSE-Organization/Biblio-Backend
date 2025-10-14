@@ -8,7 +8,7 @@ import {
   Product,
   ProductVariant
 } from '@/models';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import {
   CreateOrderForm,
@@ -31,6 +31,8 @@ import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class OrderService {
+  private readonly logger = new Logger(OrderService.name);
+
   constructor(
     @InjectModel(Order)
     private readonly orderRepository: typeof Order,
@@ -190,8 +192,11 @@ export class OrderService {
       order.total = await this.calculateTotal(order, t);
       await order.save({ transaction: t });
 
-      // send-noti order employee
-      await this.notificationService.sendPlaceOrder(order);
+      // send-noti new order for all admin and employee
+      this.notificationService
+        .sendPlaceOrder(order)
+        .catch((err) => this.logger.error('SendPlaceOrder error', err));
+
       return { message: 'Place order successfully' };
     });
   }

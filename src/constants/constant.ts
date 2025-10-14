@@ -61,7 +61,13 @@ export const Constant = {
 
   // Notification type
   NOTIFICATION_TYPE_ORDER: 1,
-  NOTIFICATION_TYPE_PRODUCT: 2
+  NOTIFICATION_TYPE_PRODUCT: 2,
+
+  BACKEND_APP: 'BACKEND_APP',
+
+  // Notification CMD
+  CMD_BROADCAST: 'CMD_BROADCAST',
+  CMD_NOTIFICATION_NEW_ORDER: 'CMD_NOTIFICATION_NEW_ORDER'
 } as const;
 
 export const fileFolders = {

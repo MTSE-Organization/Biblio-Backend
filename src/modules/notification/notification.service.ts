@@ -6,7 +6,6 @@ import { Order } from '@/models';
 import { AccountService } from '../account/account.service';
 import { Constant } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
-import { RedisService } from '../redis/redis.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -19,8 +18,7 @@ export class NotificationService {
     @Inject(forwardRef(() => AccountService))
     private readonly accountService: AccountService,
     private readonly configService: ConfigService,
-    private readonly rabbitmqService: RabbitmqService,
-    private readonly redisService: RedisService
+    private readonly rabbitmqService: RabbitmqService
   ) {
     this.notificationQueue = this.configService.get<string>(
       'RABBITMQ_NOTIFICATION_QUEUE'
@@ -50,10 +48,6 @@ export class NotificationService {
   }
 
   async sendPlaceOrder(order: Order) {
-    const accounts = await this.accountService.findAllByKindIn([
-      Constant.ACCOUNT_KIND_ADMIN,
-      Constant.ACCOUNT_KIND_EMPLOYEE
-    ]);
     const notification = {
       title: 'Order place',
       imageUrl: 'abc',
@@ -61,40 +55,28 @@ export class NotificationService {
       type: Constant.NOTIFICATION_TYPE_ORDER,
       data: JSON.stringify({ orderId: order.id })
     };
+
+    const [accounts, _] = await Promise.all([
+      this.accountService.findAllByKindIn([
+        Constant.ACCOUNT_KIND_ADMIN,
+        Constant.ACCOUNT_KIND_EMPLOYEE
+      ]),
+      this.rabbitmqService.handleSendMsg(
+        Constant.BACKEND_APP,
+        this.notificationQueue,
+        JSON.stringify(notification),
+        Constant.CMD_BROADCAST,
+        Constant.CMD_NOTIFICATION_NEW_ORDER
+      )
+    ]);
+
     const notifications = accounts.map((account) => ({
       accountId: account.id,
       ...notification
     }));
-    console.log(notifications);
 
     await this.notificationRepository.bulkCreate(notifications, {
       individualHooks: true
     });
-
-    const keysEmp: Set<string> = await this.redisService.getKeysByPrefix('emp');
-    console.log(keysEmp);
-    const promises: Promise<void>[] = [];
-    for (const key of keysEmp) {
-      // ${keyType}:${userId}:${sessionId}
-      const parts = key.split(':');
-      const userId = parts[1];
-      const sessionId = parts[2];
-
-      const form = {
-        accountId: userId,
-        ...notification
-      };
-
-      const data = { userId: userId, sessionId: sessionId, message: form };
-      promises.push(
-        this.rabbitmqService.handleSendMsg(
-          'BACKEND_APP',
-          this.notificationQueue,
-          JSON.stringify(data),
-          'CMD_BROADCAST'
-        )
-      );
-    }
-    await Promise.all(promises);
   }
 }

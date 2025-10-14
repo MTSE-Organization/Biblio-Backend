@@ -32,7 +32,8 @@ export class RabbitmqController {
           'BACKEND_APP',
           this.notificationQueue,
           JSON.stringify(data),
-          'CMD_BROADCAST'
+          'CMD_BROADCAST',
+          null
         )
       );
     }
