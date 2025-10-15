@@ -13,6 +13,7 @@ import { CouponModule } from '../coupon/coupon.module';
 import { OrderScheduler } from './order.scheduler';
 import { ProductModule } from '../product/product.module';
 import { NotificationModule } from '../notification/notification.module';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
   controllers: [OrderController],
@@ -30,7 +31,8 @@ import { NotificationModule } from '../notification/notification.module';
     CartItemModule,
     CouponModule,
     ProductModule,
-    NotificationModule
+    NotificationModule,
+    forwardRef(() => PaymentModule)
   ],
   exports: [OrderService, OrderItemService]
 })

@@ -22,12 +22,13 @@ import { AddressService } from '../address/address.service';
 import { Constant, ErrorCode, OrderTransitions } from '@/constants';
 import { OrderItemService } from './order-item.service';
 import { OrderStatusService } from './order-status.service';
-import { Sequelize, Transaction } from 'sequelize';
+import { Sequelize, Transaction, where } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
 import { CreateOrderDto } from './dtos';
 import { NotificationService } from '../notification/notification.service';
+import { PaymentService } from '../payment/payment.service';
 
 @Injectable()
 export class OrderService {
@@ -44,6 +45,8 @@ export class OrderService {
     private readonly addressService: AddressService,
     private readonly couponService: CouponService,
     private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => PaymentService))
+    private readonly paymentService: PaymentService,
     @InjectConnection() private readonly sequelize: Sequelize
   ) {}
 
@@ -171,33 +174,36 @@ export class OrderService {
 
       // update information
       order.paymentMethod = form.paymentMethod;
-      order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
+      order.total = await this.calculateTotal(order, t);
 
+      let paymentUrl: string | null = null;
       // payment method cod
       if (form.paymentMethod === Constant.PAYMENT_METHOD_COD) {
+        order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
         await this.orderStatusService.create(
           Constant.ORDER_STATUS_WAITING_CONFIRMATION,
           order.id,
           t
         );
+        await this.orderItemService.processOrderItems(order.id, t);
+        // send-noti new order for all admin and employee
+        this.notificationService
+          .sendPlaceOrder(order)
+          .catch((err) => this.logger.error('SendPlaceOrder error', err));
       } else {
+        order.currentStatus = Constant.ORDER_STATUS_WAITING_PAYMENT;
         // call to VNPAY API
         await this.orderStatusService.create(
-          Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+          Constant.ORDER_STATUS_WAITING_PAYMENT,
           order.id,
           t
         );
+        paymentUrl = this.paymentService.getPaymentUrl(order);
       }
-      await this.orderItemService.processOrderItems(order.id, t);
-      order.total = await this.calculateTotal(order, t);
+
       await order.save({ transaction: t });
 
-      // send-noti new order for all admin and employee
-      this.notificationService
-        .sendPlaceOrder(order)
-        .catch((err) => this.logger.error('SendPlaceOrder error', err));
-
-      return { message: 'Place order successfully' };
+      return { data: { paymentUrl }, message: 'Place order successfully' };
     });
   }
 
@@ -400,5 +406,30 @@ export class OrderService {
       ]);
       return { message: 'Complete order successfully' };
     });
+  }
+
+  async handleNewOrder(orderId: bigint) {
+    const order = await this.orderRepository.findByPk(orderId);
+    if (!order) {
+      throw new NotFoundException(
+        'Order not found',
+        ErrorCode.ORDER_ERROR_NOT_FOUND
+      );
+    }
+    order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
+
+    await Promise.all([
+      this.orderStatusService.create(
+        Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+        order.id
+      ),
+      this.orderItemService.processOrderItems(order.id),
+      order.save()
+    ]);
+
+    // send-noti new order for all admin and employee
+    this.notificationService
+      .sendPlaceOrder(order)
+      .catch((err) => this.logger.error('SendPlaceOrder error', err));
   }
 }
