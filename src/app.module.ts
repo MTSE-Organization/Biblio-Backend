@@ -8,7 +8,7 @@ import {
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { sequelizeConfig } from './config/sequelize.config';
 import { GroupModule } from './modules/group/group.module';
 import { CategoryModule } from './modules/category/category.module';
@@ -40,6 +40,10 @@ import { RedisModule } from './modules/redis/redis.module';
 import { ElasticSearchModule } from './modules/elastic-search/elastic-search.module';
 import { RabbitmqModule } from './modules/rabbitmq/rabbitmq.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { VnpayModule } from 'nestjs-vnpay';
+import { ignoreLogger } from 'vnpay';
+import { PaymentModule } from './modules/payment/payment.module';
+import { VnpayConfigModule } from './modules/vnpay-config/vnpay-config.module';
 //#endregion
 
 @Module({
@@ -75,7 +79,9 @@ import { NotificationModule } from './modules/notification/notification.module';
     RedisModule,
     ElasticSearchModule,
     RabbitmqModule,
-    NotificationModule
+    NotificationModule,
+    VnpayConfigModule,
+    PaymentModule
   ]
 })
 export class AppModule implements NestModule {
