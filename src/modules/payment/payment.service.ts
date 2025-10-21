@@ -38,12 +38,7 @@ export class PaymentService {
     const verify = await this.vnpayService.verifyReturnUrl(params);
     const paymentStatus = verify.vnp_ResponseCode;
     const orderId = verify.vnp_TxnRef;
-    if (verify.isSuccess) {
-      await this.orderService.handleNewOrder(BigInt(orderId));
-      console.log('Thanh toán thành công!', verify.message);
-    } else {
-      console.log('Thanh toán thất bại:', verify.message);
-    }
+    await this.orderService.handleNewOrder(BigInt(orderId), verify.isSuccess);
     return { orderId, paymentStatus, redirectUri: this.redirectUri };
   }
 }

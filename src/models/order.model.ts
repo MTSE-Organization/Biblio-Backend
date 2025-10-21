@@ -39,6 +39,9 @@ export class Order extends Auditable {
   @Column({ type: DataType.INTEGER })
   declare paymentMethod: number;
 
+  @Column({ type: DataType.INTEGER })
+  declare paymentStatus: number;
+
   @Column({ type: DataType.TEXT })
   declare note: string;
 

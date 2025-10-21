@@ -1,5 +1,5 @@
 import { CartItem, OrderItem, Product, ProductVariant } from '@/models';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductVariantService } from '../product-variant/product-variant.service';
 import bigDecimal from 'js-big-decimal';
@@ -191,5 +191,16 @@ export class OrderItemService {
       where: { orderId: BigInt(orderId) },
       transaction
     });
+  }
+
+  async findFirstByOrderId(orderId: bigint): Promise<OrderItem> {
+    const orderItem = await this.orderItemRepository.findOne({
+      where: { orderId: BigInt(orderId) },
+      include: [{ model: ProductVariant }]
+    });
+    if (!orderItem) {
+      throw new NotFoundException('Order item not found');
+    }
+    return orderItem;
   }
 }

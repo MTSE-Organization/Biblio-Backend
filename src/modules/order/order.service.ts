@@ -137,12 +137,7 @@ export class OrderService {
         where: {
           id: form.id,
           accountId,
-          currentStatus: {
-            [Op.in]: [
-              Constant.ORDER_STATUS_WAITING,
-              Constant.ORDER_STATUS_WAITING_PAYMENT
-            ]
-          }
+          currentStatus: Constant.ORDER_STATUS_WAITING
         }
       });
       if (!order) {
@@ -152,7 +147,7 @@ export class OrderService {
         );
       }
 
-      if (order.currentStatus === Constant.ORDER_STATUS_WAITING_PAYMENT) {
+      if (order.paymentStatus === Constant.PAYMENT_STATUS_PENDING) {
         return {
           data: { paymentUrl: this.paymentService.getPaymentUrl(order) },
           message: 'Place order successfully'
@@ -199,17 +194,16 @@ export class OrderService {
         );
         await this.orderItemService.processOrderItems(order.id, t);
         // send-noti new order for all admin and employee
+        const orderItem = await this.orderItemService.findFirstByOrderId(
+          order.id
+        );
+        const imageUrl = orderItem?.productVariant.imageUrl;
         this.notificationService
-          .sendPlaceOrder(order)
+          .sendPlaceOrder(order, imageUrl)
           .catch((err) => this.logger.error('SendPlaceOrder error', err));
       } else {
-        order.currentStatus = Constant.ORDER_STATUS_WAITING_PAYMENT;
+        order.paymentStatus = Constant.PAYMENT_STATUS_PENDING;
         // call to VNPAY API
-        await this.orderStatusService.create(
-          Constant.ORDER_STATUS_WAITING_PAYMENT,
-          order.id,
-          t
-        );
         paymentUrl = this.paymentService.getPaymentUrl(order);
       }
 
@@ -399,17 +393,17 @@ export class OrderService {
   async complete(id: bigint, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_SHIPPING) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
         );
       }
 
-      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
+      order.currentStatus = Constant.ORDER_STATUS_COMPLETE;
       await Promise.all([
         this.orderStatusService.create(
-          Constant.ORDER_STATUS_RECEIVED,
+          Constant.ORDER_STATUS_COMPLETE,
           order.id,
           t
         ),
@@ -420,7 +414,7 @@ export class OrderService {
     });
   }
 
-  async handleNewOrder(orderId: bigint) {
+  async handleNewOrder(orderId: bigint, isPaymentSuccess: boolean) {
     const order = await this.orderRepository.findByPk(orderId);
     if (!order) {
       throw new NotFoundException(
@@ -429,6 +423,9 @@ export class OrderService {
       );
     }
     order.currentStatus = Constant.ORDER_STATUS_WAITING_CONFIRMATION;
+    order.paymentStatus = isPaymentSuccess
+      ? Constant.PAYMENT_STATUS_SUCCESS
+      : Constant.PAYMENT_STATUS_FAILED;
 
     await Promise.all([
       this.orderStatusService.create(
@@ -439,9 +436,12 @@ export class OrderService {
       order.save()
     ]);
 
+    const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
+    const imageUrl = orderItem?.productVariant.imageUrl;
+
     // send-noti new order for all admin and employee
     this.notificationService
-      .sendPlaceOrder(order)
+      .sendPlaceOrder(order, imageUrl)
       .catch((err) => this.logger.error('SendPlaceOrder error', err));
   }
 }
