@@ -22,7 +22,7 @@ import { AddressService } from '../address/address.service';
 import { Constant, ErrorCode, OrderTransitions } from '@/constants';
 import { OrderItemService } from './order-item.service';
 import { OrderStatusService } from './order-status.service';
-import { Sequelize, Transaction, where } from 'sequelize';
+import { Op, Sequelize, Transaction, where } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
@@ -137,7 +137,12 @@ export class OrderService {
         where: {
           id: form.id,
           accountId,
-          currentStatus: Constant.ORDER_STATUS_WAITING
+          currentStatus: {
+            [Op.in]: [
+              Constant.ORDER_STATUS_WAITING,
+              Constant.ORDER_STATUS_WAITING_PAYMENT
+            ]
+          }
         }
       });
       if (!order) {
@@ -145,6 +150,13 @@ export class OrderService {
           'Order not found',
           ErrorCode.ORDER_ERROR_NOT_FOUND
         );
+      }
+
+      if (order.currentStatus === Constant.ORDER_STATUS_WAITING_PAYMENT) {
+        return {
+          data: { paymentUrl: this.paymentService.getPaymentUrl(order) },
+          message: 'Place order successfully'
+        };
       }
 
       // update address
