@@ -4,10 +4,10 @@ import { FilterNotificationForm } from './forms';
 import { Notification } from '@/models/notification.model';
 import { Order } from '@/models';
 import { AccountService } from '../account/account.service';
-import { Constant } from '@/constants';
+import { Constant, ErrorCode } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
-import { OrderItemService } from '../order/order-item.service';
+import { NotFoundException } from '@/common/exceptions';
 
 @Injectable()
 export class NotificationService {
@@ -79,5 +79,16 @@ export class NotificationService {
     await this.notificationRepository.bulkCreate(notifications, {
       individualHooks: true
     });
+  }
+
+  async markRead(id: bigint) {
+    const notification = await this.notificationRepository.findByPk(id);
+    if (!notification)
+      throw new NotFoundException(
+        'Notification not found',
+        ErrorCode.NOTIFICATION_ERROR_NOT_FOUND
+      );
+
+    await notification.update({ seen: true, lastTimeRead: new Date() });
   }
 }

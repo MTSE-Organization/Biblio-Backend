@@ -27,4 +27,7 @@ export class NotificationDto {
 
   @Expose()
   lastTimeRead: Date;
+
+  @Expose()
+  createdDate: Date;
 }
