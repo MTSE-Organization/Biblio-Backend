@@ -1,4 +1,5 @@
 import { CategoryDocDto } from '@/modules/category/dtos';
+import { ProductImageAutoCompleteDto } from '@/modules/product-image/dtos';
 import { Expose, Type } from 'class-transformer';
 
 export class ProductDocDto {
@@ -7,6 +8,9 @@ export class ProductDocDto {
 
   @Expose()
   name: string;
+
+  @Expose()
+  slug: string;
 
   @Expose()
   price: number;
@@ -25,6 +29,10 @@ export class ProductDocDto {
 
   @Expose()
   imageUrl: string;
+
+  @Expose()
+  @Type(() => ProductImageAutoCompleteDto)
+  image: ProductImageAutoCompleteDto;
 
   @Expose()
   @Type(() => CategoryDocDto)

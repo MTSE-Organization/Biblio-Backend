@@ -25,10 +25,9 @@ export class ProductMapper {
     const plain = (product as any).get?.({ plain: true }) ?? product;
     plain.price = parseFloat(plain.price);
 
-    plain.imageUrl =
-      plain.images && plain.images.length > 0
-        ? (plain.images[0].url ?? null)
-        : null;
+    if (plain.images && plain.images.length > 0) {
+      plain.image = plain.images[0];
+    }
 
     return MapperUtil.toDto(plain, ProductDocDto);
   }

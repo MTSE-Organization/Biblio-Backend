@@ -261,7 +261,7 @@ export class ProductService {
     return this.productRepository.findAll({
       where: { isFeatured: true, status: Constant.STATUS_ACTIVE },
       limit,
-      order: [['quantity', 'DESC']],
+      order: [['totalSold', 'DESC']],
       include: [{ model: Category }]
     });
   }
