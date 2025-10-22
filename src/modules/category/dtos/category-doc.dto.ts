@@ -6,4 +6,10 @@ export class CategoryDocDto {
 
   @Expose()
   name: string;
+
+  @Expose()
+  slug: string;
+
+  @Expose()
+  status: number;
 }

@@ -9,16 +9,27 @@ export const ProductMapping = {
           keyword: { type: 'keyword' }
         }
       },
+      slug: { type: 'text' },
       price: { type: 'scaled_float', scaling_factor: 100 },
       createdDate: { type: 'date' },
       ageRating: { type: 'integer' },
       language: { type: 'keyword' },
       discount: { type: 'integer' },
-      imageUrl: { type: 'keyword' },
+      image: {
+        properties: {
+          id: { type: 'keyword' },
+          url: { type: 'text' },
+          ordering: { type: 'integer' },
+          isDefault: { type: 'boolean' },
+          status: { type: 'integer' }
+        }
+      },
       category: {
         properties: {
           id: { type: 'keyword' },
-          name: { type: 'text' }
+          name: { type: 'text' },
+          slug: { type: 'text' },
+          status: { type: 'integer' }
         }
       }
     }

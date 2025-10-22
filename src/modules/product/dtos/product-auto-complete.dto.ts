@@ -24,7 +24,7 @@ export class ProductAutoCompleteDto {
   slug: string;
 
   @Expose()
-  quantity: number;
+  isFeatured: boolean;
 
   @Expose()
   discount: number;
