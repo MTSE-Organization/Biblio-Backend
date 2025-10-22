@@ -40,4 +40,7 @@ export class ProductAutoCompleteDto {
 
   @Expose()
   averageReview: number;
+
+  @Expose()
+  totalSold: number;
 }

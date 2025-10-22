@@ -15,6 +15,10 @@ export const ProductMapping = {
       ageRating: { type: 'integer' },
       language: { type: 'keyword' },
       discount: { type: 'integer' },
+      totalViews: { type: 'integer' },
+      totalReviews: { type: 'integer' },
+      averageReview: { type: 'double' },
+      totalSold: { type: 'integer' },
       image: {
         properties: {
           id: { type: 'keyword' },
