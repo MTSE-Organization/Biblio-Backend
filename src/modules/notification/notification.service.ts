@@ -7,6 +7,7 @@ import { AccountService } from '../account/account.service';
 import { Constant } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
+import { OrderItemService } from '../order/order-item.service';
 
 @Injectable()
 export class NotificationService {
@@ -47,10 +48,10 @@ export class NotificationService {
     });
   }
 
-  async sendPlaceOrder(order: Order) {
+  async sendPlaceOrder(order: Order, imageUrl?: string) {
     const notification = {
       title: 'Order place',
-      imageUrl: 'abc',
+      imageUrl: imageUrl,
       content: `New order ${order.id} place from user ${order.accountId}`,
       type: Constant.NOTIFICATION_TYPE_ORDER,
       data: JSON.stringify({ orderId: order.id })

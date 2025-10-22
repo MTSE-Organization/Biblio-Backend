@@ -3,12 +3,10 @@ import {
   Column,
   DataType,
   ForeignKey,
-  HasMany,
   Table
 } from 'sequelize-typescript';
 import { Auditable } from './auditable.model';
 import { Product } from './product.model';
-import { FavoriteProduct } from '@/models/favorite-product.model';
 
 @Table({
   tableName: 'db_product_variant',

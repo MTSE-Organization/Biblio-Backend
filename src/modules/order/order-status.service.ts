@@ -1,3 +1,5 @@
+import { NotFoundException } from '@/common/exceptions';
+import { ErrorCode } from '@/constants';
 import { OrderStatus } from '@/models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -20,5 +22,24 @@ export class OrderStatusService {
         ...(transaction && { transaction })
       }
     );
+  }
+
+  async findByOrderIdAndStatus(
+    orderId: bigint,
+    status: number
+  ): Promise<OrderStatus> {
+    const orderStatus = await this.orderStatusRepository.findOne({
+      where: {
+        orderId: orderId,
+        status: status
+      }
+    });
+    if (!orderStatus) {
+      throw new NotFoundException(
+        'Order status not found',
+        ErrorCode.ORDER_STATUS_ERROR_NOT_FOUND
+      );
+    }
+    return orderStatus;
   }
 }
