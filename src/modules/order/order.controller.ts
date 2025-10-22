@@ -121,4 +121,14 @@ export class OrderController {
   async complete(@Req() req, @Param('id') id: bigint) {
     return await this.orderService.complete(id, req.user.id);
   }
+
+  @ApiResponseNoData({
+    objectName: 'order',
+    message: 'Refund order successfully'
+  })
+  @Put('refund/:id')
+  @UseGuards(JwtAuthGuard)
+  async refund(@Req() req, @Param('id') id: bigint) {
+    return await this.orderService.refund(id, req.user.id);
+  }
 }

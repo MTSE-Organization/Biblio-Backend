@@ -414,6 +414,37 @@ export class OrderService {
     });
   }
 
+  async refund(id: bigint, accountId: bigint) {
+    return await this.sequelize.transaction(async (t) => {
+      const order = await this.findByIdAndAccount(id, accountId);
+      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
+        throw new BadRequestException(
+          'Status is not valid',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+      }
+
+      const orderStatus = await this.orderStatusService.findByOrderIdAndStatus(
+        order.id,
+        Constant.ORDER_STATUS_COMPLETE
+      );
+      const now = new Date();
+      const diffTime = now.getTime() - orderStatus?.createdDate.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 3) {
+        throw new BadRequestException(
+          'Order cannot be refunded',
+          ErrorCode.ORDER_ERROR_CANNOT_REFUND
+        );
+      }
+
+      order.currentStatus = Constant.ORDER_STATUS_REQUEST_REFUND;
+      await order.save({ transaction: t });
+      return { message: 'Refund order successfully' };
+    });
+  }
+
   async handleNewOrder(orderId: bigint, isPaymentSuccess: boolean) {
     const order = await this.orderRepository.findByPk(orderId);
     if (!order) {
