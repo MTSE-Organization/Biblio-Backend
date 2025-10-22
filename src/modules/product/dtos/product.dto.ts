@@ -67,6 +67,9 @@ export class ProductDto {
   averageReview: number;
 
   @Expose()
+  totalSold: number;
+
+  @Expose()
   createdDate: Date;
 
   @Expose()

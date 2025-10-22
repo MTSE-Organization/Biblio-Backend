@@ -28,7 +28,16 @@ export class ProductDocDto {
   discount: number;
 
   @Expose()
-  imageUrl: string;
+  totalViews: number;
+
+  @Expose()
+  totalReviews: number;
+
+  @Expose()
+  averageReview: number;
+
+  @Expose()
+  totalSold: number;
 
   @Expose()
   @Type(() => ProductImageAutoCompleteDto)
