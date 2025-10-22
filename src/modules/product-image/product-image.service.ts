@@ -14,6 +14,8 @@ import { FileService } from '../file/file.service';
 import { Sequelize } from 'sequelize';
 import { ElasticSearchService } from '../elastic-search/elastic-search.service';
 import { ProductMapping } from '../elastic-search/mappings/product.mapping';
+import { MapperUtil } from '@/utils';
+import { ProductImageAutoCompleteDto } from './dtos';
 
 @Injectable()
 export class ProductImageService {
@@ -53,7 +55,9 @@ export class ProductImageService {
 
     if (productImage.isDefault) {
       // build doc product
-      const doc = { imageUrl: productImage.url };
+      const doc = {
+        image: MapperUtil.toDto(productImage, ProductImageAutoCompleteDto)
+      };
       // update to es
       await this.elasticSearchService.createIndex(
         ElasticConstant.PRODUCT_INDEX,
@@ -77,7 +81,7 @@ export class ProductImageService {
 
     if (productImage.isDefault) {
       // build doc product
-      const doc = { imageUrl: null };
+      const doc = { image: null };
       // update to es
       await this.elasticSearchService.createIndex(
         ElasticConstant.PRODUCT_INDEX,
@@ -174,10 +178,10 @@ export class ProductImageService {
         { where: { id }, transaction }
       );
 
-      await transaction.commit();
-
       // build doc product
-      const doc = { imageUrl: productImage.url };
+      const doc = {
+        image: MapperUtil.toDto(productImage, ProductImageAutoCompleteDto)
+      };
       // update to es
       await this.elasticSearchService.createIndex(
         ElasticConstant.PRODUCT_INDEX,
@@ -188,6 +192,7 @@ export class ProductImageService {
         productImage.productId.toString(),
         doc
       );
+      await transaction.commit();
 
       return { message: 'Set default product image successfully' };
     } catch (err) {
