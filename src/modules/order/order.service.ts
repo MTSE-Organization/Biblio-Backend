@@ -29,6 +29,8 @@ import bigDecimal from 'js-big-decimal';
 import { CreateOrderDto } from './dtos';
 import { NotificationService } from '../notification/notification.service';
 import { PaymentService } from '../payment/payment.service';
+import { FilterRevenueForm } from './forms/filter-revenue.form';
+import { RevenueOrderDto } from './dtos/revenue-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -474,5 +476,41 @@ export class OrderService {
     this.notificationService
       .sendPlaceOrder(order, imageUrl)
       .catch((err) => this.logger.error('SendPlaceOrder error', err));
+  }
+
+  async getRevenue(form: FilterRevenueForm): Promise<RevenueOrderDto> {
+    const where: any = {
+      currentStatus: {
+        [Op.notIn]: [Constant.ORDER_STATUS_CANCELED]
+      }
+    };
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.createdDate = {};
+      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    }
+
+    const orders = await this.orderRepository.findAll({
+      where,
+      attributes: ['total']
+    });
+
+    let totalRevenue = '0';
+
+    for (const order of orders) {
+      totalRevenue = bigDecimal.add(totalRevenue, order.total);
+    }
+
+    return {
+      totalRevenue,
+      totalOrders: orders.length
+    };
   }
 }

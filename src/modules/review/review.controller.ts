@@ -17,6 +17,8 @@ import { MapperUtil } from '@/utils';
 import { ReviewDto, ReviewStatsDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
 import { ApiListResponse, ApiResponseNoData, PCode } from '@/common/decorators';
+import { ReviewTopRatedProductDto } from './dtos/review-top-rate-product.dto';
+import { FilterTopReviewForm } from './forms/filter-top-review.form';
 
 @Controller('review')
 export class ReviewController {
@@ -70,5 +72,13 @@ export class ReviewController {
   async delete(@Req() req: any, @Param('id') id: bigint) {
     const accountId = req.user.id;
     return this.reviewService.delete(id, accountId);
+  }
+
+  @ApiListResponse(ReviewTopRatedProductDto, { objectName: 'product-favorite' })
+  @Get('top-favorite')
+  async getTopFavorite(
+    @Query() form: FilterTopReviewForm
+  ): Promise<ReviewTopRatedProductDto[]> {
+    return this.reviewService.getTopRatedProducts(form);
   }
 }
