@@ -25,6 +25,8 @@ import {
 } from './forms';
 import { MapperUtil } from '@/utils';
 import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
+import { RevenueOrderDto } from './dtos/revenue-order.dto';
+import { FilterRevenueForm } from './forms/filter-revenue.form';
 
 @Controller('order')
 export class OrderController {
@@ -130,5 +132,11 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   async refund(@Req() req, @Param('id') id: bigint) {
     return await this.orderService.refund(id, req.user.id);
+  }
+
+  @ApiResponse(RevenueOrderDto, { objectName: 'revenue' })
+  @Get('revenue')
+  async getRevenue(@Query() form: FilterRevenueForm) {
+    return await this.orderService.getRevenue(form);
   }
 }

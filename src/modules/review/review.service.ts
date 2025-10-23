@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Review } from '@/models/review.model';
 import { ReviewForm } from './forms/review.form';
@@ -8,7 +8,9 @@ import { NotFoundException } from '@/common/exceptions';
 import { ErrorCode } from '@/constants';
 import { ProductService } from '@/modules/product/product.service';
 import { ReviewStatsDto } from './dtos';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
+import { FilterTopReviewForm } from './forms/filter-top-review.form';
+import { ReviewTopRatedProductDto } from './dtos/review-top-rate-product.dto';
 
 @Injectable()
 export class ReviewService {
@@ -126,5 +128,53 @@ export class ReviewService {
     }
 
     return result;
+  }
+
+  async getTopRatedProducts(
+    form: FilterTopReviewForm
+  ): Promise<ReviewTopRatedProductDto[]> {
+    const rate = form.rate ?? 5;
+    const where: any = { rate };
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.createdDate = {};
+      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    }
+
+    const queryOptions: any = {
+      where,
+      attributes: [
+        'productId',
+        [Sequelize.fn('COUNT', Sequelize.col('Review.id')), 'starCount']
+      ],
+      include: [
+        {
+          model: Product,
+          as: 'product',
+          attributes: ['id', 'name']
+        }
+      ],
+      group: ['productId', 'product.id', 'product.name'],
+      order: [[Sequelize.literal('starCount'), 'DESC']]
+    };
+
+    if (form.top) {
+      queryOptions.limit = form.top;
+    }
+
+    const topProducts = await this.reviewRepository.findAll(queryOptions);
+
+    return topProducts.map((r: any) => ({
+      productId: r.productId,
+      productName: r.product.name,
+      starCount: Number(r.getDataValue('starCount'))
+    }));
   }
 }
