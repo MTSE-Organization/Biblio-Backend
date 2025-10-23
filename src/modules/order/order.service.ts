@@ -470,9 +470,11 @@ export class OrderService {
     const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
     const imageUrl = orderItem?.productVariant.imageUrl;
 
-    // send-noti new order for all admin and employee
-    this.notificationService
-      .sendPlaceOrder(order, imageUrl)
-      .catch((err) => this.logger.error('SendPlaceOrder error', err));
+    if (isPaymentSuccess) {
+      // send-noti new order for all admin and employee
+      this.notificationService
+        .sendPlaceOrder(order, imageUrl)
+        .catch((err) => this.logger.error('SendPlaceOrder error', err));
+    }
   }
 }
