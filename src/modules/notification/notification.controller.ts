@@ -1,11 +1,24 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Put,
+  Query,
+  Req,
+  UseGuards
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
 import { NotificationDto } from './dtos';
 import { FilterNotificationForm } from './forms';
-import { ApiListResponse } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData
+} from '@/common/decorators';
+import { CountNotificationDto } from '@/modules/notification/dtos/notification-count.dto';
 
 @Controller('notification')
 export class NotificationController {
@@ -27,15 +40,26 @@ export class NotificationController {
   }
 
   // @PCode('GR_L')
+  @ApiResponse(CountNotificationDto, {
+    message: 'Count notification successfully',
+    objectName: 'notification'
+  })
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('count-unread')
   async countUnRead(@Req() req) {
     const count = await this.notificationService.countUnRead(req.user.id);
-    console.log({ count });
 
     return {
       data: { count },
-      message: 'Get count un read successfully'
+      message: 'Get count unread successfully'
     };
+  }
+
+  @ApiResponseNoData({ message: 'Mark read notification successfully' })
+  @UseGuards(JwtAuthGuard)
+  @Put('mark-read/:id')
+  async markRead(@Param('id') id: bigint) {
+    await this.notificationService.markRead(id);
+    return { message: 'Mark read notification successfully' };
   }
 }
