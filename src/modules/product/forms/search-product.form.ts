@@ -6,9 +6,11 @@ export class SearchProductForm extends PaginationForm {
   @StringDecorator('keyword')
   keyword: string;
 
+  @Type(() => Number)
   @NumberDecorator('minPrice')
   minPrice: number;
 
+  @Type(() => Number)
   @NumberDecorator('maxPrice')
   maxPrice: number;
 

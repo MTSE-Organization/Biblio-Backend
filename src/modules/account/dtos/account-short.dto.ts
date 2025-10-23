@@ -1,5 +1,4 @@
-import { GroupAutoCompleteDto } from '@/modules/group/dtos/group-auto-complete.dto';
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
 export class AccountShortDto {
   @Expose()

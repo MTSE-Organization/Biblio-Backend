@@ -8,6 +8,8 @@ import { Constant } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
 import { OrderItemService } from '../order/order-item.service';
+import { MapperUtil } from '@/utils';
+import { AccountShortDto } from '../account/dtos';
 
 @Injectable()
 export class NotificationService {
@@ -49,12 +51,17 @@ export class NotificationService {
   }
 
   async sendPlaceOrder(order: Order, imageUrl?: string) {
+    const customer = await this.accountService.findById(order.accountId);
+
     const notification = {
       title: 'Order place',
       imageUrl: imageUrl,
       content: `New order ${order.id} place from user ${order.accountId}`,
       type: Constant.NOTIFICATION_TYPE_ORDER,
-      data: JSON.stringify({ orderId: order.id })
+      data: JSON.stringify({
+        orderId: order.id,
+        customer: MapperUtil.toDto(customer, AccountShortDto)
+      })
     };
 
     const [accounts, _] = await Promise.all([
