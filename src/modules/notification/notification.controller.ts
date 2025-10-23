@@ -62,4 +62,19 @@ export class NotificationController {
     await this.notificationService.markRead(id);
     return { message: 'Mark read notification successfully' };
   }
+
+  @ApiResponseNoData({ message: 'Mark all notifications as read successfully' })
+  @Put('read-all')
+  @UseGuards(JwtAuthGuard)
+  async markAllRead(@Req() req) {
+    await this.notificationService.markAllRead(req.user.id);
+    return { message: 'Mark all notifications as read successfully' };
+  }
+
+  @Put('delete-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponseNoData({ message: 'Delete all notifications successfully' })
+  async deleteAll(@Req() req) {
+    return await this.notificationService.deleteAllByAccountId(req.user.id);
+  }
 }

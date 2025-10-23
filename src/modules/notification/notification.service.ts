@@ -11,7 +11,7 @@ import { OrderItemService } from '../order/order-item.service';
 import { MapperUtil } from '@/utils';
 import { AccountShortDto } from '../account/dtos';
 import { NotFoundException } from '@/common/exceptions';
-
+import { Op } from 'sequelize';
 
 @Injectable()
 export class NotificationService {
@@ -99,5 +99,39 @@ export class NotificationService {
       );
 
     await notification.update({ seen: true, lastTimeRead: new Date() });
+  }
+
+  async markAllRead(accountId: bigint) {
+    await this.notificationRepository.update(
+      { seen: true, lastTimeRead: new Date() },
+      {
+        where: {
+          accountId,
+          seen: false
+        }
+      }
+    );
+  }
+
+  async deleteAllByAccountId(accountId: bigint) {
+    const notifications = await this.notificationRepository.findAll({
+      where: {
+        accountId,
+        status: { [Op.ne]: Constant.STATUS_DELETED }
+      }
+    });
+
+    if (!notifications.length) return { message: 'No notifications to delete' };
+
+    await this.notificationRepository.update(
+      { status: Constant.STATUS_DELETED },
+      {
+        where: {
+          accountId,
+          status: { [Op.ne]: Constant.STATUS_DELETED }
+        }
+      }
+    );
+    return { message: 'Delete all notifications successfully' };
   }
 }
