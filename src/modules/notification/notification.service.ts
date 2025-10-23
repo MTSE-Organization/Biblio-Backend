@@ -114,24 +114,12 @@ export class NotificationService {
   }
 
   async deleteAllByAccountId(accountId: bigint) {
-    const notifications = await this.notificationRepository.findAll({
+    const count = await this.notificationRepository.destroy({
       where: {
-        accountId,
-        status: { [Op.ne]: Constant.STATUS_DELETED }
+        accountId
       }
     });
 
-    if (!notifications.length) return { message: 'No notifications to delete' };
-
-    await this.notificationRepository.update(
-      { status: Constant.STATUS_DELETED },
-      {
-        where: {
-          accountId,
-          status: { [Op.ne]: Constant.STATUS_DELETED }
-        }
-      }
-    );
-    return { message: 'Delete all notifications successfully' };
+    return { message: `Deleted ${count} notifications successfully` };
   }
 }
