@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -71,10 +72,17 @@ export class NotificationController {
     return { message: 'Mark all notifications as read successfully' };
   }
 
-  @Put('delete-all')
+  @Delete('delete-all')
   @UseGuards(JwtAuthGuard)
   @ApiResponseNoData({ message: 'Delete all notifications successfully' })
   async deleteAll(@Req() req) {
-    return await this.notificationService.deleteAllByAccountId(req.user.id);
+    await this.notificationService.deleteAllByAccountId(req.user.id);
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponseNoData({ message: 'Delete notification successfully' })
+  async delete(@Param('id') id: bigint, @Req() req: any) {
+    await this.notificationService.delete(id, req.user.id);
   }
 }
