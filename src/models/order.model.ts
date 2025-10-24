@@ -60,4 +60,7 @@ export class Order extends Auditable {
 
   @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
   declare total: string;
+
+  @Column({ type: DataType.TEXT })
+  declare refundReason: string;
 }

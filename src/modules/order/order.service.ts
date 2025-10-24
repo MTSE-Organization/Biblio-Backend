@@ -15,6 +15,7 @@ import {
   CreateOrderFromCartForm,
   FilterOrderForm,
   PlaceOrderForm,
+  RefundOrderForm,
   UpdateStatusForm
 } from './forms';
 import { AccountService } from '../account/account.service';
@@ -416,9 +417,9 @@ export class OrderService {
     });
   }
 
-  async refund(id: bigint, accountId: bigint) {
+  async refund(form: RefundOrderForm, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
-      const order = await this.findByIdAndAccount(id, accountId);
+      const order = await this.findByIdAndAccount(form.id, accountId);
       if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
         throw new BadRequestException(
           'Status is not valid',
@@ -442,6 +443,7 @@ export class OrderService {
       }
 
       order.currentStatus = Constant.ORDER_STATUS_REQUEST_REFUND;
+      order.refundReason = form.refundReason;
       await order.save({ transaction: t });
       return { message: 'Refund order successfully' };
     });

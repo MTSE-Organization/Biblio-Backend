@@ -21,7 +21,13 @@ export class OrderAutoCompleteDto {
   currentStatus: number;
 
   @Expose()
+  refundReason: string;
+
+  @Expose()
   paymentMethod: number;
+
+  @Expose()
+  paymentStatus: number;
 
   @Expose()
   createdDate: Date;
