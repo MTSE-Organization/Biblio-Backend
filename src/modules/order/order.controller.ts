@@ -21,6 +21,7 @@ import {
   CreateOrderForm,
   FilterOrderForm,
   PlaceOrderForm,
+  RefundOrderForm,
   UpdateStatusForm
 } from './forms';
 import { MapperUtil } from '@/utils';
@@ -128,10 +129,10 @@ export class OrderController {
     objectName: 'order',
     message: 'Refund order successfully'
   })
-  @Put('refund/:id')
+  @Put('refund')
   @UseGuards(JwtAuthGuard)
-  async refund(@Req() req, @Param('id') id: bigint) {
-    return await this.orderService.refund(id, req.user.id);
+  async refund(@Req() req, @Body() form: RefundOrderForm) {
+    return await this.orderService.refund(form, req.user.id);
   }
 
   @ApiResponse(RevenueOrderDto, { objectName: 'revenue' })

@@ -28,6 +28,9 @@ export class OrderDto {
   paymentMethod: number;
 
   @Expose()
+  paymentStatus: number;
+
+  @Expose()
   note: string;
 
   @Expose()
@@ -43,6 +46,9 @@ export class OrderDto {
 
   @Expose()
   total: string;
+
+  @Expose()
+  refundReason: string;
 
   @Expose()
   createdDate: Date;
