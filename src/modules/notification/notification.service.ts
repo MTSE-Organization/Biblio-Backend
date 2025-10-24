@@ -122,4 +122,18 @@ export class NotificationService {
 
     return { message: `Deleted ${count} notifications successfully` };
   }
+
+  async delete(id: bigint, accountId: bigint) {
+    const notification = await this.notificationRepository.findOne({
+      where: { id, accountId }
+    });
+
+    if (!notification)
+      throw new NotFoundException(
+        'Notification not found',
+        ErrorCode.NOTIFICATION_ERROR_NOT_FOUND
+      );
+
+    await notification.destroy();
+  }
 }
