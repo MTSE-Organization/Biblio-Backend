@@ -48,7 +48,7 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('count-unread')
   async countUnRead(@Req() req) {
-    const count = await this.notificationService.countUnRead(req.user.id);
+    const count = await this.notificationService.countUnread(req.user.id);
 
     return {
       data: { count },
