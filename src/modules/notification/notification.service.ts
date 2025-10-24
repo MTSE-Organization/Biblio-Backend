@@ -38,16 +38,17 @@ export class NotificationService {
     const { rows, count } = await this.notificationRepository.findAndCountAll({
       limit: limit,
       offset: offset,
-      where: query.getFilter()
+      where: query.getFilter(),
+      order: [['createdDate', 'DESC']]
     });
     return { notifications: rows, count };
   }
 
-  async countUnRead(accountId: bigint) {
+  async countUnread(accountId: bigint) {
     return this.notificationRepository.count({
       where: {
         accountId,
-        seen: false
+        seen: 0
       }
     });
   }
