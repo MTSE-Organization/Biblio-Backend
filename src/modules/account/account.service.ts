@@ -15,6 +15,7 @@ import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
 import { FileService } from '../file/file.service';
 import { Op } from 'sequelize';
+import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
 
 @Injectable()
 export class AccountService {
@@ -251,5 +252,25 @@ export class AccountService {
       where: { [field]: value }
     });
     return count > 0;
+  }
+
+  async countNewAccountsInDateRange(
+    form: FilterAccountStatisticForm
+  ): Promise<number> {
+    const where: any = {};
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.created_date = {};
+      if (form.fromDate) where.created_date[Op.gte] = form.fromDate;
+      if (form.toDate) where.created_date[Op.lte] = form.toDate;
+    }
+
+    return await this.accountRepository.count({ where });
   }
 }

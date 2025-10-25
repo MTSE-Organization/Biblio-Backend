@@ -14,6 +14,7 @@ import {
   CreateOrderForm,
   CreateOrderFromCartForm,
   FilterOrderForm,
+  FilterOrderType,
   PlaceOrderForm,
   RefundOrderForm,
   UpdateStatusForm
@@ -27,7 +28,11 @@ import { Op, Sequelize, Transaction, where } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
-import { CreateOrderDto } from './dtos';
+import {
+  CreateOrderDto,
+  OrderStatisticStatusDto,
+  OrderStatisticStatusItemDto
+} from './dtos';
 import { NotificationService } from '../notification/notification.service';
 import { PaymentService } from '../payment/payment.service';
 import { FilterRevenueForm } from './forms/filter-revenue.form';
@@ -557,5 +562,66 @@ export class OrderService {
       totalRevenue,
       totalOrders: orders.length
     };
+  }
+
+  async getOrderStatusDistribution(
+    form: FilterOrderType
+  ): Promise<OrderStatisticStatusDto> {
+    const where: any = {};
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.createdDate = {};
+      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    }
+
+    const totalOrders = await this.orderRepository.count({ where });
+
+    const validStatuses = this.getValidOrderStatuses();
+
+    const items: OrderStatisticStatusItemDto[] = [];
+
+    for (const status of validStatuses) {
+      const total = await this.orderRepository.count({
+        where: { ...where, currentStatus: status }
+      });
+
+      const percentage =
+        totalOrders === 0
+          ? 0
+          : Number(((total / totalOrders) * 100).toFixed(2));
+
+      items.push({
+        status,
+        total,
+        percentage
+      });
+    }
+
+    return {
+      status: items,
+      totalOrders
+    };
+  }
+
+  private getValidOrderStatuses(): number[] {
+    return [
+      Constant.ORDER_STATUS_WAITING,
+      Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+      Constant.ORDER_STATUS_CONFIRMED,
+      Constant.ORDER_STATUS_PACKING,
+      Constant.ORDER_STATUS_SHIPPING,
+      Constant.ORDER_STATUS_COMPLETE,
+      Constant.ORDER_STATUS_RECEIVED,
+      Constant.ORDER_STATUS_CANCELED,
+      Constant.ORDER_STATUS_REQUEST_REFUND,
+      Constant.ORDER_STATUS_REFUNDED
+    ];
   }
 }

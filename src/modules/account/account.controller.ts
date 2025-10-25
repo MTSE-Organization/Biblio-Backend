@@ -24,6 +24,8 @@ import {
   ApiResponseNoData,
   PCode
 } from '@/common/decorators';
+import { AccountStatisticDto } from './dtos/account-statistic.dto';
+import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
 
 @Controller('account')
 export class AccountController {
@@ -69,5 +71,17 @@ export class AccountController {
     const user: UserDetailsDto = req.user;
     const isSuperAdmin = user.isSuperAdmin;
     return await this.accountService.delete(id, isSuperAdmin);
+  }
+
+  @ApiResponse(AccountStatisticDto, { objectName: 'account-statistic' })
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('statistics/new-customer')
+  async getAccountStatistics(
+    @Query() form: FilterAccountStatisticForm
+  ): Promise<AccountStatisticDto> {
+    const total = await this.accountService.countNewAccountsInDateRange(form);
+    return {
+      totalAccounts: total
+    };
   }
 }
