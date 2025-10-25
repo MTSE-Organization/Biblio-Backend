@@ -441,7 +441,7 @@ export class OrderService {
   async refund(form: RefundOrderForm, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(form.id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_RECEIVED) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
@@ -450,7 +450,7 @@ export class OrderService {
 
       const orderStatus = await this.orderStatusService.findByOrderIdAndStatus(
         order.id,
-        Constant.ORDER_STATUS_COMPLETE
+        Constant.ORDER_STATUS_RECEIVED
       );
       const now = new Date();
       const diffTime = now.getTime() - orderStatus?.createdDate.getTime();
