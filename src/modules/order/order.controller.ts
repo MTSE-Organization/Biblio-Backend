@@ -30,8 +30,7 @@ import {
   CreateOrderDto,
   OrderAutoCompleteDto,
   OrderDto,
-  OrderStatisticTypeDto,
-  OrderStatisticTypeRatioDto
+  OrderStatisticStatusDto
 } from './dtos';
 import { RevenueOrderDto } from './dtos/revenue-order.dto';
 import { FilterRevenueForm } from './forms/filter-revenue.form';
@@ -148,17 +147,11 @@ export class OrderController {
     return await this.orderService.getRevenue(form);
   }
 
-  @ApiResponse(OrderStatisticTypeDto, { objectName: 'statistics' })
   @Get('statistics/order-status')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  async getOrderStatistics(@Query() form: FilterOrderType) {
-    return await this.orderService.getOrderStatistic(form);
-  }
-
-  @ApiResponse(OrderStatisticTypeRatioDto, { objectName: 'status-ratio' })
-  @Get('statistics/order-status-ratio')
-  @UseGuards(JwtAuthGuard, AuthorizationGuard)
-  async getOrderStatusRatio(@Query() form: FilterOrderType) {
-    return await this.orderService.getOrderStatusRatio(form);
+  @ApiResponse(OrderStatisticStatusDto, {
+    objectName: 'status-distribution'
+  })
+  async getOrderStatusDistribution(@Query() form: FilterOrderType) {
+    return await this.orderService.getOrderStatusDistribution(form);
   }
 }

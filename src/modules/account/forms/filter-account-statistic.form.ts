@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsOptional } from 'class-validator';
 
-export class FilterOrderType {
+export class FilterAccountStatisticForm {
   @Type(() => Date)
   @IsDate()
   @IsOptional()

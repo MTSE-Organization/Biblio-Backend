@@ -30,8 +30,8 @@ import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
 import {
   CreateOrderDto,
-  OrderStatisticTypeDto,
-  OrderStatisticTypeRatioDto
+  OrderStatisticStatusDto,
+  OrderStatisticStatusItemDto
 } from './dtos';
 import { NotificationService } from '../notification/notification.service';
 import { PaymentService } from '../payment/payment.service';
@@ -555,9 +555,9 @@ export class OrderService {
     };
   }
 
-  async getOrderStatistic(
+  async getOrderStatusDistribution(
     form: FilterOrderType
-  ): Promise<OrderStatisticTypeDto> {
+  ): Promise<OrderStatisticStatusDto> {
     const where: any = {};
 
     if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
@@ -572,99 +572,33 @@ export class OrderService {
       if (form.toDate) where.createdDate[Op.lte] = form.toDate;
     }
 
-    if (form.type !== undefined && form.type !== null) {
-      const validStatuses = this.getValidOrderStatuses();
-      const type = Number(form.type);
-
-      if (!validStatuses.includes(type)) {
-        throw new BadRequestException('type is not valid');
-      }
-
-      where.currentStatus = form.type;
-
-      const count = await this.orderRepository.count({ where });
-
-      return {
-        status: form.type,
-        name: this.getStatusOrderName(form.type),
-        totalOrders: count
-      };
-    }
-
-    const count = await this.orderRepository.count({ where });
-    return {
-      status: -1,
-      name: 'ALL',
-      totalOrders: count
-    };
-  }
-
-  async getOrderStatusRatio(
-    form: FilterOrderType
-  ): Promise<OrderStatisticTypeRatioDto> {
-    const where: any = {};
-
-    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
-      throw new BadRequestException(
-        'toDate must be greater than or equal to fromDate'
-      );
-    }
-
-    if (form.fromDate || form.toDate) {
-      where.createdDate = {};
-      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
-      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
-    }
+    const totalOrders = await this.orderRepository.count({ where });
 
     const validStatuses = this.getValidOrderStatuses();
-    const type = Number(form.type);
 
-    if (!validStatuses.includes(type)) {
-      throw new BadRequestException('type is not valid');
+    const items: OrderStatisticStatusItemDto[] = [];
+
+    for (const status of validStatuses) {
+      const total = await this.orderRepository.count({
+        where: { ...where, currentStatus: status }
+      });
+
+      const percentage =
+        totalOrders === 0
+          ? 0
+          : Number(((total / totalOrders) * 100).toFixed(2));
+
+      items.push({
+        status,
+        total,
+        percentage
+      });
     }
-
-    const [count, total] = await Promise.all([
-      this.orderRepository.count({ where: { ...where, currentStatus: type } }),
-      this.orderRepository.count({ where })
-    ]);
-
-    const percentage =
-      total === 0 ? 0 : Number(((count / total) * 100).toFixed(2));
 
     return {
-      status: type,
-      name: this.getStatusOrderName(type),
-      totalOrdersOfStatus: count,
-      totalOrders: total,
-      percentage
+      status: items,
+      totalOrders
     };
-  }
-
-  getStatusOrderName(status: number): string {
-    switch (status) {
-      case Constant.ORDER_STATUS_WAITING:
-        return 'WAITING';
-      case Constant.ORDER_STATUS_WAITING_CONFIRMATION:
-        return 'WAITING_CONFIRMATION';
-      case Constant.ORDER_STATUS_CONFIRMED:
-        return 'CONFIRMED';
-      case Constant.ORDER_STATUS_PACKING:
-        return 'PACKING';
-      case Constant.ORDER_STATUS_SHIPPING:
-        return 'SHIPPING';
-      case Constant.ORDER_STATUS_COMPLETE:
-        return 'COMPLETE';
-      case Constant.ORDER_STATUS_RECEIVED:
-        return 'RECEIVED';
-      case Constant.ORDER_STATUS_CANCELED:
-        return 'CANCELED';
-      case Constant.ORDER_STATUS_REQUEST_REFUND:
-        return 'REQUEST_REFUND';
-      case Constant.ORDER_STATUS_REFUNDED:
-        return 'REFUNDED';
-      default:
-        return 'ALL';
-    }
   }
 
   private getValidOrderStatuses(): number[] {

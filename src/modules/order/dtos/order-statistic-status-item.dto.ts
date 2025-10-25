@@ -1,12 +1,12 @@
 import { Expose } from 'class-transformer';
 
-export class OrderStatisticTypeDto {
+export class OrderStatisticStatusItemDto {
   @Expose()
   status: number;
 
   @Expose()
-  name: string;
+  total: number;
 
   @Expose()
-  totalOrders: number;
+  percentage: number;
 }
