@@ -22,7 +22,7 @@ export class CartController {
     return MapperUtil.toDto(cart, CartDto);
   }
 
-  @ApiResponseNoData({ type: 'Add cart item successfully' })
+  @ApiResponseNoData({ message: 'Add cart item successfully' })
   @PCode('CART_A_I')
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Post('add-item')
