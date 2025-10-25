@@ -129,7 +129,7 @@ export function ApiListResponse<TModel extends NestJsType<any>>(
 
 export function ApiResponse<TModel extends NestJsType<any>>(
   model: TModel,
-  options?: { objectName: string; message?: string }
+  options?: { objectName?: string; message?: string }
 ) {
   const example = generateExampleFromDto(model);
 

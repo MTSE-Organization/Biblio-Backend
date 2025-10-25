@@ -14,11 +14,17 @@ import { AuthorizationGuard, JwtAuthGuard } from '@/modules/auth/guards';
 import { ReviewForm } from './forms/review.form';
 import { FilterReviewForm } from './forms/filter-review.form';
 import { MapperUtil } from '@/utils';
-import { ReviewDto, ReviewStatsDto } from './dtos';
+import { CheckReviewDto, ReviewDto, ReviewStatsDto } from './dtos';
 import { ResponseListDto } from '@/common/interfaces';
-import { ApiListResponse, ApiResponseNoData, PCode } from '@/common/decorators';
+import {
+  ApiListResponse,
+  ApiResponse,
+  ApiResponseNoData,
+  PCode
+} from '@/common/decorators';
 import { ReviewTopRatedProductDto } from './dtos/review-top-rate-product.dto';
 import { FilterTopReviewForm } from './forms/filter-top-review.form';
+import { CheckReviewForm } from '@/modules/review/forms';
 
 @Controller('review')
 export class ReviewController {
@@ -80,5 +86,13 @@ export class ReviewController {
     @Query() form: FilterTopReviewForm
   ): Promise<ReviewTopRatedProductDto[]> {
     return this.reviewService.getTopRatedProducts(form);
+  }
+
+  @ApiResponse(CheckReviewDto, { message: 'Check review successfully' })
+  @UseGuards(JwtAuthGuard)
+  @Post('check-review')
+  async checkReview(@Req() req: any, @Body() body: CheckReviewForm) {
+    const isReviewed = await this.reviewService.checkReview(body, req.user.id);
+    return { isReviewed, message: 'Check review successfully' };
   }
 }

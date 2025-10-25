@@ -10,6 +10,12 @@ export class ReviewForm {
   @BigIntDecorator('productId', true)
   productId: bigint;
 
+  @BigIntDecorator('productVariantId', true)
+  productVariantId: bigint;
+
+  @BigIntDecorator('orderId', true)
+  orderId: bigint;
+
   @Type(() => Number)
   @NumberDecorator('rate')
   rate: number;
