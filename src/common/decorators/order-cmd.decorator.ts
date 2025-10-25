@@ -17,8 +17,9 @@ export const OrderCmdDecorator = (name: string, required: boolean = false) => {
         Constant.CMD_START_PACKING,
         Constant.CMD_START_SHIPPING,
         Constant.CMD_DELIVERED,
-        Constant.CMD_RECEIVED,
-        Constant.CMD_CONFIRM_REFUNDED
+        Constant.CMD_CONFIRM_REFUNDED,
+        Constant.CMD_REJECT_ORDER,
+        Constant.CMD_REJECT_REFUNDED
       ],
       {
         message: `${name} invalid`

@@ -37,6 +37,7 @@ import { NotificationService } from '../notification/notification.service';
 import { PaymentService } from '../payment/payment.service';
 import { FilterRevenueForm } from './forms/filter-revenue.form';
 import { RevenueOrderDto } from './dtos/revenue-order.dto';
+import { title } from 'process';
 
 @Injectable()
 export class OrderService {
@@ -317,6 +318,30 @@ export class OrderService {
         ErrorCode.ORDER_ERROR_NOT_FOUND
       );
     }
+    const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
+    const imageUrl = orderItem?.productVariant.imageUrl;
+    if (form.cmd === Constant.CMD_REJECT_REFUNDED) {
+      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
+      await Promise.all([
+        this.orderStatusService.deleteByOrderIdAndStatus(
+          order.id,
+          Constant.ORDER_STATUS_REQUEST_REFUND
+        ),
+        order.save()
+      ]);
+
+      // send notification reject refund for customer
+      this.notificationService
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_CUSTOMER,
+          imageUrl,
+          `Yêu cầu hoàn trả đơn hàng #${order.id} bị từ chối`,
+          `Yêu cầu hoàn trả đơn hàng #${order.id} của bạn đã bị từ chối. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`
+        )
+        .catch((err) => this.logger.error('send notification error', err));
+      return { message: 'Update status successfully' };
+    }
     const status = this.getNextStatus(form.cmd, order.currentStatus);
     order.currentStatus = status;
     await Promise.all([
@@ -325,9 +350,6 @@ export class OrderService {
     ]);
 
     // send notification for customer
-    const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
-    const imageUrl = orderItem?.productVariant.imageUrl;
-
     this.notificationService
       .sendOrderNotification(
         order,

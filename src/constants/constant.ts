@@ -49,6 +49,8 @@ export const Constant = {
   CMD_DELIVERED: 'CMD_DELIVERED', // SHIPPING -> DELIVERED
   CMD_RECEIVED: 'CMD_RECEIVED', // DELIVERED -> RECEIVED
   CMD_CONFIRM_REFUNDED: 'CMD_CONFIRM_REFUNDED', // REQUEST REFUND -> REFUNDED
+  CMD_REJECT_ORDER: 'CMD_REJECT_ORDER', // REQUEST WAITING_CONFIRMATION -> CANCELED
+  CMD_REJECT_REFUNDED: 'CMD_REJECT_REFUNDED', // REQUEST REQUEST REFUND -> COMPLETE
 
   // Payment method
   PAYMENT_METHOD_COD: 1,
@@ -110,6 +112,10 @@ export const OrderTransitions: Record<string, { from: number[]; to: number }> =
     },
     [Constant.CMD_CONFIRM_REFUNDED]: {
       from: [Constant.ORDER_STATUS_REQUEST_REFUND],
+      to: Constant.ORDER_STATUS_REFUNDED
+    },
+    [Constant.CMD_REJECT_ORDER]: {
+      from: [Constant.ORDER_STATUS_WAITING_CONFIRMATION],
       to: Constant.ORDER_STATUS_REFUNDED
     }
   };

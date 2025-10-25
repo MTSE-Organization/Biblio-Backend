@@ -52,19 +52,25 @@ export class NotificationService {
     });
   }
 
-  async sendOrderNotification(order: Order, type: number, imageUrl?: string) {
+  async sendOrderNotification(
+    order: Order,
+    type: number,
+    imageUrl?: string,
+    content?: string,
+    title?: string
+  ) {
     const customer: Account = await this.accountService.findById(
       order.accountId
     );
-    const title = this.getNotificationTitleByStatus(
-      order.currentStatus,
-      order.id
-    );
-    const content = this.getNotificationContentByStatus(
-      order.currentStatus,
-      order.id,
-      customer.email
-    );
+    title =
+      title || this.getNotificationTitleByStatus(order.currentStatus, order.id);
+    content =
+      content ||
+      this.getNotificationContentByStatus(
+        order.currentStatus,
+        order.id,
+        customer.email
+      );
 
     const notification: NotificationType = {
       title: title,
@@ -143,6 +149,8 @@ export class NotificationService {
         return `Đơn hàng #${id} đang được yêu cầu hoàn tiền`;
       case Constant.ORDER_STATUS_REFUNDED:
         return `Đơn hàng #${id} đã được hoàn tiền`;
+      case Constant.ORDER_STATUS_CANCELED:
+        return `Đơn hàng #${id} đã bị hủy`;
       default:
         throw new BadRequestException(
           'Invalid order status',
@@ -169,6 +177,8 @@ export class NotificationService {
         return `Khách hàng ${email} đã gửi yêu cầu hoàn trả cho đơn hàng #${id}. Vui lòng kiểm tra và xử lý.`;
       case Constant.ORDER_STATUS_REFUNDED:
         return `Đơn hàng #${id} của bạn đã được hoàn tiền thành công. Cảm ơn bạn đã kiên nhẫn!`;
+      case Constant.ORDER_STATUS_CANCELED:
+        return `Đơn hàng #${id} của bạn đã bị hủy theo yêu cầu. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`;
       default:
         throw new BadRequestException(
           'Invalid order status',
