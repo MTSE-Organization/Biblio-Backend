@@ -7,13 +7,10 @@ import { AccountService } from '../account/account.service';
 import { Constant, ErrorCode } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { ConfigService } from '@nestjs/config';
-import { OrderItemService } from '../order/order-item.service';
 import { MapperUtil } from '@/utils';
 import { AccountShortDto } from '../account/dtos';
-import { NotFoundException } from '@/common/exceptions';
+import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { NotificationType } from './types';
-import { Op } from 'sequelize';
-
 
 @Injectable()
 export class NotificationService {
@@ -55,77 +52,41 @@ export class NotificationService {
     });
   }
 
-  async sendPlaceOrder(order: Order, imageUrl?: string) {
-    const customer = await this.accountService.findById(order.accountId);
+  async sendOrderNotification(order: Order, type: number, imageUrl?: string) {
+    const customer: Account = await this.accountService.findById(
+      order.accountId
+    );
+    const title = this.getNotificationTitleByStatus(
+      order.currentStatus,
+      order.id
+    );
+    const content = this.getNotificationContentByStatus(
+      order.currentStatus,
+      order.id,
+      customer.email
+    );
 
     const notification: NotificationType = {
-      title: 'Order place',
+      title: title,
       imageUrl: imageUrl,
-      content: `New order ${order.id} place from user ${order.accountId}`,
+      content: content,
       type: Constant.NOTIFICATION_TYPE_ORDER,
       data: JSON.stringify({
         orderId: order.id,
         customer: MapperUtil.toDto(customer, AccountShortDto)
       })
     };
-
-    await this.handleSendNotificationEmployee(notification);
-  }
-
-  async sendRefundOrder(order: Order, imageUrl?: string) {
-    const customer = await this.accountService.findById(order.accountId);
-
-    const notification: NotificationType = {
-      title: 'Order refund request',
-      imageUrl: imageUrl,
-      content: `Request refund order ${order.id} from user ${order.accountId}`,
-      type: Constant.NOTIFICATION_TYPE_ORDER,
-      data: JSON.stringify({
-        orderId: order.id,
-        customer: MapperUtil.toDto(customer, AccountShortDto)
-      })
-    };
-
-    await this.handleSendNotificationEmployee(notification);
-  }
-
-  async sendDeliveryOrder(order: Order, imageUrl?: string) {
-    const customer = await this.accountService.findById(order.accountId);
-
-    const notification: NotificationType = {
-      title: 'Order delivery',
-      imageUrl: imageUrl,
-      content: `Order ${order.id} has been delivered to user ${order.accountId}`,
-      type: Constant.NOTIFICATION_TYPE_ORDER,
-      data: JSON.stringify({
-        orderId: order.id,
-        customer: MapperUtil.toDto(customer, AccountShortDto)
-      }),
-      accountId: customer.id
-    };
-
-    await this.handleSendNotificationCustomer(notification);
-  }
-
-  async sendRefundedOrder(order: Order, imageUrl?: string) {
-    const customer = await this.accountService.findById(order.accountId);
-
-    const notification: NotificationType = {
-      title: 'Order refunded',
-      imageUrl: imageUrl,
-      content: `Order ${order.id} has been refunded for user ${order.accountId}`,
-      type: Constant.NOTIFICATION_TYPE_ORDER,
-      data: JSON.stringify({
-        orderId: order.id,
-        customer: MapperUtil.toDto(customer, AccountShortDto)
-      }),
-      accountId: customer.id
-    };
-
-    await this.handleSendNotificationCustomer(notification);
+    if (type === Constant.NOTIFICATION_FOR_EMPLOYEE) {
+      await this.handleSendNotificationEmployee(notification);
+    } else {
+      notification.accountId = customer.id;
+      await this.handleSendNotificationCustomer(notification);
+    }
   }
 
   async handleSendNotificationEmployee(notification: NotificationType) {
+    console.log(notification);
+
     const [accounts, _] = await Promise.all([
       this.accountService.findAllByKindIn([
         Constant.ACCOUNT_KIND_ADMIN,
@@ -164,6 +125,56 @@ export class NotificationService {
     };
 
     await this.notificationRepository.create(data);
+  }
+
+  getNotificationTitleByStatus(status: number, id: bigint): string {
+    console.log({ status });
+
+    switch (status) {
+      case Constant.ORDER_STATUS_WAITING_CONFIRMATION:
+        return `Đơn hàng #${id} đang chờ xác nhận`;
+      case Constant.ORDER_STATUS_CONFIRMED:
+        return `Đơn hàng #${id} đã được xác nhận`;
+      case Constant.ORDER_STATUS_PACKING:
+        return `Đơn hàng #${id} đang được đóng gói`;
+      case Constant.ORDER_STATUS_SHIPPING:
+        return `Đơn hàng #${id} đang được vận chuyển`;
+      case Constant.ORDER_STATUS_REQUEST_REFUND:
+        return `Đơn hàng #${id} đang được yêu cầu hoàn tiền`;
+      case Constant.ORDER_STATUS_REFUNDED:
+        return `Đơn hàng #${id} đã được hoàn tiền`;
+      default:
+        throw new BadRequestException(
+          'Invalid order status',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+    }
+  }
+
+  getNotificationContentByStatus(
+    status: number,
+    id: bigint,
+    email: string
+  ): string {
+    switch (status) {
+      case Constant.ORDER_STATUS_WAITING_CONFIRMATION:
+        return `Khách hàng ${email} đã đặt đơn hàng #${id}. Vui lòng kiểm tra và xác nhận.`;
+      case Constant.ORDER_STATUS_CONFIRMED:
+        return `Đơn hàng #${id} của bạn đã được cửa hàng xác nhận. Cảm ơn bạn đã đặt hàng!`;
+      case Constant.ORDER_STATUS_PACKING:
+        return `Đơn hàng #${id} của bạn đang được cửa hàng đóng gói và chuẩn bị giao.`;
+      case Constant.ORDER_STATUS_SHIPPING:
+        return `Đơn hàng #${id} của bạn đang trên đường giao đến. Vui lòng chú ý điện thoại để nhận hàng.`;
+      case Constant.ORDER_STATUS_REQUEST_REFUND:
+        return `Khách hàng ${email} đã gửi yêu cầu hoàn trả cho đơn hàng #${id}. Vui lòng kiểm tra và xử lý.`;
+      case Constant.ORDER_STATUS_REFUNDED:
+        return `Đơn hàng #${id} của bạn đã được hoàn tiền thành công. Cảm ơn bạn đã kiên nhẫn!`;
+      default:
+        throw new BadRequestException(
+          'Invalid order status',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+    }
   }
 
   async markRead(id: bigint) {
