@@ -202,8 +202,12 @@ export class OrderService {
         );
         const imageUrl = orderItem?.productVariant.imageUrl;
         this.notificationService
-          .sendPlaceOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendPlaceOrder error', err));
+          .sendOrderNotification(
+            order,
+            Constant.NOTIFICATION_FOR_EMPLOYEE,
+            imageUrl
+          )
+          .catch((err) => this.logger.error('send notification error', err));
       } else {
         order.paymentStatus = Constant.PAYMENT_STATUS_PENDING;
         // call to VNPAY API
@@ -315,25 +319,17 @@ export class OrderService {
       order.save()
     ]);
 
-    if (
-      order.currentStatus === Constant.ORDER_STATUS_SHIPPING ||
-      order.currentStatus === Constant.ORDER_STATUS_REFUNDED
-    ) {
-      // send-noti ship order for all admin and employee
-      const orderItem = await this.orderItemService.findFirstByOrderId(
-        order.id
-      );
-      const imageUrl = orderItem?.productVariant.imageUrl;
-      if (order.currentStatus === Constant.ORDER_STATUS_SHIPPING) {
-        this.notificationService
-          .sendDeliveryOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendDeliveryOrder error', err));
-      } else if (order.currentStatus === Constant.ORDER_STATUS_REFUNDED) {
-        this.notificationService
-          .sendRefundedOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendRefundedOrder error', err));
-      }
-    }
+    // send notification for customer
+    const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
+    const imageUrl = orderItem?.productVariant.imageUrl;
+
+    this.notificationService
+      .sendOrderNotification(
+        order,
+        Constant.NOTIFICATION_FOR_CUSTOMER,
+        imageUrl
+      )
+      .catch((err) => this.logger.error('send notification error', err));
 
     return { message: 'Update status successfully' };
   }
@@ -474,8 +470,12 @@ export class OrderService {
       const imageUrl = orderItem?.productVariant.imageUrl;
 
       this.notificationService
-        .sendRefundOrder(order, imageUrl)
-        .catch((err) => this.logger.error('SendRefundOrder error', err));
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
 
       return { message: 'Refund order successfully' };
     });
@@ -509,8 +509,12 @@ export class OrderService {
     if (isPaymentSuccess) {
       // send-noti new order for all admin and employee
       await this.notificationService
-        .sendPlaceOrder(order, imageUrl)
-        .catch((err) => this.logger.error('SendPlaceOrder error', err));
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
     }
   }
 
