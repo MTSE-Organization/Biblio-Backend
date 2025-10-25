@@ -20,12 +20,19 @@ import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import {
   CreateOrderForm,
   FilterOrderForm,
+  FilterOrderType,
   PlaceOrderForm,
   RefundOrderForm,
   UpdateStatusForm
 } from './forms';
 import { MapperUtil } from '@/utils';
-import { CreateOrderDto, OrderAutoCompleteDto, OrderDto } from './dtos';
+import {
+  CreateOrderDto,
+  OrderAutoCompleteDto,
+  OrderDto,
+  OrderStatisticTypeDto,
+  OrderStatisticTypeRatioDto
+} from './dtos';
 import { RevenueOrderDto } from './dtos/revenue-order.dto';
 import { FilterRevenueForm } from './forms/filter-revenue.form';
 
@@ -139,5 +146,19 @@ export class OrderController {
   @Get('revenue')
   async getRevenue(@Query() form: FilterRevenueForm) {
     return await this.orderService.getRevenue(form);
+  }
+
+  @ApiResponse(OrderStatisticTypeDto, { objectName: 'statistics' })
+  @Get('statistics/order-status')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  async getOrderStatistics(@Query() form: FilterOrderType) {
+    return await this.orderService.getOrderStatistic(form);
+  }
+
+  @ApiResponse(OrderStatisticTypeRatioDto, { objectName: 'status-ratio' })
+  @Get('statistics/order-status-ratio')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  async getOrderStatusRatio(@Query() form: FilterOrderType) {
+    return await this.orderService.getOrderStatusRatio(form);
   }
 }

@@ -3,3 +3,5 @@ export * from './order-item.dto';
 export * from './order-status.dto';
 export * from './order-auto-complete.dto';
 export * from './create-order.dto';
+export * from './order-statistic-type.dto';
+export * from './order-statistic-type-ratio.dto';
