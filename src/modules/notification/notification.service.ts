@@ -145,6 +145,10 @@ export class NotificationService {
         return `Đơn hàng #${id} đang được đóng gói`;
       case Constant.ORDER_STATUS_SHIPPING:
         return `Đơn hàng #${id} đang được vận chuyển`;
+      case Constant.ORDER_STATUS_COMPLETE:
+        return `Đơn hàng ${id} đã được giao thành công`;
+      case Constant.ORDER_STATUS_RECEIVED:
+        return `Đơn hàng ${id} đã được nhận`;
       case Constant.ORDER_STATUS_REQUEST_REFUND:
         return `Đơn hàng #${id} đang được yêu cầu hoàn tiền`;
       case Constant.ORDER_STATUS_REFUNDED:
@@ -173,6 +177,10 @@ export class NotificationService {
         return `Đơn hàng #${id} của bạn đang được cửa hàng đóng gói và chuẩn bị giao.`;
       case Constant.ORDER_STATUS_SHIPPING:
         return `Đơn hàng #${id} của bạn đang trên đường giao đến. Vui lòng chú ý điện thoại để nhận hàng.`;
+      case Constant.ORDER_STATUS_COMPLETE:
+        return `Đơn hàng #${id} đã được giao thành công. Vui lòng nhận hàng.`;
+      case Constant.ORDER_STATUS_RECEIVED:
+        return `Khách hàng ${email} đã nhận đơn hàng #${id}.`;
       case Constant.ORDER_STATUS_REQUEST_REFUND:
         return `Khách hàng ${email} đã gửi yêu cầu hoàn trả cho đơn hàng #${id}. Vui lòng kiểm tra và xử lý.`;
       case Constant.ORDER_STATUS_REFUNDED:
