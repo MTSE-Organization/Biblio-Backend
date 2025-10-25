@@ -461,6 +461,11 @@ export class OrderService {
 
       order.currentStatus = Constant.ORDER_STATUS_REQUEST_REFUND;
       order.refundReason = form.refundReason;
+      await this.orderStatusService.create(
+        Constant.ORDER_STATUS_REQUEST_REFUND,
+        order.id,
+        t
+      );
       await order.save({ transaction: t });
 
       // send-noti request refund order for all admin and employee
