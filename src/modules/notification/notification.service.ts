@@ -104,6 +104,24 @@ export class NotificationService {
     await this.handleSendNotificationCustomer(notification);
   }
 
+  async sendRefundedOrder(order: Order, imageUrl?: string) {
+    const customer = await this.accountService.findById(order.accountId);
+
+    const notification: NotificationType = {
+      title: 'Order refunded',
+      imageUrl: imageUrl,
+      content: `Order ${order.id} has been refunded for user ${order.accountId}`,
+      type: Constant.NOTIFICATION_TYPE_ORDER,
+      data: JSON.stringify({
+        orderId: order.id,
+        customer: MapperUtil.toDto(customer, AccountShortDto)
+      }),
+      accountId: customer.id
+    };
+
+    await this.handleSendNotificationCustomer(notification);
+  }
+
   async handleSendNotificationEmployee(notification: NotificationType) {
     const [accounts, _] = await Promise.all([
       this.accountService.findAllByKindIn([

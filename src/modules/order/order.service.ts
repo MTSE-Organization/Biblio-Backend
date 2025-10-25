@@ -315,16 +315,24 @@ export class OrderService {
       order.save()
     ]);
 
-    if (order.currentStatus === Constant.ORDER_STATUS_SHIPPING) {
+    if (
+      order.currentStatus === Constant.ORDER_STATUS_SHIPPING ||
+      order.currentStatus === Constant.ORDER_STATUS_REFUNDED
+    ) {
       // send-noti ship order for all admin and employee
       const orderItem = await this.orderItemService.findFirstByOrderId(
         order.id
       );
       const imageUrl = orderItem?.productVariant.imageUrl;
-
-      this.notificationService
-        .sendDeliveryOrder(order, imageUrl)
-        .catch((err) => this.logger.error('SendDeliveryOrder error', err));
+      if (order.currentStatus === Constant.ORDER_STATUS_SHIPPING) {
+        this.notificationService
+          .sendDeliveryOrder(order, imageUrl)
+          .catch((err) => this.logger.error('SendDeliveryOrder error', err));
+      } else if (order.currentStatus === Constant.ORDER_STATUS_REFUNDED) {
+        this.notificationService
+          .sendRefundedOrder(order, imageUrl)
+          .catch((err) => this.logger.error('SendRefundedOrder error', err));
+      }
     }
 
     return { message: 'Update status successfully' };
