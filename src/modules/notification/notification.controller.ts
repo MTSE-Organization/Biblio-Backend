@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -47,7 +48,7 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard, AuthorizationGuard)
   @Get('count-unread')
   async countUnRead(@Req() req) {
-    const count = await this.notificationService.countUnRead(req.user.id);
+    const count = await this.notificationService.countUnread(req.user.id);
 
     return {
       data: { count },
@@ -61,5 +62,27 @@ export class NotificationController {
   async markRead(@Param('id') id: bigint) {
     await this.notificationService.markRead(id);
     return { message: 'Mark read notification successfully' };
+  }
+
+  @ApiResponseNoData({ message: 'Mark all notifications as read successfully' })
+  @Put('read-all')
+  @UseGuards(JwtAuthGuard)
+  async markAllRead(@Req() req) {
+    await this.notificationService.markAllRead(req.user.id);
+    return { message: 'Mark all notifications as read successfully' };
+  }
+
+  @Delete('delete-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponseNoData({ message: 'Delete all notifications successfully' })
+  async deleteAll(@Req() req) {
+    await this.notificationService.deleteAllByAccountId(req.user.id);
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponseNoData({ message: 'Delete notification successfully' })
+  async delete(@Param('id') id: bigint, @Req() req: any) {
+    await this.notificationService.delete(id, req.user.id);
   }
 }

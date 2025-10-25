@@ -508,7 +508,7 @@ export class OrderService {
 
     if (isPaymentSuccess) {
       // send-noti new order for all admin and employee
-      this.notificationService
+      await this.notificationService
         .sendPlaceOrder(order, imageUrl)
         .catch((err) => this.logger.error('SendPlaceOrder error', err));
     }

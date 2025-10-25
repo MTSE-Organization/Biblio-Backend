@@ -12,6 +12,8 @@ import { MapperUtil } from '@/utils';
 import { AccountShortDto } from '../account/dtos';
 import { NotFoundException } from '@/common/exceptions';
 import { NotificationType } from './types';
+import { Op } from 'sequelize';
+
 
 @Injectable()
 export class NotificationService {
@@ -38,16 +40,17 @@ export class NotificationService {
     const { rows, count } = await this.notificationRepository.findAndCountAll({
       limit: limit,
       offset: offset,
-      where: query.getFilter()
+      where: query.getFilter(),
+      order: [['createdDate', 'DESC']]
     });
     return { notifications: rows, count };
   }
 
-  async countUnRead(accountId: bigint) {
+  async countUnread(accountId: bigint) {
     return this.notificationRepository.count({
       where: {
         accountId,
-        seen: false
+        seen: 0
       }
     });
   }
@@ -172,5 +175,41 @@ export class NotificationService {
       );
 
     await notification.update({ seen: true, lastTimeRead: new Date() });
+  }
+
+  async markAllRead(accountId: bigint) {
+    await this.notificationRepository.update(
+      { seen: true, lastTimeRead: new Date() },
+      {
+        where: {
+          accountId,
+          seen: false
+        }
+      }
+    );
+  }
+
+  async deleteAllByAccountId(accountId: bigint) {
+    const count = await this.notificationRepository.destroy({
+      where: {
+        accountId
+      }
+    });
+
+    return { message: `Deleted ${count} notifications successfully` };
+  }
+
+  async delete(id: bigint, accountId: bigint) {
+    const notification = await this.notificationRepository.findOne({
+      where: { id, accountId }
+    });
+
+    if (!notification)
+      throw new NotFoundException(
+        'Notification not found',
+        ErrorCode.NOTIFICATION_ERROR_NOT_FOUND
+      );
+
+    await notification.destroy();
   }
 }
