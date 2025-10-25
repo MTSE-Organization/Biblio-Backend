@@ -314,6 +314,19 @@ export class OrderService {
       this.orderStatusService.create(status, order.id),
       order.save()
     ]);
+
+    if (order.currentStatus === Constant.ORDER_STATUS_SHIPPING) {
+      // send-noti ship order for all admin and employee
+      const orderItem = await this.orderItemService.findFirstByOrderId(
+        order.id
+      );
+      const imageUrl = orderItem?.productVariant.imageUrl;
+
+      this.notificationService
+        .sendDeliveryOrder(order, imageUrl)
+        .catch((err) => this.logger.error('SendDeliveryOrder error', err));
+    }
+
     return { message: 'Update status successfully' };
   }
 
@@ -445,6 +458,17 @@ export class OrderService {
       order.currentStatus = Constant.ORDER_STATUS_REQUEST_REFUND;
       order.refundReason = form.refundReason;
       await order.save({ transaction: t });
+
+      // send-noti request refund order for all admin and employee
+      const orderItem = await this.orderItemService.findFirstByOrderId(
+        order.id
+      );
+      const imageUrl = orderItem?.productVariant.imageUrl;
+
+      this.notificationService
+        .sendRefundOrder(order, imageUrl)
+        .catch((err) => this.logger.error('SendRefundOrder error', err));
+
       return { message: 'Refund order successfully' };
     });
   }

@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FilterNotificationForm } from './forms';
 import { Notification } from '@/models/notification.model';
-import { Order } from '@/models';
+import { Account, Order } from '@/models';
 import { AccountService } from '../account/account.service';
 import { Constant, ErrorCode } from '@/constants';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
@@ -11,7 +11,7 @@ import { OrderItemService } from '../order/order-item.service';
 import { MapperUtil } from '@/utils';
 import { AccountShortDto } from '../account/dtos';
 import { NotFoundException } from '@/common/exceptions';
-
+import { NotificationType } from './types';
 
 @Injectable()
 export class NotificationService {
@@ -55,7 +55,7 @@ export class NotificationService {
   async sendPlaceOrder(order: Order, imageUrl?: string) {
     const customer = await this.accountService.findById(order.accountId);
 
-    const notification = {
+    const notification: NotificationType = {
       title: 'Order place',
       imageUrl: imageUrl,
       content: `New order ${order.id} place from user ${order.accountId}`,
@@ -66,6 +66,45 @@ export class NotificationService {
       })
     };
 
+    await this.handleSendNotificationEmployee(notification);
+  }
+
+  async sendRefundOrder(order: Order, imageUrl?: string) {
+    const customer = await this.accountService.findById(order.accountId);
+
+    const notification: NotificationType = {
+      title: 'Order refund request',
+      imageUrl: imageUrl,
+      content: `Request refund order ${order.id} from user ${order.accountId}`,
+      type: Constant.NOTIFICATION_TYPE_ORDER,
+      data: JSON.stringify({
+        orderId: order.id,
+        customer: MapperUtil.toDto(customer, AccountShortDto)
+      })
+    };
+
+    await this.handleSendNotificationEmployee(notification);
+  }
+
+  async sendDeliveryOrder(order: Order, imageUrl?: string) {
+    const customer = await this.accountService.findById(order.accountId);
+
+    const notification: NotificationType = {
+      title: 'Order delivery',
+      imageUrl: imageUrl,
+      content: `Order ${order.id} has been delivered to user ${order.accountId}`,
+      type: Constant.NOTIFICATION_TYPE_ORDER,
+      data: JSON.stringify({
+        orderId: order.id,
+        customer: MapperUtil.toDto(customer, AccountShortDto)
+      }),
+      accountId: customer.id
+    };
+
+    await this.handleSendNotificationCustomer(notification);
+  }
+
+  async handleSendNotificationEmployee(notification: NotificationType) {
     const [accounts, _] = await Promise.all([
       this.accountService.findAllByKindIn([
         Constant.ACCOUNT_KIND_ADMIN,
@@ -88,6 +127,22 @@ export class NotificationService {
     await this.notificationRepository.bulkCreate(notifications, {
       individualHooks: true
     });
+  }
+
+  async handleSendNotificationCustomer(notification: NotificationType) {
+    await this.rabbitmqService.handleSendMsg(
+      Constant.BACKEND_APP,
+      this.notificationQueue,
+      JSON.stringify(notification),
+      Constant.CMD_NOTIFICATION_CUSTOMER,
+      null
+    );
+    const data = {
+      accountId: notification.accountId,
+      ...notification
+    };
+
+    await this.notificationRepository.create(data);
   }
 
   async markRead(id: bigint) {
