@@ -417,17 +417,17 @@ export class OrderService {
   async complete(id: bigint, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_SHIPPING) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
         );
       }
 
-      order.currentStatus = Constant.ORDER_STATUS_COMPLETE;
+      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
       await Promise.all([
         this.orderStatusService.create(
-          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED,
           order.id,
           t
         ),

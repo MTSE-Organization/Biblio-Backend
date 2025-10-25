@@ -8,6 +8,8 @@ import {
 import { Auditable } from './auditable.model';
 import { Account } from './account.model';
 import { Product } from './product.model';
+import { ProductVariant } from './product-variant.model';
+import { Order } from '@/models/order.model';
 
 @Table({
   tableName: 'db_review',
@@ -20,6 +22,20 @@ export class Review extends Auditable {
 
   @BelongsTo(() => Product)
   declare product: Product;
+
+  @ForeignKey(() => ProductVariant)
+  @Column({ allowNull: true, type: DataType.BIGINT })
+  declare productVariantId: bigint;
+
+  @BelongsTo(() => ProductVariant)
+  declare productVariant: ProductVariant;
+
+  @ForeignKey(() => Order)
+  @Column({ allowNull: true, type: DataType.BIGINT })
+  declare orderId: bigint;
+
+  @BelongsTo(() => ProductVariant)
+  declare order: ProductVariant;
 
   @ForeignKey(() => Account)
   @Column({ allowNull: false, type: DataType.BIGINT })
