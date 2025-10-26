@@ -34,8 +34,8 @@ export class UpdateAddressForm {
   isDefault?: boolean;
 
   @StringDecorator('receiverName')
-  receiverName: string;
+  receiverName?: string;
 
   @StringDecorator('phoneNumber')
-  phoneNumber: string;
+  phoneNumber?: string;
 }
