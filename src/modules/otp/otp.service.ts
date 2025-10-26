@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
+import { BadRequestException } from '@/common/exceptions';
+import { ErrorCode } from '@/constants';
 
 @Injectable()
 export class OtpService {
@@ -23,5 +25,33 @@ export class OtpService {
     }
     await this.redisService.delete(email);
     return true;
+  }
+
+  async handleResendLimit(email: string): Promise<string> {
+    const resendKey = `${email}:otp:resend`;
+    const resendCount = parseInt(
+      (await this.redisService.get(resendKey)) || '0',
+      10
+    );
+    if (resendCount >= 3) {
+      throw new BadRequestException(
+        'You have exceeded the maximum number of resend attempts (3 per 10 minutes)',
+        ErrorCode.AUTH_ERROR_RESEND_OTP_LIMIT
+      );
+    }
+    const otp = this.generateOtp();
+
+    await this.storeOtp(email, otp);
+
+    if (resendCount === 0) {
+      await this.redisService.set(resendKey, 1, 10 * 60 * 1000);
+    } else {
+      await this.redisService.set(resendKey, resendCount + 1);
+    }
+    return otp;
+  }
+
+  async handleClearOtp(email: string): Promise<void> {
+    await this.redisService.deleteByPrefix(`${email}`);
   }
 }
