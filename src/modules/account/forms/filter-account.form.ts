@@ -1,4 +1,5 @@
 import {
+  BigIntDecorator,
   BooleanDecorator,
   NumberDecorator,
   StringDecorator
@@ -9,6 +10,9 @@ import { Transform, Type } from 'class-transformer';
 import { Op } from 'sequelize';
 
 export class FilterAccountForm extends PaginationForm {
+  @BigIntDecorator('id')
+  id: bigint;
+
   @StringDecorator('email')
   email: string;
 
@@ -27,6 +31,7 @@ export class FilterAccountForm extends PaginationForm {
 
   getFilter(): Record<string, any> {
     const where: Record<string, any> = {};
+    if (this.id) where.id = this.id;
     if (!StringUtil.isEmpty(this.email))
       where.email = { [Op.like]: `%${this.email}%` };
     if (!StringUtil.isEmpty(this.fullName))
