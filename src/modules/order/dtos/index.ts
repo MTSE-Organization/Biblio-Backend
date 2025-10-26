@@ -5,3 +5,4 @@ export * from './order-auto-complete.dto';
 export * from './create-order.dto';
 export * from './order-statistic-status-item.dto';
 export * from './order-statistic-status.dto';
+export * from './revenue-statistics.dto';

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Review } from '@/models/review.model';
 import { ReviewForm } from './forms/review.form';
 import { FilterReviewForm } from './forms/filter-review.form';
-import { Product, Account } from '@/models';
+import { Product, Account, ProductImage, Category } from '@/models';
 import { NotFoundException } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
 import { ProductService } from '@/modules/product/product.service';
@@ -133,11 +133,9 @@ export class ReviewService {
     return result;
   }
 
-  async getTopRatedProducts(
-    form: FilterTopReviewForm
-  ): Promise<ReviewTopRatedProductDto[]> {
+  async getTopRatedProducts(form: FilterTopReviewForm) {
     const rate = form.rate ?? 5;
-    const where: any = { rate };
+    const where: any = {};
 
     if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
       throw new BadRequestException(
@@ -146,39 +144,82 @@ export class ReviewService {
     }
 
     if (form.fromDate || form.toDate) {
-      where.createdDate = {};
-      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
-      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+      where.createdAt = {};
+      if (form.fromDate) where.createdAt[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdAt[Op.lte] = form.toDate;
     }
 
-    const queryOptions: any = {
-      where,
+    if (form.rate) {
+      where.rate = rate;
+    }
+
+    const results = await this.reviewRepository.findAll({
       attributes: [
         'productId',
-        [Sequelize.fn('COUNT', Sequelize.col('Review.id')), 'starCount']
+        [Sequelize.fn('AVG', Sequelize.col('Review.rate')), 'averageRating'],
+        [Sequelize.fn('COUNT', Sequelize.col('Review.id')), 'totalReviews']
       ],
+      where,
       include: [
         {
           model: Product,
-          as: 'product',
-          attributes: ['id', 'name']
+          attributes: [
+            'id',
+            'name',
+            'slug',
+            'price',
+            'discount',
+            'averageReview',
+            'totalReviews'
+          ],
+          include: [
+            {
+              model: ProductImage,
+              attributes: ['url'],
+              where: { isDefault: true },
+              required: false
+            },
+            {
+              model: Category,
+              attributes: ['id', 'name', 'slug']
+            }
+          ]
         }
       ],
-      group: ['productId', 'product.id', 'product.name'],
-      order: [[Sequelize.literal('starCount'), 'DESC']]
+      group: [
+        'Review.product_id',
+        'product.id',
+        'product.name',
+        'product.slug',
+        'product.price',
+        'product.average_review',
+        'product.total_reviews',
+        'product->images.id',
+        'product->images.url',
+        'product->category.id'
+      ],
+      order: [[Sequelize.literal('averageRating'), 'DESC']],
+      limit: 10,
+      raw: true,
+      subQuery: false
+    });
+
+    return {
+      content: results.map((r: any) => ({
+        productId: r['product.id'],
+        name: r['product.name'],
+        slug: r['product.slug'],
+        price: parseFloat(r['product.price']),
+        image: r['product.images.url'] ?? null,
+        category: {
+          id: r['product.category.id'],
+          name: r['product.category.name'],
+          slug: r['product.category.slug']
+        },
+        averageRating: parseFloat(r['averageRating']).toFixed(2),
+        totalReviews: r['totalReviews']
+      }))
     };
-
-    if (form.top) {
-      queryOptions.limit = form.top;
-    }
-
-    const topProducts = await this.reviewRepository.findAll(queryOptions);
-
-    return topProducts.map((r: any) => ({
-      productId: r.productId,
-      productName: r.product.name,
-      starCount: Number(r.getDataValue('starCount'))
-    }));
   }
 
   async checkReview(form: CheckReviewForm, accountId: bigint) {

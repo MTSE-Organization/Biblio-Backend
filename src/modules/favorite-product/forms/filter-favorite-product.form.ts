@@ -1,6 +1,5 @@
 import { BigIntDecorator } from '@/common/decorators';
 import { PaginationForm } from '@/common/forms';
-import { Expose, Type } from 'class-transformer';
 
 export class FilterFavoriteProductForm extends PaginationForm {
   @BigIntDecorator('productId')

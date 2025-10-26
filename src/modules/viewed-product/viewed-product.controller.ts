@@ -13,7 +13,6 @@ import { ViewedProductService } from './viewed-product.service';
 import { ViewedProductForm } from '@/modules/viewed-product/forms/viewed-product.form';
 import { JwtAuthGuard } from '@/modules/auth/guards';
 import { FilterViewedProductForm } from '@/modules/viewed-product/forms/filter-viewed-product.form';
-import { MapperUtil } from '@/utils';
 import { ResponseListDto } from '@/common/interfaces';
 import { ViewedProductDto } from '@/modules/viewed-product/dtos/viewed-product.dto';
 import { ApiListResponse, ApiResponseNoData } from '@/common/decorators';
