@@ -105,25 +105,7 @@ export class AccountController {
   async delete(@Param('id') id: bigint, @Req() req) {
     const user: UserDetailsDto = req.user;
     const isSuperAdmin = user.isSuperAdmin;
-
-    if (user.kind === Constant.ACCOUNT_KIND_USER) {
-      throw new BadRequestException(
-        'Not allow to delete account user',
-        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
-      );
-    }
-
-    if (
-      user.isSuperAdmin ||
-      (isSuperAdmin === false && user.kind === Constant.ACCOUNT_KIND_ADMIN)
-    ) {
-      throw new BadRequestException(
-        'Not allow to delete account',
-        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
-      );
-    }
-
-    return await this.accountService.delete(id);
+    return await this.accountService.delete(id, isSuperAdmin);
   }
 
   @ApiResponse(AccountStatisticDto, { objectName: 'account-statistic' })

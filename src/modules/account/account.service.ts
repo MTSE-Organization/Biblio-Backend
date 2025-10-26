@@ -300,8 +300,26 @@ export class AccountService {
     return { message: 'Profile updated successfully' };
   }
 
-  async delete(id: bigint) {
+  async delete(id: bigint, isSuperAdmin: boolean) {
     const account = await this.findById(id);
+
+    if (account.kind === Constant.ACCOUNT_KIND_USER) {
+      throw new BadRequestException(
+        'Not allow to delete account user',
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
+      );
+    }
+
+    if (
+      account.isSuperAdmin ||
+      (isSuperAdmin === false && account.kind === Constant.ACCOUNT_KIND_ADMIN)
+    ) {
+      throw new BadRequestException(
+        'Not allow to delete account',
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
+      );
+    }
+
     if (account.avatarPath) {
       await this.fileService.deleteFile(account.avatarPath);
     }
