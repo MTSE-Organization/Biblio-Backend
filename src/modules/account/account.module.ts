@@ -6,6 +6,7 @@ import { Account } from '@/models';
 import { GroupModule } from '../group/group.module';
 import { CartModule } from '../cart/cart.module';
 import { FileModule } from '../file/file.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   controllers: [AccountController],
@@ -15,6 +16,7 @@ import { FileModule } from '../file/file.module';
     SequelizeModule.forFeature([Account]),
     GroupModule,
     forwardRef(() => CartModule),
+    forwardRef(() => NotificationModule),
     FileModule
   ]
 })

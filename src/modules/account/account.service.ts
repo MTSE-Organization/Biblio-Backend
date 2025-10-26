@@ -18,9 +18,10 @@ import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
 import { FileService } from '../file/file.service';
-import { col, fn, literal, Op } from 'sequelize';
+import { col, fn, Op } from 'sequelize';
 import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
 import { CreateEmployeeForm } from './forms/create-employee.form';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AccountService {
@@ -30,6 +31,9 @@ export class AccountService {
 
     @Inject(forwardRef(() => CartService))
     private readonly cartService: CartService,
+
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
 
     private readonly fileService: FileService
   ) {}
@@ -301,6 +305,7 @@ export class AccountService {
     if (account.avatarPath) {
       await this.fileService.deleteFile(account.avatarPath);
     }
+    await this.notificationService.deleteAllByAccountId(id);
     await account.destroy();
     return { message: 'Delete account successfully' };
   }
