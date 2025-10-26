@@ -18,6 +18,10 @@ export class SearchProductForm extends PaginationForm {
   @NumberDecorator('ageRating')
   ageRating: number;
 
+  @Type(() => Number)
+  @NumberDecorator('rating')
+  rating: number;
+
   @StringDecorator('language')
   language: string;
 

@@ -400,9 +400,21 @@ export class ProductService {
       filter.push({ term: { 'category.id': form.categoryId } });
     }
 
+    if (form.rating) {
+      filter.push({
+        range: {
+          averageReview: {
+            gte: form.rating
+          }
+        }
+      });
+    }
+
     const sort: any[] = [];
     if (form.sortBy) {
       sort.push({ [form.sortBy]: { order: form.sortOrder || 'asc' } });
+    } else {
+      sort.push({ averageReview: { order: 'desc' } });
     }
 
     const { limit, offset } = form.getPagination();
