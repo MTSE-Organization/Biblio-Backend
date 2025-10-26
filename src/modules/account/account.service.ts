@@ -257,7 +257,7 @@ export class AccountService {
   async countNewAccountsInDateRange(
     form: FilterAccountStatisticForm
   ): Promise<number> {
-    const where: any = {};
+    const where: any = { kind: Constant.ACCOUNT_KIND_USER };
 
     if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
       throw new BadRequestException(
@@ -269,6 +269,23 @@ export class AccountService {
       where.created_date = {};
       if (form.fromDate) where.created_date[Op.gte] = form.fromDate;
       if (form.toDate) where.created_date[Op.lte] = form.toDate;
+    } else {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
+
+      where.created_date = {
+        [Op.gte]: firstDay,
+        [Op.lte]: lastDay
+      };
     }
 
     return await this.accountRepository.count({ where });

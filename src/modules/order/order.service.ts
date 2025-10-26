@@ -593,6 +593,23 @@ export class OrderService {
       where.createdDate = {};
       if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
       if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    } else {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
+
+      where.createdDate = {
+        [Op.gte]: firstDay,
+        [Op.lte]: lastDay
+      };
     }
 
     const orders = await this.orderRepository.findAll({
