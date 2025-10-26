@@ -50,6 +50,24 @@ export class AuthService {
     };
   }
 
+  async resendOtp(email: string) {
+    const account = await this.accountService.findByEmail(email);
+    if (!account) {
+      throw new BadRequestException(
+        'Account not found',
+        ErrorCode.ACCOUNT_ERROR_NOT_FOUND
+      );
+    }
+
+    const otp = await this.otpService.handleResendLimit(email);
+
+    void this.mailService.sendActivationMail(email, otp);
+
+    return {
+      message: 'Resend OTP successfully'
+    };
+  }
+
   async verifyOtp(form: ActiveAccountForm) {
     const isVerified = await this.otpService.verifyOtp(form.email, form.otp);
     if (!isVerified) {
@@ -57,6 +75,7 @@ export class AuthService {
     }
     // OTP valid - proceed to activate the user account or mark as verified
     await this.accountService.activateUser(form.email);
+    await this.otpService.handleClearOtp(form.email);
     return { message: 'OTP verified successfully' };
   }
 

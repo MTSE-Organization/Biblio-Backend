@@ -13,7 +13,8 @@ import {
   ActiveAccountForm,
   ChangePasswordForm,
   ForgotPasswordForm,
-  RegisterForm
+  RegisterForm,
+  ResendOtpForm
 } from './forms';
 import { JwtAuthGuard } from './guards';
 import { UserDetailsDto, UserInfoGoogleDto } from './dtos';
@@ -41,6 +42,14 @@ export class AuthController {
   @Post('verify-otp')
   async verifyOtp(@Body() form: ActiveAccountForm) {
     return this.authService.verifyOtp(form);
+  }
+
+  @ApiResponseNoData({
+    message: 'Resend OTP successfully'
+  })
+  @Post('resend-otp')
+  async resendOtp(@Body() form: ResendOtpForm) {
+    return await this.authService.resendOtp(form.email);
   }
 
   @ApiResponseNoData({
