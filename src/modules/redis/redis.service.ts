@@ -21,6 +21,10 @@ export class RedisService {
     }
   }
 
+  async setKeepTTL(key: string, value: string): Promise<void> {
+    await this.redisClient.set(key, value, 'KEEPTTL');
+  }
+
   async delete(key: string): Promise<void> {
     await this.cacheManager.del(key);
   }
