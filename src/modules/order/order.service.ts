@@ -320,39 +320,11 @@ export class OrderService {
     }
     const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
     const imageUrl = orderItem?.productVariant.imageUrl;
-    if (form.cmd === Constant.CMD_REJECT_REFUNDED) {
-      if (order.currentStatus !== Constant.ORDER_STATUS_REQUEST_REFUND) {
-        throw new BadRequestException(
-          'Status is not valid',
-          ErrorCode.ORDER_ERROR_INVALID_STATUS
-        );
-      }
-      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
-      if (form.rejectReason) {
-        order.rejectReason = form.rejectReason;
-      }
-      await Promise.all([
-        this.orderStatusService.deleteByOrderIdAndStatus(
-          order.id,
-          Constant.ORDER_STATUS_REQUEST_REFUND
-        ),
-        order.save()
-      ]);
-
-      // send notification reject refund for customer
-      this.notificationService
-        .sendOrderNotification(
-          order,
-          Constant.NOTIFICATION_FOR_CUSTOMER,
-          imageUrl,
-          `Yêu cầu hoàn trả đơn hàng #${order.id} bị từ chối`,
-          `Yêu cầu hoàn trả đơn hàng #${order.id} của bạn đã bị từ chối. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`
-        )
-        .catch((err) => this.logger.error('send notification error', err));
-      return { message: 'Update status successfully' };
-    }
     const status = this.getNextStatus(form.cmd, order.currentStatus);
     order.currentStatus = status;
+    if (form.rejectReason) {
+      order.rejectReason = form.rejectReason;
+    }
     await Promise.all([
       this.orderStatusService.create(status, order.id),
       order.save()

@@ -155,6 +155,10 @@ export class NotificationService {
         return `Đơn hàng #${id} đã được hoàn trả`;
       case Constant.ORDER_STATUS_CANCELED:
         return `Đơn hàng #${id} đã bị hủy`;
+      case Constant.ORDER_STATUS_REJECT_ORDER:
+        return `Đơn hàng #${id} đã bị từ chối`;
+      case Constant.ORDER_STATUS_REJECT_REFUND:
+        return `Yêu cầu hoàn trả đơn hàng #${id} bị từ chối`;
       default:
         throw new BadRequestException(
           'Invalid order status',
@@ -187,6 +191,10 @@ export class NotificationService {
         return `Đơn hàng #${id} của bạn đã được hoàn trả thành công. Cảm ơn bạn đã kiên nhẫn!`;
       case Constant.ORDER_STATUS_CANCELED:
         return `Đơn hàng #${id} của bạn đã bị hủy theo yêu cầu. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`;
+      case Constant.ORDER_STATUS_REJECT_ORDER:
+        return `Đơn hàng #${id} đã bị từ chối. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`;
+      case Constant.ORDER_STATUS_REJECT_REFUND:
+        return `Yêu cầu hoàn trả đơn hàng #${id} của bạn đã bị từ chối. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`;
       default:
         throw new BadRequestException(
           'Invalid order status',

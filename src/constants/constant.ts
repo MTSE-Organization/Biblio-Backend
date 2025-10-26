@@ -41,6 +41,8 @@ export const Constant = {
   ORDER_STATUS_CANCELED: 7,
   ORDER_STATUS_REQUEST_REFUND: 8,
   ORDER_STATUS_REFUNDED: 9,
+  ORDER_STATUS_REJECT_ORDER: 10,
+  ORDER_STATUS_REJECT_REFUND: 11,
 
   // CMD update status order
   CMD_CONFIRM_ORDER: 'CMD_CONFIRM_ORDER', // WAITING_CONFIRMATION -> CONFIRMED
@@ -116,6 +118,10 @@ export const OrderTransitions: Record<string, { from: number[]; to: number }> =
     },
     [Constant.CMD_REJECT_ORDER]: {
       from: [Constant.ORDER_STATUS_WAITING_CONFIRMATION],
-      to: Constant.ORDER_STATUS_CANCELED
+      to: Constant.ORDER_STATUS_REJECT_ORDER
+    },
+    [Constant.CMD_REJECT_REFUNDED]: {
+      from: [Constant.ORDER_STATUS_REQUEST_REFUND],
+      to: Constant.ORDER_STATUS_REJECT_REFUND
     }
   };
