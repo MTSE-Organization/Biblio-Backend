@@ -103,7 +103,9 @@ export class AddressService {
       form.isDefault = true;
     } else {
       if (form.isDefault) {
-        await this.resetDefault(accountId);
+        if (!address.isDefault) {
+          await this.resetDefault(accountId);
+        }
       } else if (address.isDefault) {
         const otherAddress = await this.addressRepository.findOne({
           where: { accountId, id: { [Op.ne]: form.id } }
