@@ -688,4 +688,45 @@ export class OrderService {
       Constant.ORDER_STATUS_REFUNDED
     ];
   }
+
+  async getRevenueStatistic(form: FilterRevenueForm) {
+    const where: any = {
+      currentStatus: {
+        [Op.in]: [
+          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED
+        ]
+      }
+    };
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.createdDate = {};
+      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    }
+
+    const results = await this.orderRepository.findAll({
+      where,
+      attributes: [
+        [this.sequelize.fn('DATE', this.sequelize.col('created_date')), 'date'],
+        [this.sequelize.fn('SUM', this.sequelize.col('total')), 'total']
+      ],
+      group: [this.sequelize.fn('DATE', this.sequelize.col('created_date'))],
+      order: [
+        [this.sequelize.fn('DATE', this.sequelize.col('created_date')), 'ASC']
+      ]
+    });
+    const items = results.map((r: any) => ({
+      date: r.getDataValue('date'),
+      total: r.getDataValue('total')
+    }));
+
+    return { items };
+  }
 }

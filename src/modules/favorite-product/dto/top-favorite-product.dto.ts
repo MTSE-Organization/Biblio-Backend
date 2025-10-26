@@ -1,29 +1,34 @@
 import { CategoryAutoCompleteDto } from '@/modules/category/dtos';
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
-export class ReviewTopRatedProductDto {
+export class TopFavoriteProductDto {
   @Expose()
-  productId: bigint;
+  productId: string;
 
   @Expose()
-  productName: string;
+  name: string;
 
   @Expose()
   slug: string;
 
   @Expose()
-  price: string;
+  price: number;
 
   @Expose()
   image: string;
 
   @Expose()
-  averageRating: number;
+  discount: number;
 
   @Expose()
-  @Type(() => CategoryAutoCompleteDto)
   category: CategoryAutoCompleteDto;
 
   @Expose()
+  averageRating: number;
+
+  @Expose()
   totalReviews: number;
+
+  @Expose()
+  totalFavorites: number;
 }

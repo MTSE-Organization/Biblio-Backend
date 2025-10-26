@@ -14,7 +14,7 @@ import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
 import { CartService } from '../cart/cart.service';
 import { FileService } from '../file/file.service';
-import { Op } from 'sequelize';
+import { col, fn, literal, Op } from 'sequelize';
 import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
 
 @Injectable()
@@ -289,5 +289,48 @@ export class AccountService {
     }
 
     return await this.accountRepository.count({ where });
+  }
+
+  async countNewAccountsByDay(form: FilterAccountStatisticForm) {
+    const where: any = { kind: Constant.ACCOUNT_KIND_USER };
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException('toDate must be >= fromDate');
+    }
+
+    if (!form.fromDate || !form.toDate) {
+      const now = new Date();
+      form.fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      form.toDate = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59
+      );
+    }
+
+    where.created_date = {
+      [Op.gte]: form.fromDate,
+      [Op.lte]: form.toDate
+    };
+
+    const result = await this.accountRepository.findAll({
+      attributes: [
+        [fn('DATE', col('created_date')), 'date'],
+        [fn('COUNT', col('id')), 'total']
+      ],
+      where,
+      group: [fn('DATE', col('created_date'))],
+      order: [[fn('DATE', col('created_date')), 'ASC']]
+    });
+
+    return {
+      items: result.map((r: any) => ({
+        date: r.getDataValue('date'),
+        total: Number(r.getDataValue('total'))
+      }))
+    };
   }
 }

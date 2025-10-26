@@ -12,7 +12,7 @@ import {
 import { AccountService } from './account.service';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
 import { FilterAccountForm, UpdateProfileForm } from './forms';
-import { AccountDto } from './dtos';
+import { AccountDailyStatisticDto, AccountDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { ResponseListDto } from '@/common/interfaces';
 import { MapperUtil } from '@/utils';
@@ -83,5 +83,17 @@ export class AccountController {
     return {
       totalAccounts: total
     };
+  }
+
+  @ApiResponse(AccountDailyStatisticDto, {
+    objectName: 'account daily statistic'
+  })
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Get('statistics/daily')
+  async getAccountDailyStatistics(
+    @Query() form: FilterAccountStatisticForm
+  ): Promise<AccountDailyStatisticDto> {
+    const stats = await this.accountService.countNewAccountsByDay(form);
+    return stats;
   }
 }

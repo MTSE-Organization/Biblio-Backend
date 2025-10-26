@@ -81,10 +81,8 @@ export class ReviewController {
   }
 
   @ApiListResponse(ReviewTopRatedProductDto, { objectName: 'product-favorite' })
-  @Get('top-favorite')
-  async getTopFavorite(
-    @Query() form: FilterTopReviewForm
-  ): Promise<ReviewTopRatedProductDto[]> {
+  @Get('top-review')
+  async getTopFavorite(@Query() form: FilterTopReviewForm) {
     return this.reviewService.getTopRatedProducts(form);
   }
 
