@@ -259,10 +259,21 @@ export class ProductService {
 
   async findBestSeller(limit: number = 6) {
     return this.productRepository.findAll({
-      where: { isFeatured: true, status: Constant.STATUS_ACTIVE },
+      where: { totalSold: { [Op.gt]: 0 }, status: Constant.STATUS_ACTIVE },
       limit,
       order: [['totalSold', 'DESC']],
-      include: [{ model: Category }]
+      include: [
+        { model: Category },
+        {
+          model: ProductImage,
+          where: {
+            [Op.or]: [{ isDefault: true }, { ordering: 0 }]
+          },
+          required: false,
+          limit: 1,
+          separate: true
+        }
+      ]
     });
   }
 

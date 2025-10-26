@@ -142,15 +142,17 @@ export class OrderController {
   }
 
   @ApiResponse(RevenueOrderDto, { objectName: 'revenue' })
+  @UseGuards(JwtAuthGuard)
   @Get('revenue')
   async getRevenue(@Query() form: FilterRevenueForm) {
     return await this.orderService.getRevenue(form);
   }
 
-  @Get('statistics/order-status')
   @ApiResponse(OrderStatisticStatusDto, {
-    objectName: 'status-distribution'
+    objectName: 'status distribution'
   })
+  @UseGuards(JwtAuthGuard)
+  @Get('statistics/order-status')
   async getOrderStatusDistribution(@Query() form: FilterOrderType) {
     return await this.orderService.getOrderStatusDistribution(form);
   }
