@@ -566,9 +566,7 @@ export class OrderService {
 
   async getRevenue(form: FilterRevenueForm): Promise<RevenueOrderDto> {
     const where: any = {
-      currentStatus: {
-        [Op.notIn]: [Constant.ORDER_STATUS_CANCELED]
-      }
+      currentStatus: Constant.ORDER_STATUS_RECEIVED
     };
 
     if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
@@ -589,7 +587,6 @@ export class OrderService {
     });
 
     let totalRevenue = '0';
-
     for (const order of orders) {
       totalRevenue = bigDecimal.add(totalRevenue, order.total);
     }
