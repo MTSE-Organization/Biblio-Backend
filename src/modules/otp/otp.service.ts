@@ -44,9 +44,12 @@ export class OtpService {
     await this.storeOtp(email, otp);
 
     if (resendCount === 0) {
-      await this.redisService.set(resendKey, 1, 10 * 60 * 1000);
+      await this.redisService.set(resendKey, 1, 1 * 60 * 1000);
     } else {
-      await this.redisService.set(resendKey, resendCount + 1);
+      await this.redisService.setKeepTTL(
+        resendKey,
+        (resendCount + 1).toString()
+      );
     }
     return otp;
   }
