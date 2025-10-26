@@ -30,4 +30,10 @@ export class AddressDto {
 
   @Expose()
   accountId: bigint;
+
+  @Expose()
+  receiverName: string;
+
+  @Expose()
+  phoneNumber: string;
 }

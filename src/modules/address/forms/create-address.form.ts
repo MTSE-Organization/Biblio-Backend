@@ -28,4 +28,10 @@ export class CreateAddressForm {
 
   @BooleanDecorator('isDefault')
   isDefault?: boolean;
+
+  @StringDecorator('receiverName')
+  receiverName: string;
+
+  @StringDecorator('phoneNumber')
+  phoneNumber: string;
 }

@@ -32,4 +32,10 @@ export class UpdateAddressForm {
 
   @BooleanDecorator('isDefault')
   isDefault?: boolean;
+
+  @StringDecorator('receiverName')
+  receiverName: string;
+
+  @StringDecorator('phoneNumber')
+  phoneNumber: string;
 }
