@@ -43,4 +43,10 @@ export class Address extends Auditable {
 
   @BelongsTo(() => Account)
   declare account: Account;
+
+  @Column({ type: DataType.STRING })
+  declare receiverName: string;
+
+  @Column({ type: DataType.STRING })
+  declare phoneNumber: string;
 }
