@@ -15,14 +15,10 @@ import { JwtAuthGuard } from '@/modules/auth/guards';
 import { FilterFavoriteProductForm } from '@/modules/favorite-product/forms/filter-favorite-product.form';
 import { ResponseListDto } from '@/common/interfaces';
 import { FavoriteProductDto } from '@/modules/favorite-product/dto/favorite-product.dto';
-import { MapperUtil } from '@/utils';
-import {
-  ApiListResponse,
-  ApiResponse,
-  ApiResponseNoData
-} from '@/common/decorators';
-import { CheckFavoriteProductDto } from '@/modules/favorite-product/dto/check-favorite-product.dto';
+import { ApiListResponse, ApiResponseNoData } from '@/common/decorators';
 import { FavoriteProductMapper } from '@/modules/favorite-product/favorite-product.mapper';
+import { TopFavoriteFilterForm } from '@/modules/favorite-product/forms/top-favorite-filter.form';
+import { TopFavoriteProductDto } from '@/modules/favorite-product/dto/top-favorite-product.dto';
 
 @Controller('favorite-product')
 export class FavoriteProductController {
@@ -65,5 +61,14 @@ export class FavoriteProductController {
   @Delete('delete/:id')
   async deleteFavoriteProduct(@Param('id') id: bigint) {
     return await this.favoriteProductService.delete(id);
+  }
+
+  @ApiListResponse(TopFavoriteProductDto, {
+    objectName: 'top favorite product'
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('top-favorite')
+  async getTopFavorite(@Query() form: TopFavoriteFilterForm) {
+    return await this.favoriteProductService.getTopFavorite(form);
   }
 }
