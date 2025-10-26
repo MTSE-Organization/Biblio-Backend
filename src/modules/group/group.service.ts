@@ -54,6 +54,19 @@ export class GroupService {
     return group;
   }
 
+  async findByIdAndKind(id: bigint, kind: number) {
+    const group = await this.groupRepository.findOne({
+      where: { id, kind }
+    });
+    if (!group) {
+      throw new NotFoundException(
+        'Group not found',
+        ErrorCode.GROUP_ERROR_NOT_FOUND
+      );
+    }
+    return group;
+  }
+
   async update(form: UpdateGroupForm) {
     const { id, name, permissionIds, ...data } = form;
     const group = await this.findById(id);

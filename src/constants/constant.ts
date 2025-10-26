@@ -13,6 +13,7 @@ export const Constant = {
   // Group
   GROUP_KIND_ADMIN: 1,
   GROUP_KIND_USER: 2,
+  GROUP_KIND_EMPLOYEE: 3,
   GROUP_NAME_USER: 'Role User',
 
   // Product Variant

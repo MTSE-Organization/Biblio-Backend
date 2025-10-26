@@ -8,7 +8,11 @@ import {
   UnauthorizedException
 } from '@/common/exceptions';
 import { Constant, ErrorCode } from '@/constants';
-import { FilterAccountForm, UpdateProfileForm } from './forms';
+import {
+  FilterAccountForm,
+  UpdateEmployeeForm,
+  UpdateProfileForm
+} from './forms';
 import { UserDetailsDto, UserInfoGoogleDto } from '../auth/dtos';
 import * as bcrypt from 'bcryptjs';
 import { GroupService } from '../group/group.service';
@@ -16,6 +20,7 @@ import { CartService } from '../cart/cart.service';
 import { FileService } from '../file/file.service';
 import { col, fn, literal, Op } from 'sequelize';
 import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
+import { CreateEmployeeForm } from './forms/create-employee.form';
 
 @Injectable()
 export class AccountService {
@@ -48,7 +53,7 @@ export class AccountService {
     return account;
   }
 
-  async findByIdAndStatus(id: number, status: number): Promise<Account> {
+  async findByIdAndStatus(id: bigint, status: number): Promise<Account> {
     const account: Account | null = await this.accountRepository.findOne({
       where: { id, status }
     });
@@ -136,6 +141,68 @@ export class AccountService {
     return account;
   }
 
+  async createEmployee(form: CreateEmployeeForm) {
+    if (await this.existsBy('email', form.email)) {
+      throw new BadRequestException(
+        'Account error email existed',
+        ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED
+      );
+    }
+    const group = await this.groupService.findByIdAndKind(
+      form.groupId,
+      Constant.GROUP_KIND_EMPLOYEE
+    );
+    const password = this.hashPassword(form.password);
+    const data = {
+      ...form,
+      kind: Constant.ACCOUNT_KIND_EMPLOYEE,
+      password: password
+    };
+    const account = await this.accountRepository.create(data);
+    await account.$set('group', group);
+    return { message: 'Create employee account successfully' };
+  }
+
+  async updateEmployee(form: UpdateEmployeeForm) {
+    const account = await this.findByIdAndStatus(
+      form.id,
+      Constant.STATUS_ACTIVE
+    );
+    if (form.email !== account.email) {
+      const existingAccount = await this.findByEmail(form.email);
+      if (existingAccount) {
+        throw new BadRequestException(
+          'Account error email existed',
+          ErrorCode.ACCOUNT_ERROR_EMAIL_EXISTED
+        );
+      }
+      account.email = form.email;
+    }
+    if (
+      form.phone !== null &&
+      (account.phone === null || form.phone !== account.phone)
+    ) {
+      if (await this.existsBy('phone', form.phone)) {
+        throw new BadRequestException(
+          'Account error phone existed',
+          ErrorCode.ACCOUNT_ERROR_PHONE_EXISTED
+        );
+      }
+      account.phone = form.phone;
+    }
+    if (account.avatarPath && form.avatarPath !== account.avatarPath) {
+      await this.fileService.deleteFile(account.avatarPath);
+    }
+    if (form.password !== null) {
+      const password = this.hashPassword(form.password);
+      account.password = password;
+    }
+    account.fullName = form.fullName;
+    account.avatarPath = form.avatarPath;
+    await account.save();
+    return { message: 'Update employee successfully' };
+  }
+
   hashPassword(password: string): string {
     return bcrypt.hashSync(password, 10);
   }
@@ -196,7 +263,7 @@ export class AccountService {
     await account.save();
   }
 
-  async updateProfile(id: number, data: UpdateProfileForm) {
+  async updateProfile(id: bigint, data: UpdateProfileForm) {
     const account = await this.findByIdAndStatus(id, Constant.STATUS_ACTIVE);
     if (data.email !== account.email) {
       const existingAccount = await this.findByEmail(data.email);
@@ -229,17 +296,8 @@ export class AccountService {
     return { message: 'Profile updated successfully' };
   }
 
-  async delete(id: bigint, isSuperAdmin: boolean) {
+  async delete(id: bigint) {
     const account = await this.findById(id);
-    if (
-      account.isSuperAdmin ||
-      (isSuperAdmin === false && account.kind === Constant.ACCOUNT_KIND_ADMIN)
-    ) {
-      throw new BadRequestException(
-        'Not allow to delete account',
-        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
-      );
-    }
     if (account.avatarPath) {
       await this.fileService.deleteFile(account.avatarPath);
     }

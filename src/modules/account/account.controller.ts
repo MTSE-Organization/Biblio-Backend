@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Post,
   Put,
   Query,
   Req,
@@ -11,7 +12,12 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { AuthorizationGuard, JwtAuthGuard } from '../auth/guards';
-import { FilterAccountForm, UpdateProfileForm } from './forms';
+import {
+  CreateEmployeeForm,
+  FilterAccountForm,
+  UpdateEmployeeForm,
+  UpdateProfileForm
+} from './forms';
 import { AccountDailyStatisticDto, AccountDto } from './dtos';
 import { plainToInstance } from 'class-transformer';
 import { ResponseListDto } from '@/common/interfaces';
@@ -26,6 +32,8 @@ import {
 } from '@/common/decorators';
 import { AccountStatisticDto } from './dtos/account-statistic.dto';
 import { FilterAccountStatisticForm } from './forms/filter-account-statistic.form';
+import { Constant, ErrorCode } from '@/constants';
+import { BadRequestException } from '@/common/exceptions';
 
 @Controller('account')
 export class AccountController {
@@ -43,6 +51,33 @@ export class AccountController {
       totalPages: Math.ceil(count / form.size)
     };
     return response;
+  }
+
+  @ApiResponse(AccountDto)
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @PCode('ACC_V')
+  @Get('get/:id')
+  async get(@Param('id') id: bigint): Promise<AccountDto> {
+    const account = await this.accountService.findById(id);
+    return plainToInstance(AccountDto, account, {
+      excludeExtraneousValues: true
+    });
+  }
+
+  @ApiResponseNoData({ objectName: 'create-employee', type: 'create' })
+  @PCode('ACC_C_EMP')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Post('create-employee')
+  async createEmployee(@Body() form: CreateEmployeeForm) {
+    return await this.accountService.createEmployee(form);
+  }
+
+  @ApiResponseNoData({ objectName: 'update-employee', type: 'update' })
+  @PCode('ACC_U_EMP')
+  @UseGuards(JwtAuthGuard, AuthorizationGuard)
+  @Post('update-employee')
+  async updateEmployee(@Body() form: UpdateEmployeeForm) {
+    return await this.accountService.updateEmployee(form);
   }
 
   @ApiResponse(AccountProfileDto, { objectName: 'profile' })
@@ -70,7 +105,25 @@ export class AccountController {
   async delete(@Param('id') id: bigint, @Req() req) {
     const user: UserDetailsDto = req.user;
     const isSuperAdmin = user.isSuperAdmin;
-    return await this.accountService.delete(id, isSuperAdmin);
+
+    if (user.kind === Constant.ACCOUNT_KIND_USER) {
+      throw new BadRequestException(
+        'Not allow to delete account user',
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
+      );
+    }
+
+    if (
+      user.isSuperAdmin ||
+      (isSuperAdmin === false && user.kind === Constant.ACCOUNT_KIND_ADMIN)
+    ) {
+      throw new BadRequestException(
+        'Not allow to delete account',
+        ErrorCode.ACCOUNT_ERROR_NOT_ALLOW_DELETE
+      );
+    }
+
+    return await this.accountService.delete(id);
   }
 
   @ApiResponse(AccountStatisticDto, { objectName: 'account-statistic' })
