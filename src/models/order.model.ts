@@ -63,4 +63,7 @@ export class Order extends Auditable {
 
   @Column({ type: DataType.TEXT })
   declare refundReason: string;
+
+  @Column({ type: DataType.TEXT })
+  declare rejectReason: string;
 }

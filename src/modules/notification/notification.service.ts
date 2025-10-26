@@ -56,8 +56,8 @@ export class NotificationService {
     order: Order,
     type: number,
     imageUrl?: string,
-    content?: string,
-    title?: string
+    title?: string,
+    content?: string
   ) {
     const customer: Account = await this.accountService.findById(
       order.accountId
@@ -146,9 +146,9 @@ export class NotificationService {
       case Constant.ORDER_STATUS_SHIPPING:
         return `Đơn hàng #${id} đang được vận chuyển`;
       case Constant.ORDER_STATUS_REQUEST_REFUND:
-        return `Đơn hàng #${id} đang được yêu cầu hoàn tiền`;
+        return `Đơn hàng #${id} được yêu cầu hoàn trả`;
       case Constant.ORDER_STATUS_REFUNDED:
-        return `Đơn hàng #${id} đã được hoàn tiền`;
+        return `Đơn hàng #${id} đã được hoàn trả`;
       case Constant.ORDER_STATUS_CANCELED:
         return `Đơn hàng #${id} đã bị hủy`;
       default:
@@ -176,7 +176,7 @@ export class NotificationService {
       case Constant.ORDER_STATUS_REQUEST_REFUND:
         return `Khách hàng ${email} đã gửi yêu cầu hoàn trả cho đơn hàng #${id}. Vui lòng kiểm tra và xử lý.`;
       case Constant.ORDER_STATUS_REFUNDED:
-        return `Đơn hàng #${id} của bạn đã được hoàn tiền thành công. Cảm ơn bạn đã kiên nhẫn!`;
+        return `Đơn hàng #${id} của bạn đã được hoàn trả thành công. Cảm ơn bạn đã kiên nhẫn!`;
       case Constant.ORDER_STATUS_CANCELED:
         return `Đơn hàng #${id} của bạn đã bị hủy theo yêu cầu. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`;
       default:

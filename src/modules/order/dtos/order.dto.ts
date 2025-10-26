@@ -51,6 +51,9 @@ export class OrderDto {
   refundReason: string;
 
   @Expose()
+  rejectReason: string;
+
+  @Expose()
   createdDate: Date;
 
   @Expose()

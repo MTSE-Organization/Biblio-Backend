@@ -321,7 +321,16 @@ export class OrderService {
     const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
     const imageUrl = orderItem?.productVariant.imageUrl;
     if (form.cmd === Constant.CMD_REJECT_REFUNDED) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_REQUEST_REFUND) {
+        throw new BadRequestException(
+          'Status is not valid',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+      }
       order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
+      if (form.rejectReason) {
+        order.rejectReason = form.rejectReason;
+      }
       await Promise.all([
         this.orderStatusService.deleteByOrderIdAndStatus(
           order.id,
@@ -553,7 +562,10 @@ export class OrderService {
   async getRevenue(form: FilterRevenueForm): Promise<RevenueOrderDto> {
     const where: any = {
       currentStatus: {
-        [Op.notIn]: [Constant.ORDER_STATUS_CANCELED]
+        [Op.in]: [
+          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED
+        ]
       }
     };
 

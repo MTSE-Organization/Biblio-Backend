@@ -1,4 +1,8 @@
-import { BigIntDecorator, OrderCmdDecorator } from '@/common/decorators';
+import {
+  BigIntDecorator,
+  OrderCmdDecorator,
+  StringDecorator
+} from '@/common/decorators';
 
 export class UpdateStatusForm {
   @BigIntDecorator('id', true)
@@ -6,4 +10,7 @@ export class UpdateStatusForm {
 
   @OrderCmdDecorator('cmd', true)
   cmd: string;
+
+  @StringDecorator('rejectReason', false)
+  rejectReason?: string;
 }

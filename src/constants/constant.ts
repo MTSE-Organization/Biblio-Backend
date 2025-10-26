@@ -116,6 +116,6 @@ export const OrderTransitions: Record<string, { from: number[]; to: number }> =
     },
     [Constant.CMD_REJECT_ORDER]: {
       from: [Constant.ORDER_STATUS_WAITING_CONFIRMATION],
-      to: Constant.ORDER_STATUS_REFUNDED
+      to: Constant.ORDER_STATUS_CANCELED
     }
   };
