@@ -5,19 +5,24 @@ import { ReviewForm } from './forms/review.form';
 import { FilterReviewForm } from './forms/filter-review.form';
 import { Product, Account } from '@/models';
 import { NotFoundException } from '@/common/exceptions';
-import { ErrorCode } from '@/constants';
+import { Constant, ErrorCode } from '@/constants';
 import { ProductService } from '@/modules/product/product.service';
 import { ReviewStatsDto } from './dtos';
 import { Op, Sequelize } from 'sequelize';
 import { FilterTopReviewForm } from './forms/filter-top-review.form';
 import { ReviewTopRatedProductDto } from './dtos/review-top-rate-product.dto';
+import { OrderService } from '@/modules/order/order.service';
+import { CheckReviewForm } from '@/modules/review/forms';
+import { ProductVariantService } from '@/modules/product-variant/product-variant.service';
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectModel(Review)
     private readonly reviewRepository: typeof Review,
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+    private readonly productVariantService: ProductVariantService,
+    private readonly orderService: OrderService
   ) {}
 
   async findAll(query: FilterReviewForm) {
@@ -53,11 +58,9 @@ export class ReviewService {
   async create(accountId: bigint, form: ReviewForm) {
     await this.productService.findById(form.productId);
 
-    const review = await this.reviewRepository.create({
+    await this.reviewRepository.create({
       accountId,
-      productId: form.productId,
-      rate: form.rate,
-      content: form.content
+      ...form
     });
 
     await this.updateProductReviewStats(form.productId);
@@ -176,5 +179,49 @@ export class ReviewService {
       productName: r.product.name,
       starCount: Number(r.getDataValue('starCount'))
     }));
+  }
+
+  async checkReview(form: CheckReviewForm, accountId: bigint) {
+    const order = await this.orderService.findByIdAndAccount(
+      form.orderId,
+      accountId
+    );
+
+    if (!order) {
+      throw new NotFoundException(
+        'Order not found',
+        ErrorCode.ORDER_ERROR_NOT_FOUND
+      );
+    }
+
+    const productVariant = await this.productVariantService.findById(
+      form.productVariantId
+    );
+
+    if (!productVariant) {
+      throw new NotFoundException(
+        'Product variant not found',
+        ErrorCode.PRODUCT_VARIANT_ERROR_NOT_FOUND
+      );
+    }
+
+    const product = await this.productService.findById(form.productId);
+
+    if (!product) {
+      throw new NotFoundException(
+        'Product not found',
+        ErrorCode.PRODUCT_ERROR_NOT_FOUND
+      );
+    }
+
+    const review = await this.reviewRepository.findAll({
+      where: {
+        orderId: form.orderId,
+        productId: form.productId,
+        productVariantId: form.productVariantId
+      }
+    });
+
+    return review.length > 0;
   }
 }

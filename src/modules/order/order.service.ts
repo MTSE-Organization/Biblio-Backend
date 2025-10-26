@@ -14,6 +14,7 @@ import {
   CreateOrderForm,
   CreateOrderFromCartForm,
   FilterOrderForm,
+  FilterOrderType,
   PlaceOrderForm,
   RefundOrderForm,
   UpdateStatusForm
@@ -27,11 +28,16 @@ import { Op, Sequelize, Transaction, where } from 'sequelize';
 import { BadRequestException, NotFoundException } from '@/common/exceptions';
 import { CouponService } from '../coupon/coupon.service';
 import bigDecimal from 'js-big-decimal';
-import { CreateOrderDto } from './dtos';
+import {
+  CreateOrderDto,
+  OrderStatisticStatusDto,
+  OrderStatisticStatusItemDto
+} from './dtos';
 import { NotificationService } from '../notification/notification.service';
 import { PaymentService } from '../payment/payment.service';
 import { FilterRevenueForm } from './forms/filter-revenue.form';
 import { RevenueOrderDto } from './dtos/revenue-order.dto';
+import { title } from 'process';
 
 @Injectable()
 export class OrderService {
@@ -202,8 +208,12 @@ export class OrderService {
         );
         const imageUrl = orderItem?.productVariant.imageUrl;
         this.notificationService
-          .sendPlaceOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendPlaceOrder error', err));
+          .sendOrderNotification(
+            order,
+            Constant.NOTIFICATION_FOR_EMPLOYEE,
+            imageUrl
+          )
+          .catch((err) => this.logger.error('send notification error', err));
       } else {
         order.paymentStatus = Constant.PAYMENT_STATUS_PENDING;
         // call to VNPAY API
@@ -308,6 +318,39 @@ export class OrderService {
         ErrorCode.ORDER_ERROR_NOT_FOUND
       );
     }
+    const orderItem = await this.orderItemService.findFirstByOrderId(order.id);
+    const imageUrl = orderItem?.productVariant.imageUrl;
+    if (form.cmd === Constant.CMD_REJECT_REFUNDED) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_REQUEST_REFUND) {
+        throw new BadRequestException(
+          'Status is not valid',
+          ErrorCode.ORDER_ERROR_INVALID_STATUS
+        );
+      }
+      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
+      if (form.rejectReason) {
+        order.rejectReason = form.rejectReason;
+      }
+      await Promise.all([
+        this.orderStatusService.deleteByOrderIdAndStatus(
+          order.id,
+          Constant.ORDER_STATUS_REQUEST_REFUND
+        ),
+        order.save()
+      ]);
+
+      // send notification reject refund for customer
+      this.notificationService
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_CUSTOMER,
+          imageUrl,
+          `Yêu cầu hoàn trả đơn hàng #${order.id} bị từ chối`,
+          `Yêu cầu hoàn trả đơn hàng #${order.id} của bạn đã bị từ chối. Nếu có thắc mắc, vui lòng liên hệ cửa hàng.`
+        )
+        .catch((err) => this.logger.error('send notification error', err));
+      return { message: 'Update status successfully' };
+    }
     const status = this.getNextStatus(form.cmd, order.currentStatus);
     order.currentStatus = status;
     await Promise.all([
@@ -315,25 +358,14 @@ export class OrderService {
       order.save()
     ]);
 
-    if (
-      order.currentStatus === Constant.ORDER_STATUS_SHIPPING ||
-      order.currentStatus === Constant.ORDER_STATUS_REFUNDED
-    ) {
-      // send-noti ship order for all admin and employee
-      const orderItem = await this.orderItemService.findFirstByOrderId(
-        order.id
-      );
-      const imageUrl = orderItem?.productVariant.imageUrl;
-      if (order.currentStatus === Constant.ORDER_STATUS_SHIPPING) {
-        this.notificationService
-          .sendDeliveryOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendDeliveryOrder error', err));
-      } else if (order.currentStatus === Constant.ORDER_STATUS_REFUNDED) {
-        this.notificationService
-          .sendRefundedOrder(order, imageUrl)
-          .catch((err) => this.logger.error('SendRefundedOrder error', err));
-      }
-    }
+    // send notification for customer
+    this.notificationService
+      .sendOrderNotification(
+        order,
+        Constant.NOTIFICATION_FOR_CUSTOMER,
+        imageUrl
+      )
+      .catch((err) => this.logger.error('send notification error', err));
 
     return { message: 'Update status successfully' };
   }
@@ -417,23 +449,37 @@ export class OrderService {
   async complete(id: bigint, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_SHIPPING) {
+
+      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
         );
       }
 
-      order.currentStatus = Constant.ORDER_STATUS_COMPLETE;
+      const orderItem = await this.orderItemService.findFirstByOrderId(
+        order.id
+      );
+      const imageUrl = orderItem?.productVariant.imageUrl;
+
+      order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
       await Promise.all([
         this.orderStatusService.create(
-          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED,
           order.id,
           t
         ),
         this.orderItemService.handleCompleteOrder(order.id, t),
         order.save({ transaction: t })
       ]);
+      // send notification for customer
+      this.notificationService
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
       return { message: 'Complete order successfully' };
     });
   }
@@ -441,7 +487,7 @@ export class OrderService {
   async refund(form: RefundOrderForm, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(form.id, accountId);
-      if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
+      if (order.currentStatus !== Constant.ORDER_STATUS_RECEIVED) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
@@ -450,7 +496,7 @@ export class OrderService {
 
       const orderStatus = await this.orderStatusService.findByOrderIdAndStatus(
         order.id,
-        Constant.ORDER_STATUS_COMPLETE
+        Constant.ORDER_STATUS_RECEIVED
       );
       const now = new Date();
       const diffTime = now.getTime() - orderStatus?.createdDate.getTime();
@@ -465,6 +511,11 @@ export class OrderService {
 
       order.currentStatus = Constant.ORDER_STATUS_REQUEST_REFUND;
       order.refundReason = form.refundReason;
+      await this.orderStatusService.create(
+        Constant.ORDER_STATUS_REQUEST_REFUND,
+        order.id,
+        t
+      );
       await order.save({ transaction: t });
 
       // send-noti request refund order for all admin and employee
@@ -474,8 +525,12 @@ export class OrderService {
       const imageUrl = orderItem?.productVariant.imageUrl;
 
       this.notificationService
-        .sendRefundOrder(order, imageUrl)
-        .catch((err) => this.logger.error('SendRefundOrder error', err));
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
 
       return { message: 'Refund order successfully' };
     });
@@ -509,15 +564,22 @@ export class OrderService {
     if (isPaymentSuccess) {
       // send-noti new order for all admin and employee
       await this.notificationService
-        .sendPlaceOrder(order, imageUrl)
-        .catch((err) => this.logger.error('SendPlaceOrder error', err));
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
     }
   }
 
   async getRevenue(form: FilterRevenueForm): Promise<RevenueOrderDto> {
     const where: any = {
       currentStatus: {
-        [Op.notIn]: [Constant.ORDER_STATUS_CANCELED]
+        [Op.in]: [
+          Constant.ORDER_STATUS_COMPLETE,
+          Constant.ORDER_STATUS_RECEIVED
+        ]
       }
     };
 
@@ -539,7 +601,6 @@ export class OrderService {
     });
 
     let totalRevenue = '0';
-
     for (const order of orders) {
       totalRevenue = bigDecimal.add(totalRevenue, order.total);
     }
@@ -548,5 +609,66 @@ export class OrderService {
       totalRevenue,
       totalOrders: orders.length
     };
+  }
+
+  async getOrderStatusDistribution(
+    form: FilterOrderType
+  ): Promise<OrderStatisticStatusDto> {
+    const where: any = {};
+
+    if (form.fromDate && form.toDate && form.toDate < form.fromDate) {
+      throw new BadRequestException(
+        'toDate must be greater than or equal to fromDate'
+      );
+    }
+
+    if (form.fromDate || form.toDate) {
+      where.createdDate = {};
+      if (form.fromDate) where.createdDate[Op.gte] = form.fromDate;
+      if (form.toDate) where.createdDate[Op.lte] = form.toDate;
+    }
+
+    const totalOrders = await this.orderRepository.count({ where });
+
+    const validStatuses = this.getValidOrderStatuses();
+
+    const items: OrderStatisticStatusItemDto[] = [];
+
+    for (const status of validStatuses) {
+      const total = await this.orderRepository.count({
+        where: { ...where, currentStatus: status }
+      });
+
+      const percentage =
+        totalOrders === 0
+          ? 0
+          : Number(((total / totalOrders) * 100).toFixed(2));
+
+      items.push({
+        status,
+        total,
+        percentage
+      });
+    }
+
+    return {
+      status: items,
+      totalOrders
+    };
+  }
+
+  private getValidOrderStatuses(): number[] {
+    return [
+      Constant.ORDER_STATUS_WAITING,
+      Constant.ORDER_STATUS_WAITING_CONFIRMATION,
+      Constant.ORDER_STATUS_CONFIRMED,
+      Constant.ORDER_STATUS_PACKING,
+      Constant.ORDER_STATUS_SHIPPING,
+      Constant.ORDER_STATUS_COMPLETE,
+      Constant.ORDER_STATUS_RECEIVED,
+      Constant.ORDER_STATUS_CANCELED,
+      Constant.ORDER_STATUS_REQUEST_REFUND,
+      Constant.ORDER_STATUS_REFUNDED
+    ];
   }
 }

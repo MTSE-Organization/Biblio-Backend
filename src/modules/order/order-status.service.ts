@@ -42,4 +42,15 @@ export class OrderStatusService {
     }
     return orderStatus;
   }
+
+  async deleteByOrderIdAndStatus(
+    orderId: bigint,
+    status: number,
+    transaction?: Transaction
+  ) {
+    await this.orderStatusRepository.destroy({
+      where: { orderId: orderId, status: status },
+      transaction: transaction
+    });
+  }
 }

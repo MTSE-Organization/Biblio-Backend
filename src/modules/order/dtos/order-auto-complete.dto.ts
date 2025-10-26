@@ -24,6 +24,9 @@ export class OrderAutoCompleteDto {
   refundReason: string;
 
   @Expose()
+  rejectReason: string;
+
+  @Expose()
   paymentMethod: number;
 
   @Expose()
