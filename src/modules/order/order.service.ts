@@ -449,12 +449,18 @@ export class OrderService {
   async complete(id: bigint, accountId: bigint) {
     return await this.sequelize.transaction(async (t) => {
       const order = await this.findByIdAndAccount(id, accountId);
+
       if (order.currentStatus !== Constant.ORDER_STATUS_COMPLETE) {
         throw new BadRequestException(
           'Status is not valid',
           ErrorCode.ORDER_ERROR_INVALID_STATUS
         );
       }
+
+      const orderItem = await this.orderItemService.findFirstByOrderId(
+        order.id
+      );
+      const imageUrl = orderItem?.productVariant.imageUrl;
 
       order.currentStatus = Constant.ORDER_STATUS_RECEIVED;
       await Promise.all([
@@ -466,6 +472,14 @@ export class OrderService {
         this.orderItemService.handleCompleteOrder(order.id, t),
         order.save({ transaction: t })
       ]);
+      // send notification for customer
+      this.notificationService
+        .sendOrderNotification(
+          order,
+          Constant.NOTIFICATION_FOR_EMPLOYEE,
+          imageUrl
+        )
+        .catch((err) => this.logger.error('send notification error', err));
       return { message: 'Complete order successfully' };
     });
   }
@@ -587,7 +601,6 @@ export class OrderService {
     });
 
     let totalRevenue = '0';
-
     for (const order of orders) {
       totalRevenue = bigDecimal.add(totalRevenue, order.total);
     }
