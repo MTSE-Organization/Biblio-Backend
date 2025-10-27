@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { OrderItemService } from '../order/order-item.service';
+import { Constant } from '@/constants';
 
 @Injectable()
 export class AddressService {
@@ -156,7 +157,7 @@ export class AddressService {
       }
     }
 
-    await address.destroy();
+    await address.update({ status: Constant.STATUS_DELETED });
 
     const remainingCount = await this.addressRepository.count({
       where: { accountId }
@@ -175,7 +176,7 @@ export class AddressService {
     const { limit, offset } = form.getPagination();
 
     const { rows, count } = await this.addressRepository.findAndCountAll({
-      where: { accountId },
+      where: { accountId, status: Constant.STATUS_ACTIVE },
       order: [
         ['isDefault', 'DESC'],
         ['created_date', 'DESC']
